@@ -1,46 +1,57 @@
-from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QWidget,
     QLabel,
     QLineEdit,
     QPushButton,
     QVBoxLayout,
-    QComboBox,
-    QCheckBox,
+    QMessageBox,
 )
+
+from aplicacion.autenticacion.servicios import autenticar
+from aplicacion.interfaz.dashboard import Dashboard
 
 
 class Login(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("ERP NEXUS")
-        self.resize(450, 400)
+        self.setWindowTitle("ERP NEXUS - Inicio de sesión")
+        self.resize(350, 220)
 
         layout = QVBoxLayout()
 
-        titulo = QLabel("ERP NEXUS")
-        titulo.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(QLabel("Usuario"))
 
-        self.empresa = QComboBox()
-        self.empresa.addItem("Seleccione una empresa")
+        self.txt_usuario = QLineEdit()
+        layout.addWidget(self.txt_usuario)
 
-        self.usuario = QLineEdit()
-        self.usuario.setPlaceholderText("Usuario")
+        layout.addWidget(QLabel("Contraseña"))
 
-        self.password = QLineEdit()
-        self.password.setPlaceholderText("Contraseña")
-        self.password.setEchoMode(QLineEdit.EchoMode.Password)
+        self.txt_password = QLineEdit()
+        self.txt_password.setEchoMode(QLineEdit.Password)
+        layout.addWidget(self.txt_password)
 
-        self.recordar = QCheckBox("Recordar usuario")
-
-        self.boton = QPushButton("Iniciar sesión")
-
-        layout.addWidget(titulo)
-        layout.addWidget(self.empresa)
-        layout.addWidget(self.usuario)
-        layout.addWidget(self.password)
-        layout.addWidget(self.recordar)
-        layout.addWidget(self.boton)
+        self.btn_login = QPushButton("Iniciar sesión")
+        self.btn_login.clicked.connect(self.iniciar_sesion)
+        layout.addWidget(self.btn_login)
 
         self.setLayout(layout)
+
+      def iniciar_sesion(self):
+
+        usuario = self.txt_usuario.text().strip()
+        password = self.txt_password.text()
+
+        resultado = autenticar(usuario, password)
+
+        if resultado:
+            self.dashboard = Dashboard(resultado)
+            self.dashboard.show()
+            self.close()
+
+        else:
+            QMessageBox.warning(
+                self,
+                "Error",
+                "Usuario o contraseña incorrectos."
+            )
