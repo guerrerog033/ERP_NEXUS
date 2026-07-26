@@ -1,0 +1,17 @@
+New-Item .gitignore -ItemType File
+# Entorno virtual
+.venv/
+
+# Caché de Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Variables de entorno
+.env
+
+# Visual Studio Code
+.vscode/
+
+# Logs
+*.log
