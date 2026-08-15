@@ -230,6 +230,11 @@ class ServicioComprobanteEgreso(ServicioBase):
 
         datos = dict(cabecera)
 
+        datos.pop(
+            "es_anticipo",
+            None,
+        )
+
         datos["valor_total"] = total
 
         if id_registro is None:

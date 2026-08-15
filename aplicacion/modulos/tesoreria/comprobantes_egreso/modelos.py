@@ -67,6 +67,12 @@ class ComprobanteEgreso(Base):
         default="borrador",
     )
 
+    formato_impresion = Column(
+        String(20),
+        nullable=False,
+        default="carta",
+    )
+
     contabilizado = Column(
         Boolean,
         default=False,
