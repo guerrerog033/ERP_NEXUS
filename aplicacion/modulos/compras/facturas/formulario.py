@@ -4,6 +4,7 @@ from datetime import date
 
 from PySide6.QtCore import QDate, Qt, Signal
 from PySide6.QtWidgets import (
+    QComboBox,
     QDateEdit,
     QDoubleSpinBox,
     QFileDialog,
@@ -44,8 +45,14 @@ from aplicacion.modulos.compras.facturas.datasource import (
 from aplicacion.modulos.compras.facturas.factura_definition import (
     FacturaCompraDefinition,
 )
+from aplicacion.modulos.compras.facturas.formatos_impresion import (
+    formatos_combo,
+)
 from aplicacion.modulos.compras.facturas.servicios import (
     ServicioFacturaCompra,
+)
+from aplicacion.modulos.ventas.cotizaciones.servicios import (
+    ServicioCotizacion,
 )
 from aplicacion.recursos.ui.botones import Botones
 
@@ -274,6 +281,38 @@ class FormularioFacturaCompra(Page):
             1,
             1,
             3,
+        )
+
+        fila += 1
+
+        self.formato = QComboBox()
+
+        for etiqueta, codigo in formatos_combo():
+
+            self.formato.addItem(
+                etiqueta,
+                codigo,
+            )
+
+        indice_formato = self.formato.findData(
+            ServicioCotizacion.formato_predeterminado(),
+        )
+
+        if indice_formato >= 0:
+
+            self.formato.setCurrentIndex(
+                indice_formato,
+            )
+
+        grid.addWidget(
+            QLabel("Formato de impresión"),
+            fila,
+            0,
+        )
+        grid.addWidget(
+            self.formato,
+            fila,
+            1,
         )
 
         fila += 1
@@ -903,6 +942,7 @@ class FormularioFacturaCompra(Page):
             "retefuente_id": self.celda_retefuente.valor(),
             "reteica_id": self.celda_reteica.valor(),
             "reteiva_id": self.celda_reteiva.valor(),
+            "formato_impresion": self.formato.currentData(),
             "origen": (
                 "xml"
                 if self._ruta_xml_pendiente
@@ -1111,6 +1151,18 @@ class FormularioFacturaCompra(Page):
             factura.observaciones
             or "",
         )
+
+        if factura.formato_impresion:
+
+            indice_formato = self.formato.findData(
+                factura.formato_impresion,
+            )
+
+            if indice_formato >= 0:
+
+                self.formato.setCurrentIndex(
+                    indice_formato,
+                )
 
         if factura.retefuente_id:
 
