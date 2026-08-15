@@ -526,3 +526,74 @@ class TerceroServicio(ServicioBase):
             numero_documento,
 
         )
+
+    # ==================================================
+    # Portal de autoconsulta
+    # ==================================================
+
+    @classmethod
+    def generar_token_portal(
+        cls,
+        tercero_id: int,
+    ) -> str | None:
+
+        import secrets
+
+        token = secrets.token_urlsafe(
+            32,
+        )
+
+        actualizado = cls.repositorio.actualizar(
+            tercero_id,
+            {
+                "portal_token": token,
+            },
+        )
+
+        if actualizado is None:
+
+            return None
+
+        return token
+
+    @classmethod
+    def revocar_token_portal(
+        cls,
+        tercero_id: int,
+    ) -> None:
+
+        cls.repositorio.actualizar(
+            tercero_id,
+            {
+                "portal_token": None,
+            },
+        )
+
+    @classmethod
+    def obtener_por_token_portal(
+        cls,
+        token: str,
+    ):
+
+        if not token:
+
+            return None
+
+        db = cls.repositorio.obtener_sesion()
+
+        try:
+
+            return (
+                db.query(
+                    cls.repositorio.modelo,
+                )
+                .filter(
+                    cls.repositorio.modelo.portal_token
+                    == token,
+                )
+                .first()
+            )
+
+        finally:
+
+            db.close()

@@ -136,3 +136,51 @@ def test_formulario_nuevo_no_muestra_pestanas_de_registros(
         form,
         "_widgets_registros_relacionados",
     )
+
+
+def test_formulario_edicion_permite_generar_acceso_al_portal(
+    tercero_con_cuenta,
+):
+    from aplicacion.maestros.terceros.formulario import (
+        TerceroFormulario,
+    )
+    from aplicacion.maestros.terceros.servicio import (
+        TerceroServicio,
+    )
+
+    _qapp()
+
+    form = TerceroFormulario(
+        id_registro=tercero_con_cuenta.id,
+    )
+
+    from aplicacion.maestros.terceros.portal_acceso_widget import (
+        PortalAccesoWidget,
+    )
+
+    portal_tab = next(
+        (
+            widget
+            for widget in form.findChildren(
+                PortalAccesoWidget,
+            )
+        ),
+        None,
+    )
+
+    assert portal_tab is not None
+    assert portal_tab.txt_enlace.text() == ""
+
+    portal_tab._generar()
+
+    assert "portal/mi-cuenta/" in portal_tab.txt_enlace.text()
+
+    tercero_actualizado = TerceroServicio.obtener_por_id(
+        tercero_con_cuenta.id,
+    )
+
+    assert tercero_actualizado.portal_token is not None
+    assert (
+        tercero_actualizado.portal_token
+        in portal_tab.txt_enlace.text()
+    )

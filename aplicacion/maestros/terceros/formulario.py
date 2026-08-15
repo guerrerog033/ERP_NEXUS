@@ -13,6 +13,10 @@ from aplicacion.framework.ui.lista_registros_widget import (
     ListaRegistrosWidget,
 )
 
+from aplicacion.maestros.terceros.portal_acceso_widget import (
+    PortalAccesoWidget,
+)
+
 from aplicacion.maestros.terceros.servicio_registros import (
     ServicioContactoTercero,
     ServicioCuentaBancariaTercero,
@@ -272,6 +276,13 @@ class TerceroFormulario(FormularioBase):
             self._widgets_registros_relacionados.append(
                 widget,
             )
+
+        tabs.addTab(
+            PortalAccesoWidget(
+                self.id_registro,
+            ),
+            "Portal",
+        )
 
         tabs.setMinimumHeight(
             180,

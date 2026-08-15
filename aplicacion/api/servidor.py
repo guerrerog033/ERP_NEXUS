@@ -96,6 +96,33 @@ class ServidorApiErp:
                 self.end_headers()
                 self.wfile.write(cuerpo)
 
+            def _archivo(
+                self,
+                ruta,
+                *,
+                tipo_contenido: str,
+            ):
+                if ruta is None:
+                    self._responder(
+                        404,
+                        {"error": "Documento no encontrado"},
+                    )
+                    return
+
+                cuerpo = ruta.read_bytes()
+
+                self.send_response(200)
+                self.send_header(
+                    "Content-Type",
+                    tipo_contenido,
+                )
+                self.send_header(
+                    "Content-Disposition",
+                    f'attachment; filename="{ruta.name}"',
+                )
+                self.end_headers()
+                self.wfile.write(cuerpo)
+
             def do_GET(self):
                 ruta = urlparse(
                     self.path,
@@ -132,9 +159,82 @@ class ServidorApiErp:
                     )
                     return
 
+                if (
+                    len(partes) == 3
+                    and partes[0] == "portal"
+                    and partes[1] == "mi-cuenta"
+                ):
+                    html = api._portal_mi_cuenta(
+                        partes[2],
+                    )
+                    self._html(
+                        200 if html else 404,
+                        html
+                        or "<h1>Acceso no válido</h1>",
+                    )
+                    return
+
+                if (
+                    len(partes) == 6
+                    and partes[0] == "portal"
+                    and partes[1] == "mi-cuenta"
+                    and partes[3] in (
+                        "venta",
+                        "compra",
+                    )
+                    and partes[5] in (
+                        "pdf",
+                        "xml",
+                    )
+                ):
+                    self._servir_documento_portal(
+                        token=partes[2],
+                        tipo_documento=partes[3],
+                        factura_id=partes[4],
+                        formato=partes[5],
+                    )
+                    return
+
                 self._responder(
                     404,
                     {"error": "No encontrado"},
+                )
+
+            def _servir_documento_portal(
+                self,
+                *,
+                token: str,
+                tipo_documento: str,
+                factura_id: str,
+                formato: str,
+            ):
+                try:
+                    id_factura = int(
+                        factura_id,
+                    )
+                except ValueError:
+                    self._responder(
+                        404,
+                        {"error": "Documento no encontrado"},
+                    )
+                    return
+
+                ruta = api._ruta_documento_portal(
+                    token,
+                    tipo_documento,
+                    id_factura,
+                    formato,
+                )
+
+                tipo_contenido = (
+                    "application/pdf"
+                    if formato == "pdf"
+                    else "application/xml"
+                )
+
+                self._archivo(
+                    ruta,
+                    tipo_contenido=tipo_contenido,
                 )
 
             def do_POST(self):
@@ -329,6 +429,147 @@ class ServidorApiErp:
         </form>
         </body></html>
         """
+
+    @classmethod
+    def _portal_mi_cuenta(
+        cls,
+        token: str,
+    ) -> str | None:
+        from aplicacion.api.portal_servicio import (
+            ServicioPortalTercero,
+        )
+
+        datos = ServicioPortalTercero.datos_cuenta(
+            token,
+        )
+
+        if datos is None:
+            return None
+
+        def _fila(
+            factura: dict,
+            tipo: str,
+        ) -> str:
+            base = (
+                f"/portal/mi-cuenta/{token}/"
+                f"{tipo}/{factura['id']}"
+            )
+
+            pdf_link = (
+                f'<a href="{base}/pdf">PDF</a>'
+            )
+
+            xml_link = (
+                f' · <a href="{base}/xml">XML</a>'
+                if factura["tiene_xml"]
+                else ""
+            )
+
+            return f"""
+            <tr>
+                <td>{factura['numero']}</td>
+                <td>{factura['fecha']}</td>
+                <td style="text-align:right;">
+                    ${factura['total']:,.0f}
+                </td>
+                <td style="text-align:right;">
+                    ${factura['saldo_pendiente']:,.0f}
+                </td>
+                <td>{factura['estado_pago'] or ''}</td>
+                <td>{pdf_link}{xml_link}</td>
+            </tr>
+            """
+
+        def _tabla(
+            titulo: str,
+            facturas: list[dict],
+            tipo: str,
+        ) -> str:
+            if not facturas:
+                return ""
+
+            filas = "".join(
+                _fila(
+                    factura,
+                    tipo,
+                )
+                for factura in facturas
+            )
+
+            return f"""
+            <h2>{titulo}</h2>
+            <table border="1" cellpadding="6"
+                   style="border-collapse:collapse;width:100%;">
+                <thead><tr>
+                    <th>Número</th><th>Fecha</th>
+                    <th>Total</th><th>Saldo</th>
+                    <th>Estado</th><th>Documentos</th>
+                </tr></thead>
+                <tbody>{filas}</tbody>
+            </table>
+            """
+
+        return f"""
+        <!DOCTYPE html>
+        <html><head><meta charset="utf-8">
+        <title>Mi cuenta — {datos['nombre']}</title></head>
+        <body style="font-family:Arial,sans-serif;max-width:900px;margin:40px auto;">
+        <h1>{datos['nombre']}</h1>
+        <p>Documento: {datos['documento']}</p>
+        {_tabla(
+            "Mis facturas",
+            datos['facturas_venta'],
+            'venta',
+        )}
+        {_tabla(
+            "Facturas a mi proveedor",
+            datos['facturas_compra'],
+            'compra',
+        )}
+        </body></html>
+        """
+
+    @classmethod
+    def _ruta_documento_portal(
+        cls,
+        token: str,
+        tipo_documento: str,
+        factura_id: int,
+        formato: str,
+    ):
+        from aplicacion.api.portal_servicio import (
+            ServicioPortalTercero,
+        )
+
+        metodos = {
+            ("venta", "pdf"): (
+                ServicioPortalTercero.pdf_factura_venta
+            ),
+            ("venta", "xml"): (
+                ServicioPortalTercero.xml_factura_venta
+            ),
+            ("compra", "pdf"): (
+                ServicioPortalTercero.pdf_factura_compra
+            ),
+            ("compra", "xml"): (
+                ServicioPortalTercero.xml_factura_compra
+            ),
+        }
+
+        metodo = metodos.get(
+            (
+                tipo_documento,
+                formato,
+            ),
+        )
+
+        if metodo is None:
+            return None
+
+        return metodo(
+            token,
+            factura_id,
+        )
 
     @classmethod
     def generar_codigo_verificacion(cls) -> str:
