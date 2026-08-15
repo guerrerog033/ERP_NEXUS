@@ -13,9 +13,22 @@ from aplicacion.framework.base.formulario_base import (
     FormularioBase,
 )
 from aplicacion.framework.form import FormEngine
+from aplicacion.framework.ui.lista_registros_widget import (
+    CampoRegistro,
+    ListaRegistrosWidget,
+)
 
 from aplicacion.maestros.productos.datasource import (
     ProductoDataSource,
+)
+from aplicacion.maestros.productos.kit_servicio import (
+    ServicioProductoKit,
+)
+from aplicacion.maestros.productos.producto_lookup import (
+    ProductoLookup,
+)
+from aplicacion.modulos.inventario.lote_serie_servicio import (
+    ServicioLoteSerie,
 )
 
 from aplicacion.maestros.productos.imagen_producto import (
@@ -237,6 +250,87 @@ class FormularioProducto(FormularioBase):
             self._contenedor_variantes,
         )
 
+        self.kit_componentes_widget = ListaRegistrosWidget(
+            servicio=ServicioProductoKit,
+            columnas=[
+                ("componente_codigo", "Código"),
+                ("componente_nombre", "Producto"),
+                ("cantidad", "Cantidad"),
+            ],
+            campos=[
+                CampoRegistro(
+                    "componente_id",
+                    "Producto",
+                    tipo="lookup",
+                    datasource=ProductoLookup,
+                    requerido=True,
+                    resolver_texto=self._texto_producto_componente,
+                ),
+                CampoRegistro(
+                    "cantidad",
+                    "Cantidad",
+                    requerido=True,
+                ),
+            ],
+            titulo_dialogo="Componente del kit",
+            campo_padre="kit_id",
+        )
+
+        self._grupo_kit = self._crear_grupo_contenedor(
+            "Componentes del kit",
+            self.kit_componentes_widget,
+        )
+
+        self._grupo_kit.hide()
+
+        layout_raiz.addWidget(
+            self._grupo_kit,
+        )
+
+        self.lote_serie_widget = ListaRegistrosWidget(
+            servicio=ServicioLoteSerie,
+            columnas=[
+                ("numero", "Número"),
+                ("tipo", "Tipo"),
+                ("fecha_vencimiento", "Vencimiento"),
+                ("notas", "Notas"),
+            ],
+            campos=[
+                CampoRegistro(
+                    "numero",
+                    "Número de lote/serie",
+                    requerido=True,
+                ),
+                CampoRegistro(
+                    "fecha_fabricacion",
+                    "Fecha de fabricación",
+                    tipo="fecha",
+                ),
+                CampoRegistro(
+                    "fecha_vencimiento",
+                    "Fecha de vencimiento",
+                    tipo="fecha",
+                ),
+                CampoRegistro(
+                    "notas",
+                    "Notas",
+                ),
+            ],
+            titulo_dialogo="Lote / número de serie",
+            campo_padre="producto_id",
+        )
+
+        self._grupo_lote_serie = self._crear_grupo_contenedor(
+            "Lotes / números de serie",
+            self.lote_serie_widget,
+        )
+
+        self._grupo_lote_serie.hide()
+
+        layout_raiz.addWidget(
+            self._grupo_lote_serie,
+        )
+
         self.lista_precios_widget = (
             ListaPreciosProductoWidget()
         )
@@ -341,6 +435,37 @@ class FormularioProducto(FormularioBase):
             self._sincronizar_atributos_variantes,
         )
 
+        widget_es_kit = self.widget(
+            "es_kit",
+        )
+
+        if widget_es_kit is not None:
+
+            widget_es_kit.toggled.connect(
+                self._actualizar_kit_visible,
+            )
+
+            self._actualizar_kit_visible(
+                widget_es_kit.isChecked(),
+            )
+
+        for nombre_campo in (
+            "maneja_lote",
+            "maneja_serie",
+        ):
+
+            widget_flag = self.widget(
+                nombre_campo,
+            )
+
+            if widget_flag is not None:
+
+                widget_flag.toggled.connect(
+                    self._actualizar_lote_serie_visible,
+                )
+
+        self._actualizar_lote_serie_visible()
+
         if self.es_edicion:
 
             self._cargar_registro()
@@ -421,6 +546,58 @@ class FormularioProducto(FormularioBase):
         self.btn_gestionar_variantes.setVisible(
             visible,
         )
+
+    def _actualizar_kit_visible(
+        self,
+        visible: bool,
+    ) -> None:
+
+        self._grupo_kit.setVisible(
+            visible and self.es_edicion,
+        )
+
+    def _actualizar_lote_serie_visible(
+        self,
+        _valor=None,
+    ) -> None:
+
+        widget_lote = self.widget(
+            "maneja_lote",
+        )
+
+        widget_serie = self.widget(
+            "maneja_serie",
+        )
+
+        requiere = bool(
+            (
+                widget_lote is not None
+                and widget_lote.isChecked()
+            )
+            or (
+                widget_serie is not None
+                and widget_serie.isChecked()
+            )
+        )
+
+        self._grupo_lote_serie.setVisible(
+            requiere and self.es_edicion,
+        )
+
+    @staticmethod
+    def _texto_producto_componente(
+        valor,
+    ) -> str:
+
+        producto = ServicioProducto.obtener_por_id(
+            valor,
+        )
+
+        if producto is None:
+
+            return str(valor)
+
+        return f"{producto.codigo} - {producto.nombre}"
 
     def _abrir_dialogo_variantes(
         self,
@@ -540,6 +717,26 @@ class FormularioProducto(FormularioBase):
             self._actualizar_variantes_visible(
                 widget_variantes.isChecked(),
             )
+
+        self.kit_componentes_widget.cargar(
+            self.id_registro,
+        )
+
+        widget_es_kit = self.widget(
+            "es_kit",
+        )
+
+        if widget_es_kit is not None:
+
+            self._actualizar_kit_visible(
+                widget_es_kit.isChecked(),
+            )
+
+        self.lote_serie_widget.cargar(
+            self.id_registro,
+        )
+
+        self._actualizar_lote_serie_visible()
 
     def valores(self):
 
