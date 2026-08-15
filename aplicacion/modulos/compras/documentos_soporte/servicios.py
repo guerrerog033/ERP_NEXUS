@@ -29,6 +29,10 @@ class ServicioDocumentoSoporte(ServicioBase):
     @classmethod
     def generar_numero(cls) -> str:
 
+        from aplicacion.nucleo.numeracion.servicio import (
+            ServicioNumeracion,
+        )
+
         prefijo = str(
             Configuracion.obtener(
                 "compras",
@@ -37,13 +41,10 @@ class ServicioDocumentoSoporte(ServicioBase):
             or cls.PREFIJO,
         )
 
-        secuencia = cls.repositorio.siguiente_secuencia(
+        return ServicioNumeracion.siguiente_numero(
+            "documento_soporte_compra",
             prefijo,
-        )
-
-        return (
-            f"{prefijo}"
-            f"{secuencia:0{cls.LONGITUD}d}"
+            longitud=cls.LONGITUD,
         )
 
     @classmethod

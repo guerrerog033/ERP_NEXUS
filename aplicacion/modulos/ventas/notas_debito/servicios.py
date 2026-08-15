@@ -66,15 +66,14 @@ class ServicioNotaDebitoVenta(ServicioBase):
     @classmethod
     def generar_numero(cls) -> str:
 
-        prefijo = cls._prefijo()
-
-        secuencia = cls.repositorio.siguiente_secuencia(
-            prefijo,
+        from aplicacion.nucleo.numeracion.servicio import (
+            ServicioNumeracion,
         )
 
-        return (
-            f"{prefijo}"
-            f"{secuencia:0{cls._longitud()}d}"
+        return ServicioNumeracion.siguiente_numero(
+            "nota_debito_venta",
+            cls._prefijo(),
+            longitud=cls._longitud(),
         )
 
     @classmethod
@@ -130,16 +129,18 @@ class ServicioNotaDebitoVenta(ServicioBase):
             },
         ]
 
+        numero = cls.generar_numero()
+
         cabecera = {
-            "numero": cls.generar_numero(),
+            "numero": numero,
             "prefijo": Configuracion.obtener(
                 "dian",
                 "prefijo_nota_debito",
             )
             or "ND",
             "consecutivo_dian": str(
-                cls.repositorio.siguiente_secuencia(
-                    cls._prefijo(),
+                int(
+                    numero[len(cls._prefijo()):],
                 ),
             ),
             "fecha": date.today(),

@@ -49,15 +49,14 @@ class ServicioComprobanteEgreso(ServicioBase):
     @classmethod
     def generar_numero(cls) -> str:
 
-        prefijo = cls._prefijo()
-
-        secuencia = cls.repositorio.siguiente_secuencia(
-            prefijo,
+        from aplicacion.nucleo.numeracion.servicio import (
+            ServicioNumeracion,
         )
 
-        return (
-            f"{prefijo}"
-            f"{secuencia:0{cls._longitud()}d}"
+        return ServicioNumeracion.siguiente_numero(
+            "comprobante_egreso",
+            cls._prefijo(),
+            longitud=cls._longitud(),
         )
 
     @classmethod

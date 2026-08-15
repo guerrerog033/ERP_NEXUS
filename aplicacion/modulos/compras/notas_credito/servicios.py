@@ -32,16 +32,16 @@ class ServicioNotaCreditoCompra(ServicioBase):
     @classmethod
     def generar_numero(cls) -> str:
 
+        from aplicacion.nucleo.numeracion.servicio import (
+            ServicioNumeracion,
+        )
+
         prefijo = str(
             Configuracion.obtener(
                 "compras",
                 "prefijo_nota_credito",
             )
             or cls.PREFIJO,
-        )
-
-        secuencia = cls.repositorio.siguiente_secuencia(
-            prefijo,
         )
 
         longitud = int(
@@ -52,9 +52,10 @@ class ServicioNotaCreditoCompra(ServicioBase):
             or cls.LONGITUD,
         )
 
-        return (
-            f"{prefijo}"
-            f"{secuencia:0{longitud}d}"
+        return ServicioNumeracion.siguiente_numero(
+            "nota_credito_compra",
+            prefijo,
+            longitud=longitud,
         )
 
     @classmethod

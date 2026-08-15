@@ -38,10 +38,8 @@ class ServicioGuiaRemisionElectronica(ServicioBase):
     @classmethod
     def generar_numero(cls) -> str:
 
-        prefijo = cls._prefijo()
-
-        secuencia = cls.repositorio.siguiente_secuencia(
-            prefijo,
+        from aplicacion.nucleo.numeracion.servicio import (
+            ServicioNumeracion,
         )
 
         longitud = int(
@@ -52,9 +50,10 @@ class ServicioGuiaRemisionElectronica(ServicioBase):
             or cls.LONGITUD,
         )
 
-        return (
-            f"{prefijo}"
-            f"{secuencia:0{longitud}d}"
+        return ServicioNumeracion.siguiente_numero(
+            "guia_remision_venta",
+            cls._prefijo(),
+            longitud=longitud,
         )
 
     @classmethod

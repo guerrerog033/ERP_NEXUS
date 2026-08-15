@@ -19,7 +19,6 @@ from .modelos import (
 )
 from .repositorio import (
     RepositorioOrdenCompra,
-    RepositorioRecepcionCompra,
 )
 
 
@@ -36,29 +35,22 @@ class ServicioOrdenCompra:
         prefijo: str | None = None,
     ) -> str:
 
+        from aplicacion.nucleo.numeracion.servicio import (
+            ServicioNumeracion,
+        )
+
         prefijo = prefijo or cls.PREFIJO
 
-        if prefijo == cls.PREFIJO_REC:
+        codigo_tipo = (
+            "recepcion_compra"
+            if prefijo == cls.PREFIJO_REC
+            else "orden_compra"
+        )
 
-            secuencia = (
-                RepositorioRecepcionCompra
-                .siguiente_secuencia(
-                    prefijo,
-                )
-            )
-
-        else:
-
-            secuencia = (
-                RepositorioOrdenCompra
-                .siguiente_secuencia(
-                    prefijo,
-                )
-            )
-
-        return (
-            f"{prefijo}"
-            f"{secuencia:0{cls.LONGITUD}d}"
+        return ServicioNumeracion.siguiente_numero(
+            codigo_tipo,
+            prefijo,
+            longitud=cls.LONGITUD,
         )
 
     @classmethod

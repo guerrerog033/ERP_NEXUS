@@ -91,41 +91,16 @@ class ServicioDespacho:
 
     @classmethod
     def generar_numero(cls) -> str:
-        db = SessionLocal()
 
-        try:
-            from aplicacion.modulos.logistica.despacho.modelos import (
-                DespachoPedido,
-            )
+        from aplicacion.nucleo.numeracion.servicio import (
+            ServicioNumeracion,
+        )
 
-            numeros = (
-                db.query(DespachoPedido.numero)
-                .filter(
-                    DespachoPedido.numero.like(
-                        f"{cls.PREFIJO}%",
-                    )
-                )
-                .all()
-            )
-
-            maximo = 0
-
-            for (numero,) in numeros:
-                sufijo = numero[len(cls.PREFIJO):]
-
-                if sufijo.isdigit():
-                    maximo = max(
-                        maximo,
-                        int(sufijo),
-                    )
-
-            return (
-                f"{cls.PREFIJO}"
-                f"{maximo + 1:0{cls.LONGITUD}d}"
-            )
-
-        finally:
-            db.close()
+        return ServicioNumeracion.siguiente_numero(
+            "despacho_logistica",
+            cls.PREFIJO,
+            longitud=cls.LONGITUD,
+        )
 
     @classmethod
     def _validar_guia_para_estado(

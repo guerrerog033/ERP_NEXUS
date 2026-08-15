@@ -51,15 +51,14 @@ class ServicioRemision(ServicioBase):
     @classmethod
     def generar_numero(cls) -> str:
 
-        prefijo = cls._prefijo()
-
-        secuencia = cls.repositorio.siguiente_secuencia(
-            prefijo,
+        from aplicacion.nucleo.numeracion.servicio import (
+            ServicioNumeracion,
         )
 
-        return (
-            f"{prefijo}"
-            f"{secuencia:0{cls.LONGITUD}d}"
+        return ServicioNumeracion.siguiente_numero(
+            "remision_venta",
+            cls._prefijo(),
+            longitud=cls.LONGITUD,
         )
 
     @classmethod
