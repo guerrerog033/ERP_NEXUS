@@ -1,63 +1,175 @@
 from __future__ import annotations
 
-from aplicacion.framework.reportes.plantilla_comercial import (
-    html_documento_comercial,
-)
+from types import SimpleNamespace
+
 from aplicacion.modulos.ventas.cotizaciones.formatos_impresion import (
+    ContextoFormato,
     _datos_empresa,
-    _formatear_moneda,
+    formatos_combo,
+    generar_html_desde_contexto,
 )
-from aplicacion.recursos.estilos import colores
 
 
-def _filas_detalle(
-    detalles,
-) -> str:
+def _datos_proveedor(
+    orden,
+    nombre_proveedor: str,
+) -> dict:
 
-    filas = ""
+    from aplicacion.maestros.terceros.servicio import (
+        TerceroServicio,
+    )
 
-    for indice, detalle in enumerate(
-        detalles,
-        start=1,
+    proveedor_id = getattr(
+        orden,
+        "proveedor_id",
+        None,
+    )
+
+    proveedor = (
+        TerceroServicio.obtener_por_id(
+            proveedor_id,
+        )
+        if proveedor_id
+        else None
+    )
+
+    if proveedor is None:
+
+        return {
+            "nombre": nombre_proveedor,
+            "nit": "",
+            "contacto": nombre_proveedor,
+            "direccion": "No aplica",
+            "ciudad": "",
+            "telefono": "",
+            "correo": "",
+        }
+
+    nit = str(
+        proveedor.numero_documento
+        or "",
+    ).strip()
+
+    if getattr(
+        proveedor,
+        "dv",
+        None,
     ):
 
-        cantidad = float(
-            detalle.cantidad or 0,
-        )
+        nit = f"{nit}-{proveedor.dv}"
 
-        recibida = float(
-            getattr(
+    nombre = (
+        proveedor.razon_social
+        or proveedor.nombre_completo
+        or nombre_proveedor
+    )
+
+    contacto = (
+        proveedor.nombre_comercial
+        or proveedor.razon_social
+        or proveedor.nombre_completo
+        or nombre_proveedor
+    )
+
+    return {
+        "nombre": nombre,
+        "nit": nit,
+        "contacto": contacto,
+        "direccion": str(
+            proveedor.direccion
+            or "No aplica",
+        ),
+        "ciudad": str(
+            proveedor.ciudad or "",
+        ),
+        "telefono": str(
+            proveedor.telefono
+            or proveedor.celular
+            or "",
+        ),
+        "correo": str(
+            proveedor.correo or "",
+        ),
+    }
+
+
+def _detalles_para_formato(
+    detalles,
+) -> list:
+
+    return [
+        SimpleNamespace(
+            producto_id=getattr(
                 detalle,
-                "cantidad_recibida",
-                0,
+                "producto_id",
+                None,
+            ),
+            descripcion=detalle.descripcion,
+            cantidad=float(
+                detalle.cantidad or 0,
+            ),
+            precio_unitario=float(
+                detalle.costo_unitario or 0,
+            ),
+            impuesto_id=None,
+            total_linea=float(
+                detalle.total_linea or 0,
+            ),
+        )
+        for detalle in detalles
+    ]
+
+
+def _crear_contexto_orden_compra(
+    orden,
+    detalles,
+    nombre_proveedor: str,
+) -> ContextoFormato:
+
+    resumen = {
+        "subtotal": float(
+            orden.subtotal or 0,
+        ),
+        "retefuente": 0,
+        "reteica": 0,
+        "reteiva": 0,
+        "iva": 0,
+        "total": float(
+            orden.total or 0,
+        ),
+    }
+
+    return ContextoFormato(
+        cotizacion=orden,
+        detalles=_detalles_para_formato(
+            detalles,
+        ),
+        nombre_cliente=nombre_proveedor,
+        resumen=resumen,
+        empresa=_datos_empresa(),
+        cliente=_datos_proveedor(
+            orden,
+            nombre_proveedor,
+        ),
+        fecha=(
+            orden.fecha.strftime(
+                "%d/%m/%Y",
             )
-            or 0,
-        )
-
-        costo = float(
-            detalle.costo_unitario or 0,
-        )
-
-        total = cantidad * costo
-
-        filas += (
-            f"<tr>"
-            f"<td style='padding:5px 6px;border:1px solid {colores.BORDER};'>"
-            f"{indice}</td>"
-            f"<td style='padding:5px 6px;border:1px solid {colores.BORDER};'>"
-            f"{detalle.descripcion}</td>"
-            f"<td style='padding:5px 6px;border:1px solid {colores.BORDER};"
-            f"text-align:right;'>{cantidad:g}</td>"
-            f"<td style='padding:5px 6px;border:1px solid {colores.BORDER};"
-            f"text-align:right;'>{recibida:g}</td>"
-            f"<td style='padding:5px 6px;border:1px solid {colores.BORDER};"
-            f"text-align:right;'>{_formatear_moneda(costo)}</td>"
-            f"<td style='padding:5px 6px;border:1px solid {colores.BORDER};"
-            f"text-align:right;'>{_formatear_moneda(total)}</td>"
-            f"</tr>"
-        )
-
-    return filas
+            if orden.fecha
+            else ""
+        ),
+        observaciones=str(
+            orden.observaciones or "",
+        ).strip(),
+        etiqueta_documento="ORDEN DE COMPRA",
+        titulo_documento="Orden de compra",
+        info_adicional=(
+            "<p>Condiciones de entrega y pago según acuerdo "
+            "comercial con el proveedor.</p>"
+        ),
+        mostrar_imagenes=False,
+        etiqueta_contraparte="Proveedor",
+    )
 
 
 def generar_html_orden_compra(
@@ -66,59 +178,26 @@ def generar_html_orden_compra(
     nombre_proveedor: str,
     *,
     documento_proveedor: str = "",
+    formato: str | None = None,
 ) -> str:
 
-    empresa = _datos_empresa()
-
-    return html_documento_comercial(
-        empresa=empresa,
-        titulo_documento="ORDEN DE COMPRA",
-        numero_documento=str(
-            orden.numero or "",
-        ),
-        fecha=orden.fecha.strftime(
-            "%d/%m/%Y",
-        ),
-        estado=str(
-            orden.estado or "",
-        ),
-        contraparte_titulo="PROVEEDOR",
-        contraparte_nombre=nombre_proveedor,
-        contraparte_documento=documento_proveedor,
-        filas_tabla=_filas_detalle(
-            detalles,
-        ),
-        subtotal=_formatear_moneda(
-            float(
-                orden.subtotal or 0,
-            ),
-        ),
-        total=_formatear_moneda(
-            float(
-                orden.total or 0,
-            ),
-        ),
-        observaciones=str(
-            orden.observaciones
-            or "",
-        ).strip(),
-        info_adicional=(
-            "<p>Condiciones de entrega y pago según acuerdo "
-            "comercial con el proveedor.</p>"
-        ),
-        notas_pie=str(
-            empresa.get(
-                "notas_pie",
-                "",
-            )
-            or "",
-        ),
-        columnas_tabla=(
-            "#",
-            "Descripción",
-            "Cant.",
-            "Recibida",
-            "Costo",
-            "Total",
-        ),
+    ctx = _crear_contexto_orden_compra(
+        orden,
+        detalles,
+        nombre_proveedor,
     )
+
+    if documento_proveedor and not ctx.cliente["nit"]:
+
+        ctx.cliente["nit"] = documento_proveedor
+
+    return generar_html_desde_contexto(
+        ctx,
+        formato,
+    )
+
+
+__all__ = [
+    "formatos_combo",
+    "generar_html_orden_compra",
+]
