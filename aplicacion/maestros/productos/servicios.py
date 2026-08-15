@@ -28,23 +28,13 @@ RUTA_IMAGENES = (
     / "productos"
 )
 
-UNIDADES_MEDIDA = {
-    "Und",
-    "Par",
-    "Caja",
-    "Pq",
-    "Mts",
-    "Gls",
-    "Lts",
-}
-
 CAMPOS_PRODUCTO = {
     "codigo",
     "codigo_barras",
     "nombre",
     "descripcion",
     "tipo",
-    "unidad_medida",
+    "unidad_medida_id",
     "categoria_id",
     "marca_id",
     "precio_venta",
@@ -399,18 +389,37 @@ class ServicioProducto(ServicioBase):
 
         datos["tipo"] = tipo
 
-        unidad = str(
-            datos.get(
-                "unidad_medida",
+        from aplicacion.maestros.unidades_medida.repositorio import (
+            UnidadMedidaRepositorio,
+        )
+
+        unidad_medida_id = datos.get(
+            "unidad_medida_id",
+        )
+
+        if unidad_medida_id:
+
+            if UnidadMedidaRepositorio.obtener_por_id(
+                unidad_medida_id,
+            ) is None:
+
+                raise ValueError(
+                    "La unidad de medida seleccionada no existe.",
+                )
+
+        else:
+
+            unidad_defecto = UnidadMedidaRepositorio.obtener_por_codigo(
                 "Und",
             )
-        ).strip()
 
-        if unidad not in UNIDADES_MEDIDA:
+            unidad_medida_id = (
+                unidad_defecto.id
+                if unidad_defecto is not None
+                else None
+            )
 
-            unidad = "Und"
-
-        datos["unidad_medida"] = unidad
+        datos["unidad_medida_id"] = unidad_medida_id
 
         for campo in (
             "precio_venta",
@@ -1696,9 +1705,13 @@ class ServicioProducto(ServicioBase):
         from aplicacion.maestros.impuestos.servicios import (
             ServicioImpuesto,
         )
+        from aplicacion.maestros.unidades_medida.servicios import (
+            ServicioUnidadMedida,
+        )
 
         ServicioImpuesto.inicializar_predeterminados()
         ServicioListaPrecio.inicializar_predeterminados()
+        ServicioUnidadMedida.inicializar_predeterminados()
 
         from aplicacion.maestros.productos.catalogo_variantes_servicio import (
             ServicioCatalogoVariantes,

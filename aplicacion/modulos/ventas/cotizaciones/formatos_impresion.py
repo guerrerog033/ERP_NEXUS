@@ -479,14 +479,22 @@ def _unidad_producto(
         producto_id,
     )
 
-    if producto is None:
+    if producto is None or not producto.unidad_medida_id:
 
         return predeterminado
 
+    from aplicacion.maestros.unidades_medida.repositorio import (
+        UnidadMedidaRepositorio,
+    )
+
+    unidad_medida = UnidadMedidaRepositorio.obtener_por_id(
+        producto.unidad_medida_id,
+    )
+
     unidad = str(
         getattr(
-            producto,
-            "unidad_medida",
+            unidad_medida,
+            "codigo",
             "",
         )
         or "",

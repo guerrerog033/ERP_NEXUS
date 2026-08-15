@@ -13,8 +13,14 @@ from aplicacion.maestros.empresas.repositorio import (
 from aplicacion.maestros.impuestos.repositorio import (
     RepositorioImpuesto,
 )
+from aplicacion.maestros.productos.repositorio import (
+    RepositorioProducto,
+)
 from aplicacion.maestros.terceros.repositorio import (
     TerceroRepositorio,
+)
+from aplicacion.maestros.unidades_medida.repositorio import (
+    UnidadMedidaRepositorio,
 )
 from aplicacion.nucleo.configuracion import Configuracion
 
@@ -149,6 +155,44 @@ class GeneradorXmlFactura:
         return float(
             impuesto.porcentaje or 0,
         )
+
+    @classmethod
+    def _codigo_unidad(
+        cls,
+        producto_id,
+    ) -> str:
+        """
+        Código UN/CEFACT de unidad de medida para InvoicedQuantity.
+        "94" (unidad) es el respaldo cuando el producto no tiene
+        unidad de medida asignada o no está vinculado a un producto
+        del catálogo.
+        """
+
+        if not producto_id:
+
+            return "94"
+
+        producto = RepositorioProducto.obtener_por_id(
+            producto_id,
+        )
+
+        if producto is None or not producto.unidad_medida_id:
+
+            return "94"
+
+        # Se consulta por unidad_medida_id (escalar) en vez de
+        # navegar producto.unidad_medida: la sesión que trajo
+        # ``producto`` ya se cerró, así que la relación perezosa
+        # lanzaría DetachedInstanceError.
+        unidad = UnidadMedidaRepositorio.obtener_por_id(
+            producto.unidad_medida_id,
+        )
+
+        if unidad is None or not unidad.codigo_dian:
+
+            return "94"
+
+        return unidad.codigo_dian
 
     @classmethod
     def generar(
@@ -614,7 +658,11 @@ class GeneradorXmlFactura:
             ET.SubElement(
                 linea,
                 f"{{{NS['cbc']}}}InvoicedQuantity",
-                {"unitCode": "EA"},
+                {
+                    "unitCode": cls._codigo_unidad(
+                        detalle.producto_id,
+                    ),
+                },
             ).text = f"{float(detalle.cantidad):.2f}"
 
             ET.SubElement(

@@ -40,6 +40,7 @@ def test_generador_guia_remision_cude(
     guia.transportadora = "Transportes SA"
 
     detalle = MagicMock()
+    detalle.producto_id = None
     detalle.descripcion = "Producto A"
     detalle.cantidad = 2
     detalle.precio_unitario = 500

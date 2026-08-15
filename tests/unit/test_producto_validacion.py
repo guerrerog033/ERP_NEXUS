@@ -11,6 +11,32 @@ from aplicacion.maestros.productos.producto_definition import (
 from aplicacion.maestros.productos.servicios import (
     ServicioProducto,
 )
+from aplicacion.maestros.unidades_medida.repositorio import (
+    UnidadMedidaRepositorio,
+)
+
+
+@pytest.fixture(autouse=True)
+def _mock_unidad_medida(monkeypatch):
+    monkeypatch.setattr(
+        UnidadMedidaRepositorio,
+        "obtener_por_codigo",
+        classmethod(
+            lambda cls, codigo: SimpleNamespace(
+                id=1,
+                codigo=codigo,
+            ),
+        ),
+    )
+    monkeypatch.setattr(
+        UnidadMedidaRepositorio,
+        "obtener_por_id",
+        classmethod(
+            lambda cls, id_registro: SimpleNamespace(
+                id=id_registro,
+            ),
+        ),
+    )
 
 
 def _datos_producto_base(**extra):
@@ -18,7 +44,6 @@ def _datos_producto_base(**extra):
         "codigo": "PRD001",
         "nombre": "Producto demo",
         "tipo": "producto",
-        "unidad_medida": "Und",
         "precio_venta": 10000,
         "precio_incluye_iva": False,
         "costo": 5000,

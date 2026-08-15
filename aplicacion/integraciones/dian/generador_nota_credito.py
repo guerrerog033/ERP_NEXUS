@@ -373,7 +373,11 @@ class GeneradorNotaCreditoVenta:
             ET.SubElement(
                 linea,
                 f"{{{NS['cbc']}}}CreditedQuantity",
-                {"unitCode": "EA"},
+                {
+                    "unitCode": GeneradorXmlFactura._codigo_unidad(
+                        detalle.producto_id,
+                    ),
+                },
             ).text = f"{float(detalle.cantidad):.2f}"
 
             ET.SubElement(
