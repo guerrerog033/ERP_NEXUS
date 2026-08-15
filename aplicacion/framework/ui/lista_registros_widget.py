@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QDate, Qt
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QCheckBox,
     QComboBox,
+    QDateEdit,
     QDialog,
     QDialogButtonBox,
     QFormLayout,
@@ -23,6 +24,14 @@ class CampoRegistro:
     """
     Describe un campo del formulario emergente de alta/edición
     (nombre del atributo, etiqueta visible, tipo de control).
+
+    tipo="lookup" abre un buscador (LookupDialog) en vez de un
+    combo con todas las opciones precargadas — para catálogos
+    grandes (productos, terceros...) donde cargar todo de una vez
+    no es práctico. Requiere ``datasource`` (una clase Lookup) y,
+    para poder mostrar un texto legible al editar un registro
+    existente (donde solo se tiene el id guardado, no el objeto
+    completo), ``resolver_texto(valor) -> str``.
     """
 
     def __init__(
@@ -33,6 +42,8 @@ class CampoRegistro:
         tipo: str = "texto",
         opciones: list[tuple] | None = None,
         requerido: bool = False,
+        datasource=None,
+        resolver_texto=None,
     ):
 
         self.nombre = nombre
@@ -40,6 +51,8 @@ class CampoRegistro:
         self.tipo = tipo
         self.opciones = opciones or []
         self.requerido = requerido
+        self.datasource = datasource
+        self.resolver_texto = resolver_texto
 
 
 class DialogoRegistro(QDialog):
@@ -106,6 +119,70 @@ class DialogoRegistro(QDialog):
                     bool(valor),
                 )
 
+            elif campo.tipo == "lookup":
+
+                from aplicacion.framework.lookup.lookup_result import (
+                    LookupResult,
+                )
+                from aplicacion.framework.lookup.lookup_widget import (
+                    LookupWidget,
+                )
+
+                widget = LookupWidget(
+                    campo.datasource(),
+                )
+
+                if valor is not None:
+
+                    texto = (
+                        campo.resolver_texto(valor)
+                        if campo.resolver_texto
+                        else str(valor)
+                    )
+
+                    widget.establecer(
+                        LookupResult(
+                            valor=valor,
+                            texto=texto,
+                        ),
+                    )
+
+            elif campo.tipo == "fecha":
+
+                widget = QDateEdit()
+
+                widget.setCalendarPopup(
+                    True,
+                )
+
+                widget.setDisplayFormat(
+                    "yyyy-MM-dd",
+                )
+
+                widget.setMinimumDate(
+                    QDate(2000, 1, 1),
+                )
+
+                widget.setSpecialValueText(
+                    "(sin definir)",
+                )
+
+                if valor is not None:
+
+                    widget.setDate(
+                        QDate(
+                            valor.year,
+                            valor.month,
+                            valor.day,
+                        ),
+                    )
+
+                else:
+
+                    widget.setDate(
+                        widget.minimumDate(),
+                    )
+
             else:
 
                 widget = QLineEdit()
@@ -150,13 +227,30 @@ class DialogoRegistro(QDialog):
 
         for campo in self.campos:
 
-            if (
-                campo.requerido
-                and campo.tipo == "texto"
-                and not self._widgets[
-                    campo.nombre
-                ].text().strip()
-            ):
+            if not campo.requerido:
+
+                continue
+
+            widget = self._widgets[
+                campo.nombre
+            ]
+
+            vacio = (
+                (
+                    campo.tipo == "texto"
+                    and not widget.text().strip()
+                )
+                or (
+                    campo.tipo == "lookup"
+                    and widget.valor() is None
+                )
+                or (
+                    campo.tipo == "fecha"
+                    and widget.date() == widget.minimumDate()
+                )
+            )
+
+            if vacio:
 
                 QMessageBox.warning(
                     self,
@@ -192,6 +286,20 @@ class DialogoRegistro(QDialog):
                     widget.isChecked()
                 )
 
+            elif campo.tipo == "lookup":
+
+                resultado[campo.nombre] = widget.valor()
+
+            elif campo.tipo == "fecha":
+
+                fecha_qt = widget.date()
+
+                resultado[campo.nombre] = (
+                    None
+                    if fecha_qt == widget.minimumDate()
+                    else fecha_qt.toPython()
+                )
+
             else:
 
                 resultado[campo.nombre] = (
@@ -201,13 +309,15 @@ class DialogoRegistro(QDialog):
         return resultado
 
 
-class ListaRegistrosTerceroWidget(QWidget):
+class ListaRegistrosWidget(QWidget):
     """
-    Lista editable de registros hijos de un tercero (direcciones,
-    contactos, cuentas bancarias). Un mismo widget reutilizable,
-    configurado por instancia con las columnas a mostrar, los
-    campos del formulario emergente y el servicio (con la
-    interfaz listar/guardar/actualizar/eliminar) que lo respalda.
+    Lista editable de registros hijos de un registro padre
+    (direcciones/contactos/cuentas bancarias de un tercero,
+    componentes de un kit, lotes/series de un producto...). Un
+    mismo widget reutilizable, configurado por instancia con las
+    columnas a mostrar, los campos del formulario emergente y el
+    servicio (con la interfaz listar/guardar/actualizar/eliminar)
+    que lo respalda.
     """
 
     def __init__(
@@ -217,6 +327,7 @@ class ListaRegistrosTerceroWidget(QWidget):
         columnas: list[tuple],
         campos: list[CampoRegistro],
         titulo_dialogo: str,
+        campo_padre: str = "tercero_id",
         parent=None,
     ):
 
@@ -230,7 +341,9 @@ class ListaRegistrosTerceroWidget(QWidget):
 
         self.titulo_dialogo = titulo_dialogo
 
-        self.tercero_id = None
+        self.campo_padre = campo_padre
+
+        self.padre_id = None
 
         self._registros: list = []
 
@@ -318,16 +431,16 @@ class ListaRegistrosTerceroWidget(QWidget):
 
     def cargar(
         self,
-        tercero_id,
+        padre_id,
     ) -> None:
 
-        self.tercero_id = tercero_id
+        self.padre_id = padre_id
 
         self._registros = (
             self.servicio.listar(
-                tercero_id,
+                padre_id,
             )
-            if tercero_id
+            if padre_id
             else []
         )
 
@@ -406,7 +519,7 @@ class ListaRegistrosTerceroWidget(QWidget):
         self,
     ) -> None:
 
-        if not self.tercero_id:
+        if not self.padre_id:
 
             return
 
@@ -422,7 +535,7 @@ class ListaRegistrosTerceroWidget(QWidget):
 
         datos = dialogo.valores()
 
-        datos["tercero_id"] = self.tercero_id
+        datos[self.campo_padre] = self.padre_id
 
         try:
 
@@ -441,7 +554,7 @@ class ListaRegistrosTerceroWidget(QWidget):
             return
 
         self.cargar(
-            self.tercero_id,
+            self.padre_id,
         )
 
     def _editar(
@@ -489,7 +602,7 @@ class ListaRegistrosTerceroWidget(QWidget):
 
         datos = dialogo.valores()
 
-        datos["tercero_id"] = self.tercero_id
+        datos[self.campo_padre] = self.padre_id
 
         try:
 
@@ -509,7 +622,7 @@ class ListaRegistrosTerceroWidget(QWidget):
             return
 
         self.cargar(
-            self.tercero_id,
+            self.padre_id,
         )
 
     def _eliminar(
@@ -542,5 +655,5 @@ class ListaRegistrosTerceroWidget(QWidget):
         )
 
         self.cargar(
-            self.tercero_id,
+            self.padre_id,
         )
