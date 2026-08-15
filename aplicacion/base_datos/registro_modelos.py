@@ -138,6 +138,7 @@ def importar_modelos() -> None:
         PerfilProveedor,
         Tercero,
         TerceroContacto,
+        TerceroCuentaBancaria,
         TerceroDireccion,
     )
 

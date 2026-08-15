@@ -469,3 +469,46 @@ class TerceroContacto(Base):
         default=False,
         nullable=False,
     )
+
+
+class TerceroCuentaBancaria(Base):
+
+    __tablename__ = "tercero_cuentas_bancarias"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+
+    tercero_id = Column(
+        Integer,
+        ForeignKey("terceros.id"),
+        nullable=False,
+    )
+
+    banco = Column(
+        String(120),
+        nullable=False,
+    )
+
+    tipo_cuenta = Column(
+        String(20),
+        default="Ahorros",
+        nullable=False,
+    )
+
+    numero_cuenta = Column(
+        String(50),
+        nullable=False,
+    )
+
+    titular = Column(
+        String(200),
+    )
+
+    principal = Column(
+        Boolean,
+        default=False,
+        nullable=False,
+    )

@@ -6,7 +6,12 @@ from aplicacion.framework.datagrid.filtros import (
 )
 
 from .constantes import TIPO_A_ROL
-from .modelos import Tercero
+from .modelos import (
+    Tercero,
+    TerceroContacto,
+    TerceroCuentaBancaria,
+    TerceroDireccion,
+)
 
 
 class TerceroRepositorio(RepositorioBase):
@@ -314,3 +319,88 @@ class TerceroRepositorio(RepositorioBase):
         finally:
 
             db.close()
+
+
+class _RepositorioRegistroTercero(RepositorioBase):
+    """
+    Base para los registros hijos de un tercero (direcciones,
+    contactos, cuentas bancarias): mismo CRUD genérico, más un
+    listado filtrado por ``tercero_id``.
+    """
+
+    @classmethod
+    def listar_por_tercero(
+        cls,
+        tercero_id: int,
+    ) -> list:
+
+        db = cls.obtener_sesion()
+
+        try:
+
+            return (
+                db.query(
+                    cls.modelo,
+                )
+                .filter(
+                    cls.modelo.tercero_id == tercero_id,
+                )
+                .order_by(
+                    cls.modelo.principal.desc(),
+                    cls.modelo.id,
+                )
+                .all()
+            )
+
+        finally:
+
+            db.close()
+
+    @classmethod
+    def limpiar_principal(
+        cls,
+        tercero_id: int,
+        excluir_id: int | None = None,
+    ) -> None:
+
+        db = cls.obtener_sesion()
+
+        try:
+
+            consulta = db.query(
+                cls.modelo,
+            ).filter(
+                cls.modelo.tercero_id == tercero_id,
+                cls.modelo.principal.is_(True),
+            )
+
+            if excluir_id is not None:
+
+                consulta = consulta.filter(
+                    cls.modelo.id != excluir_id,
+                )
+
+            for registro in consulta.all():
+
+                registro.principal = False
+
+            db.commit()
+
+        finally:
+
+            db.close()
+
+
+class TerceroDireccionRepositorio(_RepositorioRegistroTercero):
+
+    modelo = TerceroDireccion
+
+
+class TerceroContactoRepositorio(_RepositorioRegistroTercero):
+
+    modelo = TerceroContacto
+
+
+class TerceroCuentaBancariaRepositorio(_RepositorioRegistroTercero):
+
+    modelo = TerceroCuentaBancaria

@@ -1,9 +1,22 @@
+from PySide6.QtWidgets import QTabWidget
+
 from aplicacion.framework.base.formulario_base import (
     FormularioBase,
 )
 
 from aplicacion.maestros.terceros.datasource import (
     TerceroDataSource,
+)
+
+from aplicacion.maestros.terceros.registros_relacionados_widget import (
+    CampoRegistro,
+    ListaRegistrosTerceroWidget,
+)
+
+from aplicacion.maestros.terceros.servicio_registros import (
+    ServicioContactoTercero,
+    ServicioCuentaBancariaTercero,
+    ServicioDireccionTercero,
 )
 
 from aplicacion.maestros.terceros.terceros_definition import (
@@ -94,6 +107,179 @@ class TerceroFormulario(FormularioBase):
         )
 
         self._aplicar_tipo_tercero_inicial()
+
+        self._agregar_registros_relacionados()
+
+    def _agregar_registros_relacionados(
+        self,
+    ) -> None:
+
+        if not self.es_edicion:
+
+            return
+
+        tabs = QTabWidget()
+
+        opciones_tipo_cuenta = [
+            ("Ahorros", "Ahorros"),
+            ("Corriente", "Corriente"),
+        ]
+
+        secciones = (
+            (
+                "Direcciones",
+                ServicioDireccionTercero,
+                [
+                    ("etiqueta", "Etiqueta"),
+                    ("direccion", "Dirección"),
+                    ("ciudad", "Ciudad"),
+                    ("departamento", "Departamento"),
+                    ("principal", "Principal"),
+                ],
+                [
+                    CampoRegistro(
+                        "etiqueta",
+                        "Etiqueta",
+                    ),
+                    CampoRegistro(
+                        "direccion",
+                        "Dirección",
+                        requerido=True,
+                    ),
+                    CampoRegistro(
+                        "ciudad",
+                        "Ciudad",
+                    ),
+                    CampoRegistro(
+                        "departamento",
+                        "Departamento",
+                    ),
+                    CampoRegistro(
+                        "pais",
+                        "País",
+                    ),
+                    CampoRegistro(
+                        "principal",
+                        "Dirección principal",
+                        tipo="bool",
+                    ),
+                ],
+                "Dirección",
+            ),
+            (
+                "Contactos",
+                ServicioContactoTercero,
+                [
+                    ("nombre", "Nombre"),
+                    ("cargo", "Cargo"),
+                    ("telefono", "Teléfono"),
+                    ("correo", "Correo"),
+                    ("principal", "Principal"),
+                ],
+                [
+                    CampoRegistro(
+                        "nombre",
+                        "Nombre",
+                        requerido=True,
+                    ),
+                    CampoRegistro(
+                        "cargo",
+                        "Cargo",
+                    ),
+                    CampoRegistro(
+                        "telefono",
+                        "Teléfono",
+                    ),
+                    CampoRegistro(
+                        "correo",
+                        "Correo",
+                    ),
+                    CampoRegistro(
+                        "principal",
+                        "Contacto principal",
+                        tipo="bool",
+                    ),
+                ],
+                "Contacto",
+            ),
+            (
+                "Cuentas bancarias",
+                ServicioCuentaBancariaTercero,
+                [
+                    ("banco", "Banco"),
+                    ("tipo_cuenta", "Tipo"),
+                    ("numero_cuenta", "Número"),
+                    ("titular", "Titular"),
+                    ("principal", "Principal"),
+                ],
+                [
+                    CampoRegistro(
+                        "banco",
+                        "Banco",
+                        requerido=True,
+                    ),
+                    CampoRegistro(
+                        "tipo_cuenta",
+                        "Tipo de cuenta",
+                        tipo="combo",
+                        opciones=opciones_tipo_cuenta,
+                    ),
+                    CampoRegistro(
+                        "numero_cuenta",
+                        "Número de cuenta",
+                        requerido=True,
+                    ),
+                    CampoRegistro(
+                        "titular",
+                        "Titular",
+                    ),
+                    CampoRegistro(
+                        "principal",
+                        "Cuenta principal",
+                        tipo="bool",
+                    ),
+                ],
+                "Cuenta bancaria",
+            ),
+        )
+
+        self._widgets_registros_relacionados = []
+
+        for (
+            titulo_pestana,
+            servicio,
+            columnas,
+            campos,
+            titulo_dialogo,
+        ) in secciones:
+
+            widget = ListaRegistrosTerceroWidget(
+                servicio=servicio,
+                columnas=columnas,
+                campos=campos,
+                titulo_dialogo=titulo_dialogo,
+            )
+
+            widget.cargar(
+                self.id_registro,
+            )
+
+            tabs.addTab(
+                widget,
+                titulo_pestana,
+            )
+
+            self._widgets_registros_relacionados.append(
+                widget,
+            )
+
+        tabs.setMinimumHeight(
+            180,
+        )
+
+        self.card.agregar_widget(
+            tabs,
+        )
 
     def _configurar_eventos(
         self,
