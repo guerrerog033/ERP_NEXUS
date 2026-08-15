@@ -178,20 +178,94 @@ class ValidadorGoLiveDian:
             )
 
     @classmethod
+    def _empresa_maestro(cls):
+
+        try:
+
+            from aplicacion.maestros.empresas.repositorio import (
+                EmpresaRepositorio,
+            )
+
+            empresas = EmpresaRepositorio.obtener_todos(
+                ordenar_por=(
+                    EmpresaRepositorio.modelo.id,
+                ),
+            )
+
+        except Exception:
+
+            return None
+
+        if not empresas:
+
+            return None
+
+        activas = [
+            empresa
+            for empresa in empresas
+            if empresa.activo
+        ]
+
+        return (
+            activas[0]
+            if activas
+            else empresas[0]
+        )
+
+    @classmethod
+    def _dato_empresa(
+        cls,
+        clave: str,
+        *atributos: str,
+    ) -> str:
+
+        valor = str(
+            cls._texto(
+                "empresa",
+                clave,
+                "",
+            )
+            or "",
+        ).strip()
+
+        if valor:
+
+            return valor
+
+        maestro = cls._empresa_maestro()
+
+        if maestro is None:
+
+            return ""
+
+        for atributo in atributos:
+
+            valor = str(
+                getattr(
+                    maestro,
+                    atributo,
+                    "",
+                )
+                or "",
+            ).strip()
+
+            if valor:
+
+                return valor
+
+        return ""
+
+    @classmethod
     def _validar_empresa(
         cls,
         bloqueantes: list[str],
         avisos: list[str],
     ) -> None:
 
-        nit = str(
-            cls._texto(
-                "empresa",
-                "nit",
-                "",
-            )
-            or "",
-        ).strip()
+        nit = cls._dato_empresa(
+            "nit",
+            "nit",
+        )
 
         cls._agregar_si_vacio(
             bloqueantes,
@@ -199,22 +273,33 @@ class ValidadorGoLiveDian:
             "Configure empresa.nit (debe coincidir con el certificado).",
         )
 
-        for clave, etiqueta in (
-            ("nombre", "empresa.nombre"),
-            ("direccion", "empresa.direccion"),
-            ("ciudad", "empresa.ciudad"),
+        for clave, etiqueta, atributos in (
+            (
+                "nombre",
+                "empresa.nombre",
+                (
+                    "nombre_comercial",
+                    "razon_social",
+                ),
+            ),
+            (
+                "direccion",
+                "empresa.direccion",
+                ("direccion",),
+            ),
+            (
+                "ciudad",
+                "empresa.ciudad",
+                ("ciudad",),
+            ),
         ):
 
             cls._agregar_si_vacio(
                 avisos,
-                not str(
-                    cls._texto(
-                        "empresa",
-                        clave,
-                        "",
-                    )
-                    or "",
-                ).strip(),
+                not cls._dato_empresa(
+                    clave,
+                    *atributos,
+                ),
                 f"Complete {etiqueta} para el XML electrónico.",
             )
 

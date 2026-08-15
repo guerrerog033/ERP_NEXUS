@@ -70,6 +70,13 @@ class BarraInferior(QWidget):
             destacado=False,
         )
 
+        self.btn_config_dian = self._crear_boton_rapido(
+            "DIAN",
+            "🧾",
+            "ConfiguracionDian",
+            destacado=False,
+        )
+
         separador = QFrame()
 
         separador.setFrameShape(
@@ -93,6 +100,10 @@ class BarraInferior(QWidget):
         )
 
         layout.addWidget(
+            self.btn_config_dian
+        )
+
+        layout.addWidget(
             separador
         )
 
@@ -111,6 +122,12 @@ class BarraInferior(QWidget):
         self.btn_empresas.clicked.connect(
             lambda: self.accion_rapida.emit(
                 "Empresas"
+            )
+        )
+
+        self.btn_config_dian.clicked.connect(
+            lambda: self.accion_rapida.emit(
+                "ConfiguracionDian"
             )
         )
 

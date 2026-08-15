@@ -3,6 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from aplicacion.maestros.empresas.maestro import MaestroEmpresas
+from aplicacion.integraciones.dian.configuracion_pagina import (
+    ConfiguracionDianPage,
+)
 from aplicacion.maestros.categorias.maestro import MaestroCategorias
 from aplicacion.maestros.marcas.maestro import MaestroMarcas
 from aplicacion.maestros.productos.maestro import MaestroProductos
@@ -203,6 +206,8 @@ from aplicacion.framework.menu_ids import (
 MODULOS = {
 
     "Empresas": MaestroEmpresas,
+
+    "ConfiguracionDian": ConfiguracionDianPage,
 
     "Categorías": MaestroCategorias,
 
@@ -547,6 +552,12 @@ GRUPOS: list[
                 "icono": "contabilidad",
                 "titulo": "Licencias",
                 "modulo": "AdminLicencias",
+            },
+
+            {
+                "icono": "contabilidad",
+                "titulo": "Configuración DIAN",
+                "modulo": "ConfiguracionDian",
             },
 
         ],
