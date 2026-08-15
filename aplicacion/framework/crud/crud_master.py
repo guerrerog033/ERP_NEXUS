@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-from aplicacion.framework.base.maestro_base import MaestroBase
+from sqlalchemy.exc import IntegrityError
 
-from aplicacion.framework.crud.crud_tabla import CrudTabla
+from aplicacion.framework.base.maestro_base import MaestroBase
 from aplicacion.framework.crud.crud_datos import CrudDatos
 from aplicacion.framework.crud.crud_eventos import CrudEventos
 from aplicacion.framework.crud.crud_formulario_dialog import (
     CrudFormularioDialog,
 )
 from aplicacion.framework.crud.crud_navegacion import CrudNavegacion
-
+from aplicacion.framework.crud.crud_tabla import CrudTabla
 from aplicacion.framework.table import TableEngine
 
 
@@ -259,8 +259,28 @@ class CrudMaster(
 
             return
 
-        self.backend().eliminar(
-            id_registro
-        )
+        try:
+
+            self.backend().eliminar(
+                id_registro
+            )
+
+        except IntegrityError:
+
+            self.mostrar_error(
+                "No se puede eliminar este registro "
+                "porque está siendo usado en otros "
+                "documentos."
+            )
+
+            return
+
+        except Exception as error:
+
+            self.mostrar_error(
+                f"No se pudo eliminar el registro: {error}"
+            )
+
+            return
 
         self.cargar_datos()
