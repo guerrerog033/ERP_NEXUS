@@ -2,22 +2,29 @@ from __future__ import annotations
 
 import re
 
+from PySide6.QtWidgets import QGroupBox, QVBoxLayout
+
 from aplicacion.framework.base.formulario_base import (
     FormularioBase,
 )
-
+from aplicacion.framework.documento import (
+    DVCalculator,
+)
+from aplicacion.framework.form.validators import (
+    ValidationError,
+)
 from aplicacion.integraciones.dian import DianServicio
-
 from aplicacion.maestros.empresas.datasource import (
     EmpresaDataSource,
 )
-
 from aplicacion.maestros.empresas.empresa_definition import (
     EmpresaDefinition,
 )
-
-from aplicacion.framework.documento import (
-    DVCalculator,
+from aplicacion.maestros.empresas.logo_widget import (
+    LogoEmpresaWidget,
+)
+from aplicacion.maestros.empresas.servicios import (
+    EmpresaServicio,
 )
 
 
@@ -55,6 +62,87 @@ class EmpresaFormulario(FormularioBase):
         )
 
         self._conectar_eventos()
+
+        self._insertar_logo_widget()
+
+    def _insertar_logo_widget(self):
+
+        self.logo_widget = LogoEmpresaWidget()
+
+        grupo = QGroupBox(
+            "Logo",
+        )
+
+        layout = QVBoxLayout(
+            grupo,
+        )
+
+        layout.addWidget(
+            self.logo_widget,
+        )
+
+        self.card.contenido.insertWidget(
+            self.card.contenido.count() - 1,
+            grupo,
+        )
+
+        if self.es_edicion:
+
+            registro = EmpresaServicio.obtener_por_id(
+                self.id_registro,
+            )
+
+            if (
+                registro is not None
+                and registro.logo_ruta
+            ):
+
+                self.logo_widget.establecer_ruta_relativa(
+                    registro.logo_ruta,
+                )
+
+    def guardar(self):
+
+        if self.datasource is None:
+
+            raise RuntimeError(
+                "No existe datasource configurado."
+            )
+
+        try:
+
+            datos = self.formulario.valores()
+
+            archivo = self.logo_widget.archivo_pendiente()
+
+            if archivo:
+
+                datos["_logo_archivo"] = archivo
+
+            elif self.logo_widget.ruta_relativa():
+
+                datos["logo_ruta"] = (
+                    self.logo_widget.ruta_relativa()
+                )
+
+            objeto = self.datasource.guardar(
+                datos,
+                self.id_registro,
+            )
+
+            self.guardar_exitoso(
+                objeto,
+            )
+
+        except ValidationError:
+
+            return
+
+        except Exception as error:
+
+            self.mostrar_error(
+                str(error),
+            )
 
     def _conectar_eventos(self):
 
