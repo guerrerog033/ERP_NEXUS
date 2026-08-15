@@ -444,7 +444,7 @@ class FormularioBase(Page):
 
             objeto = self.datasource.guardar(
 
-                self.formulario.valores(),
+                self.valores(),
 
                 self.id_registro,
 
