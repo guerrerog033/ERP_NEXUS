@@ -540,6 +540,9 @@ def test_vista_nota_credito_confirmar_deshabilitado_si_no_borrador(
     from aplicacion.maestros.terceros.servicio import (
         TerceroServicio,
     )
+    from aplicacion.modulos.ventas.notas_credito.datasource import (
+        NotaCreditoVentaDataSource,
+    )
     from aplicacion.modulos.ventas.notas_credito.vista import (
         VistaNotaCreditoVenta,
     )
@@ -549,20 +552,20 @@ def test_vista_nota_credito_confirmar_deshabilitado_si_no_borrador(
         contabilizado=True,
     )
 
-    mock_ds = MagicMock()
-    mock_ds.obtener_completa.return_value = nota
-
     monkeypatch.setattr(
         TerceroServicio,
         "obtener_por_id",
         lambda _id: _cliente_ui(),
     )
+    monkeypatch.setattr(
+        NotaCreditoVentaDataSource,
+        "obtener_completa",
+        lambda self, _id: nota,
+    )
 
     vista = VistaNotaCreditoVenta(
         9,
     )
-    vista.datasource = mock_ds
-    vista._cargar_datos()
 
     assert not vista.btn_confirmar.isEnabled()
 

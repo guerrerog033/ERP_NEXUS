@@ -95,6 +95,12 @@ def _datos_producto(
 
 
 def _preparar_maestros():
+    from aplicacion.maestros.empresas.repositorio import (
+        EmpresaRepositorio,
+    )
+    from aplicacion.maestros.empresas.servicios import (
+        EmpresaServicio,
+    )
     from aplicacion.maestros.impuestos.iva_catalogo import (
         id_iva_predeterminado,
     )
@@ -104,6 +110,18 @@ def _preparar_maestros():
     from aplicacion.maestros.listas_precio.servicios import (
         ServicioListaPrecio,
     )
+
+    if EmpresaRepositorio.obtener_por_nit("900123456") is None:
+
+        EmpresaServicio.guardar(
+            {
+                "razon_social": "Empresa Demo S.A.S.",
+                "nit": "900123456",
+                "dv": "7",
+                "pais": "Colombia",
+                "activo": True,
+            },
+        )
 
     ServicioImpuesto.inicializar_predeterminados()
     ServicioListaPrecio.inicializar_predeterminados()
