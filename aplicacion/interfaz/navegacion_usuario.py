@@ -3,16 +3,12 @@ from __future__ import annotations
 from PySide6.QtCore import QSettings
 
 from aplicacion.framework.menu_manifest import (
-    MODULO_INICIO,
     MODULO_PENDIENTE,
     etiqueta_modulo,
-    modulo_disponible,
 )
 
 
 class NavegacionUsuario:
-
-    MAX_RECIENTES = 5
 
     def __init__(
         self,
@@ -36,88 +32,6 @@ class NavegacionUsuario:
         return (
             f"usuario/{self._usuario_id}/{sufijo}"
         )
-
-    def registrar_visita(
-        self,
-        modulo_id: str,
-    ) -> None:
-
-        if modulo_id in (
-            MODULO_PENDIENTE,
-        ):
-
-            return
-
-        if not modulo_disponible(
-            modulo_id,
-        ) and modulo_id != MODULO_INICIO:
-
-            return
-
-        from aplicacion.framework.menu_manifest import (
-            modulo_accesible,
-        )
-
-        if not modulo_accesible(
-            modulo_id,
-        ):
-
-            return
-
-        recientes = self.recientes()
-
-        if modulo_id in recientes:
-
-            recientes.remove(
-                modulo_id,
-            )
-
-        recientes.insert(
-            0,
-            modulo_id,
-        )
-
-        recientes = recientes[
-            : self.MAX_RECIENTES
-        ]
-
-        self._settings.setValue(
-            self._clave(
-                "recientes",
-            ),
-            recientes,
-        )
-
-    def recientes(
-        self,
-    ) -> list[str]:
-
-        valores = self._settings.value(
-            self._clave(
-                "recientes",
-            ),
-            [],
-        )
-
-        if not isinstance(
-            valores,
-            list,
-        ):
-
-            return []
-
-        return [
-            str(
-                item,
-            )
-            for item in valores
-            if str(
-                item,
-            )
-            not in (
-                MODULO_PENDIENTE,
-            )
-        ]
 
     def favoritos(
         self,

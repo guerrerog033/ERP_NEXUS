@@ -375,16 +375,6 @@ class BotonSubmodulo(QFrame):
             self.modulo,
         )
 
-        dashboard = getattr(
-            AppContext,
-            "dashboard",
-            None,
-        )
-
-        if dashboard is not None:
-
-            dashboard.barra_lateral.actualizar_accesos_rapidos()
-
         self.favorito_solicitado.emit(
             self.modulo,
         )

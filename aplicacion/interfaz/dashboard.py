@@ -398,12 +398,6 @@ class Dashboard(QWidget):
 
             self.area_trabajo.mostrar_inicio()
 
-            self.navegacion.registrar_visita(
-                nombre,
-            )
-
-            self.barra_lateral.actualizar_accesos_rapidos()
-
             return
 
         if nombre == MODULO_PENDIENTE:
@@ -434,12 +428,6 @@ class Dashboard(QWidget):
             self.modulos.abrir(
                 nombre
             )
-
-            self.navegacion.registrar_visita(
-                nombre,
-            )
-
-            self.barra_lateral.actualizar_accesos_rapidos()
 
         except Exception:
 
