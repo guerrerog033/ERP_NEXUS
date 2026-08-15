@@ -1,0 +1,36 @@
+ de trabajo, usuario clicable, ayuda, configuración
+- **Área de trabajo con gradiente azul fuerte** — compite visualmente con formularios y tablas (Magister/Siigo usan fondo **neutro**)
+- **Inicio con KPIs falsos** (`$0`) — resta credibilidad
+- **Dos patrones de formulario** — pestaña vs. diálogo modal (Terceros vs. resto)
+- **Doble wrapper `Page`** — contenido con mucho padding anidado
+- **Módulos “pendientes”** en menú sin distinguirse bien de los activos
+
+---
+
+## Propuesta: interfaz “ERP profesional” para NEXUS
+
+### 1. Nueva arquitectura visual
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│ [Logo] EMPRESA S.A.S.  │ 🔍 Buscar módulos... │ 09/08/2026 │ 👤 │
+├────────────┬─────────────────────────────────────────────────────┤
+│ ⭐ Favoritos│ Ventas › Cotizaciones › COT000002          [···]  │
+│────────────│─────────────────────────────────────────────────────│
+│ Inicio     │                                                     │
+│ Ventas  ▾  │   Contenido (fondo #F8FAFC, cards blancas)          │
+│ Terceros ▾ │                                                     │
+│ Productos▾ │                                                     │
+│ Config     │                                                     │
+│            │                                                     │
+│ 240px fijo │                                                     │
+├────────────┴─────────────────────────────────────────────────────┤
+│ NEXUS │ admin │ Empresa demo │ domingo, 9 ago 2026, 8:12 a. m.  │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+**Cambios clave de diseño**
+| Elemento | Hoy | Propuesto |
+|----------|-----|-----------|
+| Fondo área trabajo | Gradiente azul | Gris claro `#F1F5F9` (contenido protagonista) |
+| Sidebar | Hover expand 68→2

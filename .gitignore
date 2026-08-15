@@ -27,3 +27,6 @@ build/
 # Respaldos y paquetes locales (no versionar ni incluir en ZIPs)
 *.zip
 *.7z
+
+# Documentos electrónicos generados en pruebas (contienen datos reales)
+aplicacion/recursos/xml/*/*.xml

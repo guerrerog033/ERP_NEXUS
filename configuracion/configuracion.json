@@ -1,0 +1,236 @@
+{
+    "erp": {
+        "nombre": "ERP NEXUS",
+        "version": "1.0.0",
+        "empresa_desarrolladora": "NEXUS SOFTWARE"
+    },
+
+    "general": {
+        "idioma": "es_CO",
+        "moneda": "COP",
+        "tema": "oscuro",
+        "modo_debug": true
+    },
+
+    "empresa": {
+        "nombre": "",
+        "nit": "",
+        "direccion": "",
+        "telefono": "",
+        "correo": "",
+        "ciudad": "",
+        "pais": "Colombia",
+        "notas_pie": "",
+        "vendedor_nombre": "",
+        "vendedor_correo": "",
+        "vendedor_telefono": ""
+    },
+
+    "base_datos": {
+        "motor": "sqlite",
+        "archivo": "erp_nexus.db"
+    },
+
+    "dian": {
+        "habilitado": true,
+        "consulta_publica": true,
+        "validacion_cufe": true,
+        "timeout_segundos": 30,
+        "ambiente": "produccion",
+        "url_catalogo_cufe": "https://catalogo-vpfe.dian.gov.co/document/searchqr",
+        "url_muisca": "https://muisca.dian.gov.co/WebRutMuisca/DefConsultaEstadoRUT.faces",
+        "url_rues": "https://www.datos.gov.co/resource/c82u-588k.json",
+        "url_rues_personas": "https://www.datos.gov.co/resource/cas9-r54x.json",
+        "emision_habilitada": true,
+        "ambiente_emision": "habilitacion",
+        "test_set_id": "",
+        "software_id": "",
+        "software_pin": "",
+        "certificado_ruta": "",
+        "certificado_clave": "",
+        "prefijo_factura": "SETP",
+        "resolucion_numero": "18760000001",
+        "resolucion_fecha_inicio": "2019-01-19",
+        "resolucion_fecha_fin": "2030-01-19",
+        "resolucion_desde": "990000000",
+        "resolucion_hasta": "995000000",
+        "carpeta_xml_venta": "aplicacion/recursos/xml/facturas_venta",
+        "contenedor_incluir_pdf": true,
+        "recepcion_compras": {
+            "habilitado": false,
+            "modo": "api",
+            "url_base": "",
+            "token": "",
+            "nit_receptor": "",
+            "dias_consulta": 30,
+            "pagina_tamano": 50,
+            "auto_validar_cufe": true,
+            "modo_automatico": true,
+            "intervalo_minutos": 30,
+            "sincronizar_al_iniciar": true,
+            "sincronizar_al_abrir_compras": true,
+            "crear_proveedor_automatico": true,
+            "auto_acuse_recibo_credito": true,
+            "notificar_nuevas": true,
+            "oauth": {
+                "habilitado": false,
+                "url_token": "",
+                "client_id": "",
+                "client_secret": ""
+            },
+            "endpoints": {
+                "listar_recibidos": "/v1/documents/received?page={page}&per_page={per_page}&from={fecha_desde}&to={fecha_hasta}&receiver_nit={nit_receptor}",
+                "descargar_xml": "/v1/documents/{track_id}/xml",
+                "enviar_acuse_recibo": "/v1/documents/events/acuse-recibo"
+            },
+            "nota": "Token Bearer del proveedor tecnológico. En modo automático las facturas se importan solas y quedan pendientes de revisión."
+        },
+        "radian": {
+            "habilitado": false,
+            "modo_automatico": false,
+            "intervalo_minutos": 60,
+            "dias_aceptacion_tacita": 5,
+            "exigir_evento_031": true,
+            "ejecutar_al_iniciar": true,
+            "nota": "Programador de aceptación tácita RADIAN 033 sobre facturas recibidas sin respuesta."
+        },
+        "nota": "Consulta pública y validación CUFE sin certificado. La emisión FE requiere certificado digital y habilitación DIAN."
+    },
+
+    "contabilidad": {
+        "cuentas": {
+            "inventario": "143501",
+            "iva_descontable": "240801",
+            "cuentas_por_pagar": "220501",
+            "gasto_compras": "613501",
+            "ingresos": "413501",
+            "iva_generado": "240805",
+            "cuentas_por_cobrar": "130505",
+            "costo_ventas": "613505",
+            "caja": "110505",
+            "bancos": "111005",
+            "retencion_retefuente_compra": "23654001",
+            "retencion_reteica_compra": "23680501",
+            "retencion_reteiva_compra": "23680101"
+        }
+    },
+
+    "inventario": {
+        "bodega_predeterminada": "PRINCIPAL",
+        "bodega_ventas_id": null,
+        "nota": "bodega_ventas_id: ID numérico de bodega para salidas de venta; null usa la predeterminada."
+    },
+
+    "compras": {
+        "prefijo": "FC",
+        "longitud_secuencia": 6,
+        "carpeta_xml": "aplicacion/recursos/xml/facturas_compra",
+        "exigir_cufe_validado_contabilizar": true,
+        "crear_proveedor_automatico": true,
+        "auto_acuse_recibo_credito": true,
+        "procesar_automatico": true,
+        "aprobar_automatico": true,
+        "auto_validar_cufe": true,
+        "emparejar_productos_automatico": true,
+        "contabilizar_automatico": true,
+        "exigir_productos_emparejados": false,
+        "inventario_en_recepcion": true,
+        "radian_031_en_recepcion": true,
+        "auto_vincular_orden": true,
+        "exigir_match_oc": false,
+        "exigir_match_oc_contabilizar": false,
+        "prefijo_nota_credito": "NCC",
+        "nota": "Automatización completa: sync/import → aprobar → CUFE → productos → retenciones → contabilizar. inventario_en_recepcion evita doble entrada al contabilizar facturas vinculadas a OC recibida."
+    },
+
+    "ventas": {
+        "prefijo_factura": "FV",
+        "prefijo_remision": "REM",
+        "prefijo_remision_interna": "REM",
+        "prefijo_guia_remision": "GRE",
+        "carpeta_xml_guia_remision": "aplicacion/recursos/xml/guias_remision",
+        "exigir_guia_emitida_entrega": true,
+        "reservar_stock_pedido": true,
+        "longitud_secuencia": 6,
+        "contabilizar_automatico": true,
+        "nota": "Remisión interna (operativa/inventario) y guía electrónica DIAN (tránsito). prefijo_remision se mantiene por compatibilidad."
+    },
+
+    "tesoreria": {
+        "prefijo_recibo_caja": "RC",
+        "prefijo_comprobante_egreso": "CE",
+        "longitud_secuencia": 6,
+        "contabilizar_automatico": false,
+        "nota": "Recibos de caja (cobros) y comprobantes de egreso (pagos a proveedores)."
+    },
+
+    "productos": {
+        "codigo_automatico": true,
+        "prefijo": "PRD",
+        "longitud_secuencia": 6,
+        "nota": "Se aplicará al crear el módulo de productos."
+    },
+
+    "impresion": {
+        "formato_predeterminado": "estandar",
+        "formatos_disponibles": [
+            "estandar",
+            "electronica",
+            "carta",
+            "corporativo",
+            "moderno",
+            "compacto",
+            "tirilla"
+        ],
+        "ancho_tirilla_mm": 80,
+        "motor_pdf": "auto",
+        "motor_pdf_html_respaldo": true,
+        "nota": "Formatos: estandar (clásico), carta, corporativo, moderno, compacto, tirilla (POS 80mm). motor_pdf: auto, reportlab o html."
+    },
+
+    "reportes": {
+        "ruta": "reportes"
+    },
+
+    "copias_seguridad": {
+        "ruta": "backups"
+    },
+
+    "licencias": {
+        "habilitado": true,
+        "modo_desarrollo": true,
+        "panel_admin_habilitado": true,
+        "secreto_validacion": "erp-nexus-dev-secret",
+        "dias_alerta_vencimiento": 15,
+        "servidor_online": {
+            "habilitado": false,
+            "url_validar": "http://localhost:8765/api/v1/licencias/validar",
+            "url_activar": "http://localhost:8765/api/v1/licencias/activar",
+            "token_api": "",
+            "timeout_segundos": 10,
+            "validar_al_inicio": true,
+            "validar_al_activar": true,
+            "fallar_si_sin_conexion": false
+        },
+        "nota": "modo_desarrollo omite la activación. En producción cambie secreto_validacion y ponga modo_desarrollo en false."
+    },
+
+    "api": {
+        "habilitado": true,
+        "puerto": 8765,
+        "nota": "API REST local y portal de aceptación de cotizaciones."
+    },
+
+    "correo": {
+        "facturas": {
+            "habilitado": false,
+            "servidor_imap": "",
+            "usuario": "",
+            "clave": "",
+            "carpeta": "INBOX",
+            "intervalo_minutos": 15,
+            "marcar_leido": true,
+            "nota": "Procesa adjuntos XML de facturas recibidas por correo."
+        }
+    }
+}
