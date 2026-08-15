@@ -7,7 +7,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QMessageBox
+from PySide6.QtWidgets import QDialog, QMessageBox
 
 
 pytestmark = pytest.mark.usefixtures(
@@ -136,6 +136,11 @@ def _auto_confirmar(
         QMessageBox,
         "warning",
         lambda *args, **kwargs: None,
+    )
+    monkeypatch.setattr(
+        QDialog,
+        "exec",
+        lambda self: QDialog.DialogCode.Accepted,
     )
 
 

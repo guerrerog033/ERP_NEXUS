@@ -122,17 +122,8 @@ def test_reporte_factura_electronica_nombre_pdf():
 
 
 @patch(
-    "aplicacion.modulos.ventas.facturas.formatos_impresion._datos_empresa",
-    return_value={
-        "nombre": "Empresa Demo",
-        "nit": "900.123.456-7",
-    },
-)
-@patch(
-    "aplicacion.modulos.ventas.facturas.formatos_impresion._datos_cliente",
-    return_value={
-        "documento": "800.123.456-1",
-    },
+    "aplicacion.reportes.comunes.datos_documento.factura_venta_a_dto",
+    return_value={},
 )
 @patch(
     "aplicacion.reportes.ventas.factura_electronica.generar_html_factura_electronica",
@@ -140,7 +131,7 @@ def test_reporte_factura_electronica_nombre_pdf():
 )
 def test_generar_html_factura_venta_usa_plantilla_electronica(
     mock_fe,
-    *_mocks,
+    _mock_dto,
 ):
 
     from aplicacion.modulos.ventas.facturas.formatos_impresion import (

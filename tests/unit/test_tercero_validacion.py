@@ -222,7 +222,7 @@ def test_validar_tipo_tercero_invalido(
 ):
 
     datos = _datos_tercero_base(
-        tipo_tercero="Empleado",
+        tipo_tercero="Socio",
     )
 
     with pytest.raises(
