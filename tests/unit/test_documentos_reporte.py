@@ -123,26 +123,25 @@ def test_generar_html_orden_compra(
 
 
 @patch(
-    "aplicacion.modulos.tesoreria.recibos_caja.formatos_impresion.recibo_caja_a_dto",
-)
-@patch(
-    "aplicacion.modulos.tesoreria.recibos_caja.formatos_impresion.html_comercial_desde_dto",
-    return_value="<html>RECIBO</html>",
+    "aplicacion.modulos.tesoreria.recibos_caja.formatos_impresion._datos_empresa",
+    return_value={
+        "nombre": "Empresa",
+        "nit": "900",
+        "direccion": "",
+        "telefono": "",
+        "correo": "",
+        "ciudad": "",
+        "pais": "Colombia",
+        "notas_pie": "",
+        "vendedor_nombre": "",
+        "vendedor_correo": "",
+        "vendedor_telefono": "",
+        "logo_ruta": "",
+    },
 )
 def test_generar_html_recibo_caja_usa_dto(
-    mock_html,
-    mock_dto,
+    *_mocks,
 ):
-
-    mock_dto.return_value = {
-        "numero": "RC-001",
-        "fecha": "10/08/2026",
-        "valor": 1250000,
-        "cliente": {
-            "nombre": "Cliente ABC",
-        },
-        "lineas": [],
-    }
 
     recibo = MagicMock()
     recibo.numero = "RC-001"
@@ -152,17 +151,20 @@ def test_generar_html_recibo_caja_usa_dto(
         10,
     )
     recibo.estado = "aplicado"
-    recibo.forma_pago = "Transferencia"
+    recibo.forma_pago = "transferencia"
     recibo.valor_total = 1250000
     recibo.observaciones = ""
     recibo.detalles = []
+    recibo.cliente_id = None
 
     html = generar_html_recibo(
         recibo,
-        nombre_cliente="Cliente ABC",
+        nombre_cliente="Contraparte ABC",
+        formato="carta",
     )
 
-    assert html == "<html>RECIBO</html>"
-    mock_dto.assert_called_once()
-    mock_html.assert_called_once()
+    assert "RC-001" in html
+    assert "Recibimos de" in html
+    assert "Contraparte ABC" in html
+    assert "Cliente" not in html
 
