@@ -18,6 +18,10 @@ from aplicacion.maestros.marcas.marca_lookup import (
     MarcaLookup,
 )
 
+from aplicacion.maestros.unidades_medida.unidad_medida_lookup import (
+    UnidadMedidaLookup,
+)
+
 from aplicacion.maestros.productos.productos_table import (
     ProductoTable,
 )
@@ -91,20 +95,11 @@ class ProductoDefinition(FormDefinition):
                     ],
                 ),
 
-                ComboField(
-                    nombre="unidad_medida",
+                LookupField(
+                    nombre="unidad_medida_id",
                     titulo="Unidad de medida",
-                    requerido=True,
-                    valor_inicial="Und",
-                    opciones=[
-                        ("Und", "Und"),
-                        ("Par", "Par"),
-                        ("Caja", "Caja"),
-                        ("Pq", "Pq"),
-                        ("Mts", "Mts"),
-                        ("Gls", "Gls"),
-                        ("Lts", "Lts"),
-                    ],
+                    datasource=UnidadMedidaLookup,
+                    permitir_vacio=False,
                 ),
 
                 LookupField(

@@ -149,6 +149,10 @@ class GeneradorDocumentoSoporte:
 
         lineas_xml = ""
 
+        # DocumentoSoporteDetalle no tiene producto_id (línea de
+        # texto libre, sin vínculo al catálogo), así que no hay
+        # unidad de medida real que consultar por línea — se usa
+        # "94" (unidad, UN/CEFACT) como en GeneradorXmlFactura._codigo_unidad.
         for indice, detalle in enumerate(
             documento.detalles,
             start=1,
@@ -157,7 +161,7 @@ class GeneradorDocumentoSoporte:
             lineas_xml += f"""
   <cac:InvoiceLine>
     <cbc:ID>{indice}</cbc:ID>
-    <cbc:InvoicedQuantity unitCode="EA">{float(detalle.cantidad):.2f}</cbc:InvoicedQuantity>
+    <cbc:InvoicedQuantity unitCode="94">{float(detalle.cantidad):.2f}</cbc:InvoicedQuantity>
     <cbc:LineExtensionAmount currencyID="COP">{float(detalle.total_linea):.2f}</cbc:LineExtensionAmount>
     <cac:Item>
       <cbc:Description>{escape(detalle.descripcion)}</cbc:Description>

@@ -6,6 +6,9 @@ from datetime import datetime
 from pathlib import Path
 from xml.sax.saxutils import escape
 
+from aplicacion.integraciones.dian.generador_xml import (
+    GeneradorXmlFactura,
+)
 from aplicacion.nucleo.configuracion import Configuracion
 
 
@@ -198,10 +201,14 @@ class GeneradorGuiaRemision:
             start=1,
         ):
 
+            codigo_unidad = GeneradorXmlFactura._codigo_unidad(
+                detalle.producto_id,
+            )
+
             lineas_xml += f"""
   <cac:DespatchLine>
     <cbc:ID>{indice}</cbc:ID>
-    <cbc:DeliveredQuantity unitCode="EA">{float(detalle.cantidad):.2f}</cbc:DeliveredQuantity>
+    <cbc:DeliveredQuantity unitCode="{codigo_unidad}">{float(detalle.cantidad):.2f}</cbc:DeliveredQuantity>
     <cac:Item>
       <cbc:Description>{escape(detalle.descripcion)}</cbc:Description>
     </cac:Item>

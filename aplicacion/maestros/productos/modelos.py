@@ -61,10 +61,20 @@ class Producto(Base):
         default="producto",
     )
 
-    unidad_medida = Column(
+    unidad_medida_legacy = Column(
+        "unidad_medida",
         String(20),
-        nullable=False,
-        default="UND",
+        nullable=True,
+    )
+
+    unidad_medida_id = Column(
+        Integer,
+        ForeignKey(
+            "unidades_medida.id",
+            ondelete="SET NULL",
+        ),
+        nullable=True,
+        index=True,
     )
 
     categoria_id = Column(
@@ -169,6 +179,10 @@ class Producto(Base):
         onupdate=func.now(),
     )
 
+    unidad_medida = relationship(
+        "UnidadMedida",
+    )
+
     categoria = relationship(
         "Categoria",
     )
@@ -213,6 +227,29 @@ class Producto(Base):
         return bool(
             self.maneja_variantes,
         )
+
+    @property
+    def unidad_medida_codigo(self) -> str:
+        """
+        Código de la unidad de medida por su id (no navega la
+        relación ``unidad_medida``: el objeto suele venir de una
+        sesión ya cerrada — ver aplicacion.comunes.repositorio_base
+        — y la carga perezosa fallaría con DetachedInstanceError).
+        """
+
+        if not self.unidad_medida_id:
+
+            return ""
+
+        from aplicacion.maestros.unidades_medida.repositorio import (
+            UnidadMedidaRepositorio,
+        )
+
+        unidad = UnidadMedidaRepositorio.obtener_por_id(
+            self.unidad_medida_id,
+        )
+
+        return unidad.codigo if unidad is not None else ""
 
     def __repr__(self) -> str:
 

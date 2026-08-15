@@ -81,7 +81,6 @@ def _datos_producto(
         "codigo": f"PRD{sufijo.upper()}",
         "nombre": f"Producto Flujo Demo {sufijo}",
         "tipo": "producto",
-        "unidad_medida": "Und",
         "precio_venta": 25000,
         "precio_incluye_iva": False,
         "costo": 12000,
@@ -110,6 +109,9 @@ def _preparar_maestros():
     from aplicacion.maestros.listas_precio.servicios import (
         ServicioListaPrecio,
     )
+    from aplicacion.maestros.unidades_medida.servicios import (
+        ServicioUnidadMedida,
+    )
 
     if EmpresaRepositorio.obtener_por_nit("900123456") is None:
 
@@ -125,6 +127,7 @@ def _preparar_maestros():
 
     ServicioImpuesto.inicializar_predeterminados()
     ServicioListaPrecio.inicializar_predeterminados()
+    ServicioUnidadMedida.inicializar_predeterminados()
 
     impuesto_id = id_iva_predeterminado()
 

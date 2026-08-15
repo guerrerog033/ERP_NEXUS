@@ -159,9 +159,13 @@ def _preparar_maestros_pos():
     from aplicacion.maestros.listas_precio.servicios import (
         ServicioListaPrecio,
     )
+    from aplicacion.maestros.unidades_medida.servicios import (
+        ServicioUnidadMedida,
+    )
 
     ServicioImpuesto.inicializar_predeterminados()
     ServicioListaPrecio.inicializar_predeterminados()
+    ServicioUnidadMedida.inicializar_predeterminados()
 
     impuesto_id = id_iva_predeterminado()
 
@@ -213,7 +217,6 @@ def _datos_producto_pos(
         "codigo": f"POS{sufijo.upper()}",
         "nombre": f"Producto POS Demo {sufijo}",
         "tipo": "producto",
-        "unidad_medida": "Und",
         "precio_venta": 25000,
         "precio_incluye_iva": False,
         "costo": 12000,

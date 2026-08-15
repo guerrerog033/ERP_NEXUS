@@ -42,7 +42,7 @@ ProductoTable = TableDefinition(
         ),
 
         Column(
-            nombre="unidad_medida",
+            nombre="unidad_medida_codigo",
             etiqueta="Unidad",
         ),
 
