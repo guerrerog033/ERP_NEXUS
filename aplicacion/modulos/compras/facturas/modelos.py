@@ -215,6 +215,12 @@ class FacturaCompra(Base):
         default="recibida",
     )
 
+    formato_impresion = Column(
+        String(20),
+        nullable=False,
+        default="carta",
+    )
+
     cufe_validado = Column(
         Boolean,
         default=False,

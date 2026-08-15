@@ -1,58 +1,207 @@
 from __future__ import annotations
 
-from aplicacion.framework.reportes.numero_letras import (
-    numero_a_letras,
-)
-from aplicacion.framework.reportes.plantilla_comercial import (
-    html_documento_comercial,
-)
 from aplicacion.modulos.ventas.cotizaciones.formatos_impresion import (
+    ContextoFormato,
     _datos_empresa,
-    _formatear_moneda,
+    formatos_combo,
+    generar_html_desde_contexto,
 )
-from aplicacion.recursos.estilos import colores
 
 
-def _filas_detalle(
-    detalles,
+def _datos_proveedor(
+    factura,
+    nombre_proveedor: str,
+    *,
+    correo_proveedor: str = "",
+) -> dict:
+
+    from aplicacion.maestros.terceros.servicio import (
+        TerceroServicio,
+    )
+
+    proveedor_id = getattr(
+        factura,
+        "proveedor_id",
+        None,
+    )
+
+    proveedor = (
+        TerceroServicio.obtener_por_id(
+            proveedor_id,
+        )
+        if proveedor_id
+        else None
+    )
+
+    if proveedor is not None:
+
+        nit = str(
+            proveedor.numero_documento
+            or "",
+        ).strip()
+
+        if getattr(
+            proveedor,
+            "dv",
+            None,
+        ):
+
+            nit = f"{nit}-{proveedor.dv}"
+
+        nombre = (
+            proveedor.razon_social
+            or proveedor.nombre_completo
+            or nombre_proveedor
+        )
+
+        contacto = (
+            proveedor.nombre_comercial
+            or proveedor.razon_social
+            or proveedor.nombre_completo
+            or nombre_proveedor
+        )
+
+        return {
+            "nombre": nombre,
+            "nit": nit,
+            "contacto": contacto,
+            "direccion": str(
+                proveedor.direccion
+                or "No aplica",
+            ),
+            "ciudad": str(
+                proveedor.ciudad or "",
+            ),
+            "telefono": str(
+                proveedor.telefono
+                or proveedor.celular
+                or "",
+            ),
+            "correo": str(
+                proveedor.correo
+                or correo_proveedor
+                or "",
+            ),
+        }
+
+    nit = str(
+        getattr(
+            factura,
+            "nit_proveedor",
+            "",
+        )
+        or "",
+    )
+
+    nombre = (
+        getattr(
+            factura,
+            "razon_social_proveedor",
+            "",
+        )
+        or nombre_proveedor
+    )
+
+    return {
+        "nombre": nombre,
+        "nit": nit,
+        "contacto": nombre,
+        "direccion": "No aplica",
+        "ciudad": "",
+        "telefono": "",
+        "correo": correo_proveedor,
+    }
+
+
+def _info_adicional_factura_compra(
+    factura,
 ) -> str:
 
-    filas = ""
+    partes: list[str] = []
 
-    for indice, detalle in enumerate(
-        detalles,
-        start=1,
-    ):
+    if factura.cufe:
 
-        cantidad = float(
-            detalle.cantidad or 0,
+        partes.append(
+            f"<p><strong>CUFE:</strong> {factura.cufe}</p>",
         )
 
-        precio = float(
-            detalle.precio_unitario or 0,
+    if factura.numero_proveedor:
+
+        partes.append(
+            f"<p><strong>Factura proveedor:</strong> "
+            f"{factura.numero_proveedor}</p>",
         )
 
-        total = float(
-            detalle.total_linea
-            or cantidad * precio,
-        )
+    partes.append(
+        f"<p>Origen: {factura.origen} · "
+        f"Estado: {factura.estado}</p>",
+    )
 
-        filas += (
-            f"<tr>"
-            f"<td style='padding:5px 6px;border:1px solid {colores.BORDER};'>"
-            f"{indice}</td>"
-            f"<td style='padding:5px 6px;border:1px solid {colores.BORDER};'>"
-            f"{detalle.descripcion}</td>"
-            f"<td style='padding:5px 6px;border:1px solid {colores.BORDER};"
-            f"text-align:right;'>{cantidad:g}</td>"
-            f"<td style='padding:5px 6px;border:1px solid {colores.BORDER};"
-            f"text-align:right;'>{_formatear_moneda(precio)}</td>"
-            f"<td style='padding:5px 6px;border:1px solid {colores.BORDER};"
-            f"text-align:right;'>{_formatear_moneda(total)}</td>"
-            f"</tr>"
-        )
+    return "".join(
+        partes,
+    )
 
-    return filas
+
+def _crear_contexto_factura_compra(
+    factura,
+    detalles,
+    nombre_proveedor: str,
+    *,
+    correo_proveedor: str = "",
+) -> ContextoFormato:
+
+    resumen = {
+        "subtotal": float(
+            factura.subtotal or 0,
+        ),
+        "retefuente": float(
+            factura.valor_retefuente or 0,
+        ),
+        "reteica": float(
+            factura.valor_reteica or 0,
+        ),
+        "reteiva": float(
+            factura.valor_reteiva or 0,
+        ),
+        "iva": float(
+            factura.iva or 0,
+        ),
+        "total": float(
+            factura.total or 0,
+        ),
+    }
+
+    return ContextoFormato(
+        cotizacion=factura,
+        detalles=list(
+            detalles,
+        ),
+        nombre_cliente=nombre_proveedor,
+        resumen=resumen,
+        empresa=_datos_empresa(),
+        cliente=_datos_proveedor(
+            factura,
+            nombre_proveedor,
+            correo_proveedor=correo_proveedor,
+        ),
+        fecha=(
+            factura.fecha.strftime(
+                "%d/%m/%Y",
+            )
+            if factura.fecha
+            else ""
+        ),
+        observaciones=str(
+            factura.observaciones or "",
+        ).strip(),
+        etiqueta_documento="FACTURA DE COMPRA",
+        titulo_documento="Factura de compra",
+        info_adicional=_info_adicional_factura_compra(
+            factura,
+        ),
+        mostrar_imagenes=False,
+        etiqueta_contraparte="Proveedor",
+    )
 
 
 def generar_html_factura_compra(
@@ -62,86 +211,27 @@ def generar_html_factura_compra(
     *,
     documento_proveedor: str = "",
     correo_proveedor: str = "",
+    formato: str | None = None,
 ) -> str:
 
-    empresa = _datos_empresa()
-
-    info = ""
-
-    if factura.cufe:
-
-        info += (
-            f"<p><strong>CUFE:</strong> {factura.cufe}</p>"
-        )
-
-    if factura.numero_proveedor:
-
-        info += (
-            f"<p><strong>Factura proveedor:</strong> "
-            f"{factura.numero_proveedor}</p>"
-        )
-
-    info += (
-        f"<p>Origen: {factura.origen} · "
-        f"Estado: {factura.estado}</p>"
+    ctx = _crear_contexto_factura_compra(
+        factura,
+        detalles,
+        nombre_proveedor,
+        correo_proveedor=correo_proveedor,
     )
 
-    return html_documento_comercial(
-        empresa=empresa,
-        titulo_documento="FACTURA DE COMPRA",
-        numero_documento=str(
-            factura.numero or "",
-        ),
-        fecha=factura.fecha.strftime(
-            "%d/%m/%Y",
-        ),
-        estado=str(
-            factura.estado or "",
-        ),
-        contraparte_titulo="PROVEEDOR",
-        contraparte_nombre=nombre_proveedor,
-        contraparte_documento=documento_proveedor,
-        contraparte_correo=correo_proveedor,
-        filas_tabla=_filas_detalle(
-            detalles,
-        ),
-        subtotal=_formatear_moneda(
-            float(
-                factura.subtotal or 0,
-            ),
-        ),
-        iva=_formatear_moneda(
-            float(
-                factura.iva or 0,
-            ),
-        ),
-        total=_formatear_moneda(
-            float(
-                factura.total or 0,
-            ),
-        ),
-        valor_letras=numero_a_letras(
-            float(
-                factura.total or 0,
-            ),
-        ),
-        observaciones=str(
-            factura.observaciones
-            or "",
-        ).strip(),
-        info_adicional=info,
-        notas_pie=str(
-            empresa.get(
-                "notas_pie",
-                "",
-            )
-            or "",
-        ),
-        columnas_tabla=(
-            "#",
-            "Descripción",
-            "Cant.",
-            "Costo",
-            "Total",
-        ),
+    if documento_proveedor and not ctx.cliente["nit"]:
+
+        ctx.cliente["nit"] = documento_proveedor
+
+    return generar_html_desde_contexto(
+        ctx,
+        formato,
     )
+
+
+__all__ = [
+    "formatos_combo",
+    "generar_html_factura_compra",
+]
