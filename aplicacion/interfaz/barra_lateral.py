@@ -716,25 +716,7 @@ class BarraLateral(QWidget):
 
 
 
-        recientes = [
-
-            modulo_id
-
-            for modulo_id in navegacion.recientes()
-
-            if modulo_id
-
-            not in favoritos
-
-            and modulo_accesible(
-                modulo_id,
-            )
-
-        ]
-
-
-
-        if not favoritos and not recientes:
+        if not favoritos:
 
 
 
@@ -758,63 +740,29 @@ class BarraLateral(QWidget):
 
 
 
-        if favoritos:
+        self._agregar_etiqueta_acceso(
+
+            "Favoritos",
+
+        )
 
 
 
-            self._agregar_etiqueta_acceso(
-
-                "Favoritos",
-
-            )
+        for modulo_id in favoritos:
 
 
 
-            for modulo_id in favoritos:
+            self._agregar_boton_acceso(
 
-
-
-                self._agregar_boton_acceso(
-
-                    navegacion.etiqueta(
-
-                        modulo_id,
-
-                    ),
+                navegacion.etiqueta(
 
                     modulo_id,
 
-                )
+                ),
 
-
-
-        if recientes:
-
-
-
-            self._agregar_etiqueta_acceso(
-
-                "Recientes",
+                modulo_id,
 
             )
-
-
-
-            for modulo_id in recientes:
-
-
-
-                self._agregar_boton_acceso(
-
-                    navegacion.etiqueta(
-
-                        modulo_id,
-
-                    ),
-
-                    modulo_id,
-
-                )
 
 
 
