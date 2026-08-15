@@ -10,9 +10,6 @@ from aplicacion.framework.base.formulario_base import (
 from aplicacion.framework.documento import (
     DVCalculator,
 )
-from aplicacion.framework.form.validators import (
-    ValidationError,
-)
 from aplicacion.integraciones.dian import DianServicio
 from aplicacion.maestros.empresas.datasource import (
     EmpresaDataSource,
@@ -101,48 +98,23 @@ class EmpresaFormulario(FormularioBase):
                     registro.logo_ruta,
                 )
 
-    def guardar(self):
+    def valores(self):
 
-        if self.datasource is None:
+        datos = super().valores()
 
-            raise RuntimeError(
-                "No existe datasource configurado."
+        archivo = self.logo_widget.archivo_pendiente()
+
+        if archivo:
+
+            datos["_logo_archivo"] = archivo
+
+        elif self.logo_widget.ruta_relativa():
+
+            datos["logo_ruta"] = (
+                self.logo_widget.ruta_relativa()
             )
 
-        try:
-
-            datos = self.formulario.valores()
-
-            archivo = self.logo_widget.archivo_pendiente()
-
-            if archivo:
-
-                datos["_logo_archivo"] = archivo
-
-            elif self.logo_widget.ruta_relativa():
-
-                datos["logo_ruta"] = (
-                    self.logo_widget.ruta_relativa()
-                )
-
-            objeto = self.datasource.guardar(
-                datos,
-                self.id_registro,
-            )
-
-            self.guardar_exitoso(
-                objeto,
-            )
-
-        except ValidationError:
-
-            return
-
-        except Exception as error:
-
-            self.mostrar_error(
-                str(error),
-            )
+        return datos
 
     def _conectar_eventos(self):
 
