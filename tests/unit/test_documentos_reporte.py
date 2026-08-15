@@ -80,6 +80,16 @@ def test_crear_reporte_pedido():
     return_value={
         "nombre": "Empresa",
         "nit": "900",
+        "direccion": "",
+        "telefono": "",
+        "correo": "",
+        "ciudad": "",
+        "pais": "Colombia",
+        "notas_pie": "",
+        "vendedor_nombre": "",
+        "vendedor_correo": "",
+        "vendedor_telefono": "",
+        "logo_ruta": "",
     },
 )
 def test_generar_html_orden_compra(
@@ -97,15 +107,19 @@ def test_generar_html_orden_compra(
     orden.subtotal = 50000
     orden.total = 50000
     orden.observaciones = ""
+    orden.proveedor_id = None
 
     html = generar_html_orden_compra(
         orden,
         [],
         "Proveedor XYZ",
+        formato="carta",
     )
 
-    assert "ORDEN DE COMPRA" in html
+    assert "Orden de compra" in html
     assert "OC-001" in html
+    assert "Proveedor XYZ" in html
+    assert "Cliente" not in html
 
 
 @patch(

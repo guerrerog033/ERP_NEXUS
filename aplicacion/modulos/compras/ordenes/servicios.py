@@ -301,6 +301,7 @@ class ServicioOrdenCompra:
         observaciones: str = "",
         lineas: list[dict],
         orden_id: int | None = None,
+        formato_impresion: str | None = None,
     ) -> OrdenCompra:
 
         if not proveedor_id:
@@ -360,6 +361,10 @@ class ServicioOrdenCompra:
                     observaciones=observaciones,
                     estado="pendiente",
                     activo=True,
+                    formato_impresion=(
+                        formato_impresion
+                        or "carta"
+                    ),
                 )
 
                 db.add(orden)
@@ -424,6 +429,12 @@ class ServicioOrdenCompra:
             orden.observaciones = observaciones
             orden.subtotal = subtotal
             orden.total = subtotal
+
+            if formato_impresion:
+
+                orden.formato_impresion = (
+                    formato_impresion
+                )
 
             db.commit()
             db.refresh(orden)

@@ -70,6 +70,12 @@ class OrdenCompra(Base):
         default="pendiente",
     )
 
+    formato_impresion = Column(
+        String(20),
+        nullable=False,
+        default="carta",
+    )
+
     activo = Column(
         Boolean,
         default=True,

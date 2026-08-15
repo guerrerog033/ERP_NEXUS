@@ -6,6 +6,8 @@ from PySide6.QtCore import QDate
 
 from PySide6.QtWidgets import (
 
+    QComboBox,
+
     QDateEdit,
 
     QDialog,
@@ -46,10 +48,18 @@ from aplicacion.maestros.terceros.proveedor_lookup import (
 
 )
 
+from aplicacion.modulos.compras.ordenes.formatos_impresion import (
+    formatos_combo,
+)
+
 from aplicacion.modulos.compras.ordenes.servicios import (
 
     ServicioOrdenCompra,
 
+)
+
+from aplicacion.modulos.ventas.cotizaciones.servicios import (
+    ServicioCotizacion,
 )
 
 from aplicacion.modulos.compras.ordenes.impresion import (
@@ -174,6 +184,35 @@ class _DialogoOrdenCompra(QDialog):
             "Observaciones:",
 
             self.observaciones,
+
+        )
+
+
+
+        self.formato = QComboBox()
+
+        for etiqueta, codigo in formatos_combo():
+
+            self.formato.addItem(
+                etiqueta,
+                codigo,
+            )
+
+        indice_formato = self.formato.findData(
+            ServicioCotizacion.formato_predeterminado(),
+        )
+
+        if indice_formato >= 0:
+
+            self.formato.setCurrentIndex(
+                indice_formato,
+            )
+
+        form.addRow(
+
+            "Formato de impresión:",
+
+            self.formato,
 
         )
 
@@ -598,6 +637,8 @@ class _DialogoOrdenCompra(QDialog):
                 observaciones=self.observaciones.text(),
 
                 lineas=self._lineas,
+
+                formato_impresion=self.formato.currentData(),
 
             )
 
