@@ -85,6 +85,29 @@ class AjustesInventarioPage(Page):
             self.tipo,
         )
 
+        self.lote_serie = QComboBox()
+
+        self.lote_serie.setEditable(
+            True,
+        )
+
+        self.lote_serie.setInsertPolicy(
+            QComboBox.InsertPolicy.NoInsert,
+        )
+
+        form.addRow(
+            "Lote/Serie:",
+            self.lote_serie,
+        )
+
+        self._etiqueta_lote_serie = form.labelForField(
+            self.lote_serie,
+        )
+
+        self._etiqueta_lote_serie.hide()
+
+        self.lote_serie.hide()
+
         self.cantidad = QDoubleSpinBox()
 
         self.cantidad.setMinimum(0.01)
@@ -164,7 +187,69 @@ class AjustesInventarioPage(Page):
                 costo,
             )
 
+        self._actualizar_lote_serie()
+
         self.cantidad.setFocus()
+
+    def _actualizar_lote_serie(
+        self,
+    ) -> None:
+
+        from aplicacion.maestros.productos.servicios import (
+            ServicioProducto,
+        )
+        from aplicacion.modulos.inventario.lote_serie_servicio import (
+            ServicioLoteSerie,
+        )
+
+        self.lote_serie.clear()
+
+        producto_id = self.producto.producto_id
+
+        producto = (
+            ServicioProducto.obtener_por_id(
+                producto_id,
+            )
+            if producto_id
+            else None
+        )
+
+        requiere_lote_serie = bool(
+            producto
+            and (
+                producto.maneja_lote
+                or producto.maneja_serie
+            )
+        )
+
+        self._etiqueta_lote_serie.setVisible(
+            requiere_lote_serie,
+        )
+
+        self.lote_serie.setVisible(
+            requiere_lote_serie,
+        )
+
+        if not requiere_lote_serie:
+
+            return
+
+        for registro in ServicioLoteSerie.listar(
+            producto_id,
+        ):
+
+            self.lote_serie.addItem(
+                registro.numero,
+                registro.id,
+            )
+
+        self.lote_serie.setCurrentIndex(
+            -1,
+        )
+
+        self.lote_serie.setEditText(
+            "",
+        )
 
     def _limpiar_formulario(
         self,
@@ -175,13 +260,66 @@ class AjustesInventarioPage(Page):
         self.observaciones.clear()
         self.cantidad.setValue(0.01)
 
-        if not mantener_producto:
+        if mantener_producto:
+
+            self._actualizar_lote_serie()
+
+        else:
 
             self.producto.establecer(
                 None,
             )
 
+            self._etiqueta_lote_serie.hide()
+
+            self.lote_serie.clear()
+
+            self.lote_serie.hide()
+
             self.costo.setValue(0)
+
+    def _resolver_lote_serie(
+        self,
+    ) -> int | None:
+        """
+        None si el producto no maneja lote/serie. Si el usuario
+        eligió uno existente del combo, su id. Si escribió un
+        número nuevo (no está en la lista), lo crea antes de
+        registrar el movimiento — flujo típico de una entrada de
+        un lote que aún no existía en el sistema.
+        """
+
+        if self.lote_serie.isHidden():
+
+            return None
+
+        indice = self.lote_serie.currentIndex()
+
+        if indice >= 0:
+
+            return self.lote_serie.currentData()
+
+        numero = self.lote_serie.currentText().strip()
+
+        if not numero:
+
+            raise ValueError(
+                "Este producto controla existencia por lote o "
+                "número de serie: indique cuál.",
+            )
+
+        from aplicacion.modulos.inventario.lote_serie_servicio import (
+            ServicioLoteSerie,
+        )
+
+        nuevo = ServicioLoteSerie.guardar(
+            {
+                "producto_id": self.producto.producto_id,
+                "numero": numero,
+            },
+        )
+
+        return nuevo.id
 
     def _guardar(self):
 
@@ -207,12 +345,27 @@ class AjustesInventarioPage(Page):
 
         try:
 
+            lote_serie_id = self._resolver_lote_serie()
+
+        except ValueError as error:
+
+            QMessageBox.warning(
+                self,
+                "Ajustes",
+                str(error),
+            )
+
+            return
+
+        try:
+
             ServicioInventario.registrar_ajuste(
                 bodega_id=self.bodega.currentData(),
                 producto_id=self.producto.producto_id,
                 producto_variante_id=(
                     self.producto.producto_variante_id
                 ),
+                lote_serie_id=lote_serie_id,
                 tipo=self.tipo.currentData(),
                 cantidad=self.cantidad.value(),
                 costo_unitario=self.costo.value(),

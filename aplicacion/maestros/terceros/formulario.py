@@ -8,9 +8,9 @@ from aplicacion.maestros.terceros.datasource import (
     TerceroDataSource,
 )
 
-from aplicacion.maestros.terceros.registros_relacionados_widget import (
+from aplicacion.framework.ui.lista_registros_widget import (
     CampoRegistro,
-    ListaRegistrosTerceroWidget,
+    ListaRegistrosWidget,
 )
 
 from aplicacion.maestros.terceros.servicio_registros import (
@@ -253,7 +253,7 @@ class TerceroFormulario(FormularioBase):
             titulo_dialogo,
         ) in secciones:
 
-            widget = ListaRegistrosTerceroWidget(
+            widget = ListaRegistrosWidget(
                 servicio=servicio,
                 columnas=columnas,
                 campos=campos,

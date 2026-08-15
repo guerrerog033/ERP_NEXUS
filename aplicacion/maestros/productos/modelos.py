@@ -162,6 +162,24 @@ class Producto(Base):
         nullable=True,
     )
 
+    es_kit = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+    )
+
+    maneja_lote = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+    )
+
+    maneja_serie = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+    )
+
     activo = Column(
         Boolean,
         nullable=False,
@@ -504,6 +522,68 @@ class CatalogoVariante(Base):
     fecha_creacion = Column(
         DateTime(timezone=True),
         server_default=func.now(),
+    )
+
+
+class ProductoKitComponente(Base):
+    """
+    Componente de un kit/combo: un producto marcado como
+    ``es_kit=True`` no tiene existencia propia, se compone de
+    otros productos en las cantidades aquí definidas. No se
+    permiten kits anidados (un componente no puede ser a su vez
+    un kit) — se valida en el servicio, no aquí.
+    """
+
+    __tablename__ = "producto_kit_componentes"
+
+    __table_args__ = (
+        UniqueConstraint(
+            "kit_id",
+            "componente_id",
+            name="uq_kit_componente",
+        ),
+    )
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+
+    kit_id = Column(
+        Integer,
+        ForeignKey(
+            "productos.id",
+            ondelete="CASCADE",
+        ),
+        nullable=False,
+        index=True,
+    )
+
+    componente_id = Column(
+        Integer,
+        ForeignKey(
+            "productos.id",
+            ondelete="RESTRICT",
+        ),
+        nullable=False,
+        index=True,
+    )
+
+    cantidad = Column(
+        CANTIDAD,
+        nullable=False,
+        default=1,
+    )
+
+    kit = relationship(
+        "Producto",
+        foreign_keys=[kit_id],
+    )
+
+    componente = relationship(
+        "Producto",
+        foreign_keys=[componente_id],
     )
 
 

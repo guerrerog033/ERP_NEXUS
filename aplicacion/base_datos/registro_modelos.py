@@ -19,6 +19,7 @@ def importar_modelos() -> None:
     from aplicacion.maestros.productos.modelos import (  # noqa: F401
         CatalogoVariante,
         Producto,
+        ProductoKitComponente,
         ProductoPrecio,
         ProductoVariante,
     )
@@ -75,6 +76,8 @@ def importar_modelos() -> None:
     from aplicacion.modulos.inventario.modelos import (  # noqa: F401
         Bodega,
         ExistenciaBodega,
+        ExistenciaLoteSerie,
+        LoteSerie,
         MovimientoInventario,
     )
 

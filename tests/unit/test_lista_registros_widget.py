@@ -5,9 +5,9 @@ from unittest.mock import patch
 
 from PySide6.QtWidgets import QDialog
 
-from aplicacion.maestros.terceros.registros_relacionados_widget import (
+from aplicacion.framework.ui.lista_registros_widget import (
     CampoRegistro,
-    ListaRegistrosTerceroWidget,
+    ListaRegistrosWidget,
 )
 
 
@@ -80,7 +80,7 @@ def _campos():
 def _widget():
     _qapp()
 
-    return ListaRegistrosTerceroWidget(
+    return ListaRegistrosWidget(
         servicio=_ServicioFalso(),
         columnas=_columnas(),
         campos=_campos(),
@@ -127,12 +127,12 @@ def test_agregar_via_dialogo_guarda_y_refresca():
     widget.cargar(7)
 
     with patch.object(
-        ListaRegistrosTerceroWidget,
+        ListaRegistrosWidget,
         "_agregar",
         wraps=widget._agregar,
     ):
         with patch(
-            "aplicacion.maestros.terceros.registros_relacionados_widget.DialogoRegistro",
+            "aplicacion.framework.ui.lista_registros_widget.DialogoRegistro",
         ) as MockDialogo:
             instancia = MockDialogo.return_value
             instancia.exec.return_value = QDialog.DialogCode.Accepted
@@ -155,9 +155,9 @@ def test_agregar_muestra_error_si_falla_validacion():
     widget.cargar(1)
 
     with patch(
-        "aplicacion.maestros.terceros.registros_relacionados_widget.DialogoRegistro",
+        "aplicacion.framework.ui.lista_registros_widget.DialogoRegistro",
     ) as MockDialogo, patch(
-        "aplicacion.maestros.terceros.registros_relacionados_widget.QMessageBox.warning",
+        "aplicacion.framework.ui.lista_registros_widget.QMessageBox.warning",
     ) as mock_warning:
         instancia = MockDialogo.return_value
         instancia.exec.return_value = QDialog.DialogCode.Accepted
@@ -189,7 +189,7 @@ def test_eliminar_confirma_y_borra():
     widget.tabla.selectRow(0)
 
     with patch(
-        "aplicacion.maestros.terceros.registros_relacionados_widget.QMessageBox.question",
+        "aplicacion.framework.ui.lista_registros_widget.QMessageBox.question",
         return_value=__import__(
             "PySide6.QtWidgets",
             fromlist=["QMessageBox"],
@@ -219,7 +219,7 @@ def test_eliminar_cancelado_no_borra():
     from PySide6.QtWidgets import QMessageBox
 
     with patch(
-        "aplicacion.maestros.terceros.registros_relacionados_widget.QMessageBox.question",
+        "aplicacion.framework.ui.lista_registros_widget.QMessageBox.question",
         return_value=QMessageBox.StandardButton.No,
     ):
         widget._eliminar()

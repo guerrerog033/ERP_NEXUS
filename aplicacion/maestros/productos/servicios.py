@@ -48,6 +48,9 @@ CAMPOS_PRODUCTO = {
     "activo",
     "maneja_variantes",
     "atributos_variante",
+    "es_kit",
+    "maneja_lote",
+    "maneja_serie",
 }
 
 
@@ -420,6 +423,43 @@ class ServicioProducto(ServicioBase):
             )
 
         datos["unidad_medida_id"] = unidad_medida_id
+
+        es_kit = bool(
+            datos.get(
+                "es_kit",
+                False,
+            )
+        )
+        maneja_variantes_dato = bool(
+            datos.get(
+                "maneja_variantes",
+                False,
+            )
+        )
+
+        if es_kit and maneja_variantes_dato:
+
+            raise ValueError(
+                "Un producto no puede ser kit y manejar "
+                "variantes al mismo tiempo.",
+            )
+
+        if bool(
+            datos.get(
+                "maneja_lote",
+                False,
+            )
+        ) and bool(
+            datos.get(
+                "maneja_serie",
+                False,
+            )
+        ):
+
+            raise ValueError(
+                "Un producto controla existencia por lote o "
+                "por número de serie, no ambos.",
+            )
 
         for campo in (
             "precio_venta",

@@ -206,6 +206,24 @@ class ProductoDefinition(FormDefinition):
                 ),
 
                 CheckField(
+                    nombre="es_kit",
+                    titulo="Es un kit/combo (se compone de otros productos)",
+                    valor_inicial=False,
+                ),
+
+                CheckField(
+                    nombre="maneja_lote",
+                    titulo="Controla existencia por lote",
+                    valor_inicial=False,
+                ),
+
+                CheckField(
+                    nombre="maneja_serie",
+                    titulo="Controla existencia por número de serie",
+                    valor_inicial=False,
+                ),
+
+                CheckField(
                     nombre="activo",
                     titulo="Activo",
                     valor_inicial=True,

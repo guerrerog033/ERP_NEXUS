@@ -1087,6 +1087,97 @@ class ServicioInventario:
             db.close()
 
     @classmethod
+    def _validar_y_ajustar_lote_serie(
+        cls,
+        db,
+        *,
+        producto,
+        lote_serie_id: int,
+        bodega_id: int,
+        cantidad: float,
+        sumar: bool,
+    ) -> None:
+        """
+        Valida que el lote/serie pertenezca al producto y ajusta
+        ExistenciaLoteSerie dentro de la MISMA transacción que el
+        movimiento de inventario (no delega a
+        ServicioLoteSerie.registrar_movimiento, que abre su propia
+        sesión — aquí importa que ambas escrituras vivan o mueran
+        juntas, no quedar con un movimiento registrado y la
+        existencia del lote/serie sin tocar si algo falla).
+        """
+
+        from .modelos import ExistenciaLoteSerie, LoteSerie
+
+        lote = (
+            db.query(LoteSerie)
+            .filter(
+                LoteSerie.id == lote_serie_id,
+            )
+            .first()
+        )
+
+        if lote is None:
+
+            raise ValueError(
+                "El lote/serie seleccionado no existe.",
+            )
+
+        if lote.producto_id != producto.id:
+
+            raise ValueError(
+                "El lote/serie seleccionado no pertenece a "
+                "este producto.",
+            )
+
+        existencia = (
+            db.query(ExistenciaLoteSerie)
+            .filter(
+                ExistenciaLoteSerie.bodega_id == bodega_id,
+                ExistenciaLoteSerie.lote_serie_id
+                == lote_serie_id,
+            )
+            .with_for_update()
+            .first()
+        )
+
+        if existencia is None:
+
+            if not sumar:
+
+                raise ValueError(
+                    "No hay existencia de ese lote/serie en "
+                    "esta bodega.",
+                )
+
+            existencia = ExistenciaLoteSerie(
+                bodega_id=bodega_id,
+                lote_serie_id=lote_serie_id,
+                cantidad=0,
+            )
+
+            db.add(existencia)
+
+            db.flush()
+
+        actual = float(existencia.cantidad or 0)
+
+        nueva = (
+            actual + cantidad
+            if sumar
+            else actual - cantidad
+        )
+
+        if nueva < 0:
+
+            raise ValueError(
+                "La existencia de ese lote/serie en esta "
+                f"bodega quedaría negativa ({nueva:g}).",
+            )
+
+        existencia.cantidad = nueva
+
+    @classmethod
     def registrar_ajuste(
         cls,
         *,
@@ -1098,6 +1189,7 @@ class ServicioInventario:
         fecha: date | None = None,
         observaciones: str = "",
         producto_variante_id: int | None = None,
+        lote_serie_id: int | None = None,
     ) -> MovimientoInventario:
 
         tipo = tipo.strip().lower()
@@ -1168,10 +1260,22 @@ class ServicioInventario:
                 or 0,
             )
 
+            if lote_serie_id is not None:
+
+                cls._validar_y_ajustar_lote_serie(
+                    db,
+                    producto=producto,
+                    lote_serie_id=lote_serie_id,
+                    bodega_id=bodega_id,
+                    cantidad=cantidad,
+                    sumar=(tipo == "entrada"),
+                )
+
             movimiento = MovimientoInventario(
                 bodega_id=bodega_id,
                 producto_id=producto_id,
                 producto_variante_id=producto_variante_id,
+                lote_serie_id=lote_serie_id,
                 tipo=tipo,
                 cantidad=cantidad,
                 costo_unitario=costo,
