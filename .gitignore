@@ -30,3 +30,7 @@ build/
 
 # Documentos electrónicos generados en pruebas (contienen datos reales)
 aplicacion/recursos/xml/*/*.xml
+
+# Logos de empresa subidos por el usuario (no versionar)
+aplicacion/recursos/imagenes/empresa/*
+!aplicacion/recursos/imagenes/empresa/.gitkeep
