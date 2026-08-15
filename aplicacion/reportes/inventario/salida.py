@@ -1,0 +1,63 @@
+from __future__ import annotations
+
+from aplicacion.framework.reportes.reporte_generico import (
+    ReporteDocumentoGenerico,
+)
+
+from aplicacion.reportes.inventario.entrada import (
+    _construir_pdf_movimiento,
+)
+
+
+def crear_reporte_salida_inventario(
+    movimientos,
+    *,
+    nombre_pdf: str | None = None,
+) -> ReporteDocumentoGenerico:
+
+    from aplicacion.reportes.comunes.datos_inventario import (
+        salida_inventario_a_dto,
+    )
+
+    if not isinstance(
+        movimientos,
+        list,
+    ):
+
+        movimientos = [
+            movimientos,
+        ]
+
+    primero = movimientos[0]
+    numero = getattr(
+        primero,
+        "id",
+        "",
+    )
+
+    return ReporteDocumentoGenerico(
+        titulo="Salida de inventario",
+        numero=str(
+            numero,
+        ),
+        generar_html_fn=lambda: __import__(
+            "aplicacion.reportes.inventario.html_movimiento",
+            fromlist=[
+                "generar_html_movimiento",
+            ],
+        ).generar_html_movimiento(
+            movimientos,
+            titulo="Salida de inventario",
+            dto_fn=salida_inventario_a_dto,
+        ),
+        nombre_pdf=(
+            nombre_pdf
+            or f"Salida inventario {numero}.pdf"
+        ),
+        construir_pdf_reportlab_fn=lambda ruta: _construir_pdf_movimiento(
+            movimientos,
+            ruta,
+            titulo="SALIDA DE INVENTARIO",
+            dto_fn=salida_inventario_a_dto,
+        ),
+    )
