@@ -28,6 +28,9 @@ from aplicacion.maestros.terceros.cliente_lookup import (
 from aplicacion.modulos.tesoreria.recibos_caja.datasource import (
     ReciboCajaDataSource,
 )
+from aplicacion.modulos.tesoreria.recibos_caja.formatos_impresion import (
+    formatos_combo,
+)
 from aplicacion.modulos.tesoreria.recibos_caja.integracion import (
     IntegracionReciboCaja,
 )
@@ -36,6 +39,9 @@ from aplicacion.modulos.tesoreria.recibos_caja.recibo_definition import (
 )
 from aplicacion.modulos.tesoreria.recibos_caja.servicios import (
     FORMAS_PAGO,
+)
+from aplicacion.modulos.ventas.cotizaciones.servicios import (
+    ServicioCotizacion,
 )
 from aplicacion.recursos.ui.botones import Botones
 
@@ -105,6 +111,25 @@ class FormularioReciboCaja(Page):
         self.observaciones = QTextEdit()
         self.observaciones.setMaximumHeight(70)
 
+        self.formato = QComboBox()
+
+        for etiqueta, codigo in formatos_combo():
+
+            self.formato.addItem(
+                etiqueta,
+                codigo,
+            )
+
+        indice_formato = self.formato.findData(
+            ServicioCotizacion.formato_predeterminado(),
+        )
+
+        if indice_formato >= 0:
+
+            self.formato.setCurrentIndex(
+                indice_formato,
+            )
+
         formulario.addRow(
             "Fecha",
             self.fecha,
@@ -116,6 +141,10 @@ class FormularioReciboCaja(Page):
         formulario.addRow(
             "Forma de pago",
             self.forma_pago,
+        )
+        formulario.addRow(
+            "Formato de impresión",
+            self.formato,
         )
         formulario.addRow(
             "Observaciones",
@@ -259,6 +288,18 @@ class FormularioReciboCaja(Page):
             self.forma_pago.setCurrentIndex(
                 indice,
             )
+
+        if recibo.formato_impresion:
+
+            indice_formato = self.formato.findData(
+                recibo.formato_impresion,
+            )
+
+            if indice_formato >= 0:
+
+                self.formato.setCurrentIndex(
+                    indice_formato,
+                )
 
         self.observaciones.setPlainText(
             recibo.observaciones or "",
@@ -535,6 +576,7 @@ class FormularioReciboCaja(Page):
             "fecha": self.fecha.date().toPython(),
             "cliente_id": int(cliente_id),
             "forma_pago": self.forma_pago.currentData(),
+            "formato_impresion": self.formato.currentData(),
             "observaciones": (
                 self.observaciones.toPlainText().strip()
             ),
