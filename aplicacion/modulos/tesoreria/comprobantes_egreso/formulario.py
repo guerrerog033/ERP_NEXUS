@@ -30,11 +30,17 @@ from aplicacion.modulos.tesoreria.comprobantes_egreso.comprobante_definition imp
 from aplicacion.modulos.tesoreria.comprobantes_egreso.datasource import (
     ComprobanteEgresoDataSource,
 )
+from aplicacion.modulos.tesoreria.comprobantes_egreso.formatos_impresion import (
+    formatos_combo,
+)
 from aplicacion.modulos.tesoreria.comprobantes_egreso.integracion import (
     IntegracionComprobanteEgreso,
 )
 from aplicacion.modulos.tesoreria.comprobantes_egreso.servicios import (
     FORMAS_PAGO,
+)
+from aplicacion.modulos.ventas.cotizaciones.servicios import (
+    ServicioCotizacion,
 )
 from aplicacion.recursos.ui.botones import Botones
 
@@ -104,6 +110,25 @@ class FormularioComprobanteEgreso(Page):
         self.observaciones = QTextEdit()
         self.observaciones.setMaximumHeight(70)
 
+        self.formato = QComboBox()
+
+        for etiqueta, codigo in formatos_combo():
+
+            self.formato.addItem(
+                etiqueta,
+                codigo,
+            )
+
+        indice_formato = self.formato.findData(
+            ServicioCotizacion.formato_predeterminado(),
+        )
+
+        if indice_formato >= 0:
+
+            self.formato.setCurrentIndex(
+                indice_formato,
+            )
+
         formulario.addRow(
             "Fecha",
             self.fecha,
@@ -115,6 +140,10 @@ class FormularioComprobanteEgreso(Page):
         formulario.addRow(
             "Forma de pago",
             self.forma_pago,
+        )
+        formulario.addRow(
+            "Formato de impresión",
+            self.formato,
         )
         formulario.addRow(
             "Observaciones",
@@ -258,6 +287,18 @@ class FormularioComprobanteEgreso(Page):
             self.forma_pago.setCurrentIndex(
                 indice,
             )
+
+        if comprobante.formato_impresion:
+
+            indice_formato = self.formato.findData(
+                comprobante.formato_impresion,
+            )
+
+            if indice_formato >= 0:
+
+                self.formato.setCurrentIndex(
+                    indice_formato,
+                )
 
         self.observaciones.setPlainText(
             comprobante.observaciones or "",
@@ -534,6 +575,7 @@ class FormularioComprobanteEgreso(Page):
             "fecha": self.fecha.date().toPython(),
             "proveedor_id": int(proveedor_id),
             "forma_pago": self.forma_pago.currentData(),
+            "formato_impresion": self.formato.currentData(),
             "observaciones": (
                 self.observaciones.toPlainText().strip()
             ),
