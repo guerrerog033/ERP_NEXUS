@@ -1,17 +1,32 @@
-New-Item .gitignore -ItemType File
 # Entorno virtual
 .venv/
 
 # Caché de Python
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
 
-# Variables de entorno
+# Variables de entorno (usar .env.example como plantilla)
 .env
 
-# Visual Studio Code
+# IDE / editor
 .vscode/
+.idea/
 
-# Logs
+# Logs y artefactos locales
 *.log
+*.tmp
+*.bak
+
+# Respaldos y paquetes locales (no versionar ni incluir en ZIPs)
+*.zip
+*.7z
+
+# Documentos electrónicos generados en pruebas (contienen datos reales)
+aplicacion/recursos/xml/*/*.xml

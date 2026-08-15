@@ -3,6 +3,7 @@ from PySide6.QtCore import Qt
 
 
 class PanelPrincipal(QWidget):
+
     def __init__(self, usuario):
         super().__init__()
 
@@ -16,6 +17,8 @@ class PanelPrincipal(QWidget):
             font-weight:bold;
         """)
 
+        layout.addStretch()
         layout.addWidget(titulo)
+        layout.addStretch()
 
         self.setLayout(layout)

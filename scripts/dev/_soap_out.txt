@@ -1,0 +1,1560 @@
+=== 1086499479 status=200 ===
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <link rel="shortcut icon" href="imagenes/favicon.ico?rev=1" type="image/vnd.microsoft.icon" id="favicon">
+  <title>Direcci&oacute;n de Impuestos y Aduanas Nacionales - DIAN</title>
+  
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+
+  <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+  <script type="text/javascript" src="js/popper.min.js"></script>
+  <script type="text/javascript" src="js/carousel.js"></script>
+  <script type="text/javascript" src="js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="js/jquery-latest.js"></script>  
+  <script type="text/javascript" src="js/jquery.signalR-2.2.2.min.js"></script>
+   <!--Inicio del cargue del chatbot-->
+  	<!--<script type="text/javascript" src="js/SignalrHubs.js"></script>
+	<script>
+	fetch('js/TxtButton_2.txt') // Reemplaza con la URL del sitio web que deseas convertir en una cadena de texto
+	.then(response => response.text())
+	.then(html => {
+	// AquÃ­ tienes el contenido HTML como una cadena de texto
+	jQuery('body').append(html);
+	})
+	.catch(error => {
+	console.log('Error:', error);
+	});
+	</script>-->	
+
+<!--fin del cargue del chatbot-->
+
+<!-- Google tag (gtag.js) -->
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-104176853-1"></script>
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-104176853-1');
+</script> 
+<!--Script para mapas de calos-->
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "mujnnx5pad"); 
+</script>  
+
+ </head>
+<body>
+	<header class="he_header">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-1 col-sm-2 col-4 he_logo">
+            <a href="https://www.gov.co">
+              <img src="imagenes/logo_header.png" alt="logo">
+            </a>
+          </div>
+          <div class="col-lg-11 col-sm-10 col-8 he_menu">
+            <div class="row">
+              <div class="col-lg-6 col-md-5">
+                <p class="screen-lg">Direcci&oacute;n de Impuestos y Aduanas Nacionales</p>
+                <p class="screen-md">Â¿Sabes que es GOV.CO?</p>
+                <p class="screen-sm">Â¿Sabes que es GOV.CO? ConÃ³celo aquÃ­</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+	<div class="card-block white">
+		<div class="container">
+			<div class="row">
+				<div class="logo-escudo col-12 col-md-6 py-3 bg-white text-center text-md-left"><img src="imagenes/Escudo_Colombia.png"></div>
+				<div class="logo-dian col-12 col-md-6 py-3 bg-white text-center text-md-right"><img src="imagenes/Logo_Dian_Derecho.png"></div>
+			</div>
+		</div>
+<!--Aqui es para colocar el banner-->
+
+	<center>
+	<div col-md-12>
+   	    <a href="https://micrositios.dian.gov.co/renta-personas-naturales-ag-2025/" target="_blank"><img src="imagenes/banner-landing-renta-2025.jpg" width="1200px" heigth="549px" alt="Personas rodeadas de naturaleza en una campaÃ±a de la DIAN sobre Renta 2025 que resalta el impacto de cada declaraciÃ³n en el bienestar ambiental." border=0 class="img-fluid"></a>
+    </div>
+	
+	
+	</center>
+	
+<!--Aqui cierra es para colocar el banner-->
+       	<hr class="hr">
+	</div>
+<!--***********************Cierre SecciÃ³n Logos Institucionales***********************-->
+   &nbsp; 
+<!--***********************SecciÃ³n Titulos web***********************-->
+	<div class="container">
+		<div class="row">
+			<div class="portales pt-2">
+				<div class="card-block pb-2">
+					<h2 class="h2-responsive titulo font-weight-bold">Portales</h2>
+					<h5 class="h5-responsive subtitulo">Nuestros portales web</h5>
+				</div>
+<!--***********************Cierre SecciÃ³n Titulos web***********************-->
+
+<!--***********************SecciÃ³n Menu***********************-->
+				<div id="sliderHome" class="bg-verde">
+				  <div id="sliderHInner">
+					<div class="sliderHItem px-2 px-md-2 py-2 linea">
+					 	&nbsp;
+						<div class="justify-content-center flex-center">
+							<div class="col-md-1 col-2 col-sm-2 px-0 img-responsive"><img class="imagen" src="imagenes/transaccional_blanco.png"></div>
+                        	<div class="col-md-9 titulo-home font-weight-bold">Transaccional</div>
+						</div>
+						<div class="row bodypreval">
+							<div class="col-9 texto">
+								<ul class="mb-0 pl-0">
+									<li><a href="https://muisca.dian.gov.co/WebArquitectura/DefLogin.faces" target="_blank">Usuario Registrado</a></li>
+									<li><a href="https://muisca.dian.gov.co/WebArquitectura/DefNuevosUsuarios.faces" target="_blank">Usuario Nuevo</a></li>
+									<li><a href="https://muisca.dian.gov.co/WebArquitectura/DefLogin.faces" target="_blank">Servicios Tributarios y Cambiarios</a></li>
+									<li><a href="https://muisca.dian.gov.co/WebDilUsuariosNoRegistrados/" target="_blank">Usuarios no registrados diligenciar formularios</a></li>
+									<br>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="sliderHItem px-2 px-md-2 py-2 linea">
+					 	&nbsp;<div class="justify-content-center flex-center">
+							<div class="col-md-1 col-2 col-sm-2 px-0 img-responsive"><img class="imagen" src="imagenes/sitio_web.png"></div>
+							<div class="col-md-9 titulo-home font-weight-bold">Sitio web institucional</div>
+						</div>
+						<div class="row  bodypreval">
+							<div class="col-9 texto">
+								<ul class="mb-0 pl-0">
+									<p><a href="https://www.dian.gov.co/Paginas/Inicio.aspx" target="_blank">Direcci&oacute;n de Impuestos y Aduanas Nacionales. Portal Institucional</a></p>
+									<br>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="sliderHItem px-2 px-md-2 py-2 linea">
+					 	&nbsp;<div class="justify-content-center flex-center">
+							<div class="col-md-1 col-2 col-sm-2 px-0 img-responsive"><img class="imagen" src="imagenes/normograma_blanco.png">
+							</div>
+							<div class="col-md-9 titulo-home font-weight-bold">Normograma DIAN</div>
+						</div>
+						<div class="row bodypreval">
+							<div class="col-9 texto">
+								<ul class="mb-0 pl-0">
+									<p><a href="https://normograma.dian.gov.co/dian/" target="_blank">Encuentre aquÃ­ normativa, doctrina y jurisprudencia en materia tributaria, aduanera, cambiaria y otras materias de competencia de la entidad</a></p>
+									<br>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="sliderHItem px-2 px-md-2 py-2 linea">
+					 	&nbsp;<div class="justify-content-center flex-center">
+							<div class="col-md-1 col-2 col-sm-2 px-0 img-responsive"><img class="imagen" src="imagenes/transparencia_blanco.png">
+							</div>
+							<div class="col-md-9 titulo-home font-weight-bold">Transparencia y acceso a la informaci&oacute;n</div>
+						</div>
+						<div class="row  bodypreval">
+							  <div class="col-9 texto">
+									<p><a href="https://www.dian.gov.co/atencionciudadano/Paginas/Transparencia.aspx" target="_blank">Encuentre aqu&iacute; informaci&oacute;n sobre estructura org&aacute;nica y talento humano, normatividad, presupuesto</a></p>
+									<br>
+							   </div>
+						    </div>
+					      </div>
+
+						  <!--Este es un movimiento del siguiente item-->
+
+						  <div class="sliderHItem px-2 px-md-2 py-2 linea">
+							&nbsp;<div class="justify-content-center flex-center">
+							   <div class="col-md-1 col-2 col-sm-2 px-0 img-responsive"><img class="imagen" src="imagenes/portal_ninos_blanco.png">
+							   </div>
+							   <div class="col-md-9 titulo-home font-weight-bold">Portal de ni&ntilde;os</div>
+						   </div>
+						   <div class="row bodypreval">
+							   <div class="col-9 texto">
+								   <ul class="mb-0 pl-0">
+									   <p><a href="https://www.dian.gov.co/atencionciudadano/portal_de_ninos/Videojuego_MisionC/Paginas/default.aspx" target="_blank">Educar a los ni&ntilde;os y ni&ntilde;as de Colombia, para la construcci&oacute;n y el desarrollo de nuestro pa&iacute;s</a></p>
+									   <br>
+								   </ul>
+							   </div>
+						   </div>
+					   </div>
+
+					   <!--Cierre de este es un movimiento del siguiente item-->
+
+				        </div>
+                    </div>
+            </div>
+			<div class="col-12 col-md-9 pt-2 ayudar">
+				<div class="card-block pb-2">
+					<h2 class="h2-responsive titulo font-weight-bold">C&oacute;mo podemos ayudarle</h2>
+					<h5 class="h5-responsive subtitulo">Encuentre aqu&iacute; el acceso directo a  nuestros diferentes servicios.</h5>
+				</div>
+                
+<!--*********************Cierre SecciÃ³n Menu***********************-->   
+<!--************Inicio SecciÃ³n Cajas Centrales Derecha*************-->  
+   <!--***********************************caja1**************************************-->
+           
+				<div class="card-block" id="sliderHome2">
+                  <div class="row px-0" id="sliderH2Inner">
+					<div class="col-12 col-md-4 mt-3 mt-md-0 sliderH2Item">
+                            <div class="card h-0">
+								<div class="card-body">
+									<div class="row justify-content-center">
+										<div class="col-md-2 col-sm-2 col-2 px-0"><img class="imagen" src="imagenes/calendarios_active.png">
+										</div>
+									<div class="col-md-9 titulo-home font-weight-bold">Calendarios</div>
+									</div>
+								<div class="card-block">
+									<div class="row">
+										<div class="col-9 caja card-text">
+											<ul class="mb-0 pl-0 azul servicios">
+												<li><a href="https://www.dian.gov.co/Paginas/CalendarioTributario.aspx" target="_blank">Tributarios</a></li>
+												<li><a href="https://www.dian.gov.co/Paginas/CalendarioCambiario.aspx" target="_blank">Cambiarios</a></li>
+											</ul>
+									</div>
+									</div>
+                                    </div>
+								</div>
+							</div>
+						</div>
+                        
+                        <!--***********************************caja2**************************************-->
+                        <div class="col-12 col-md-4 mt-3 mt-md-0 sliderH2Item">
+                            <div class="card h-0">
+								<div class="card-body">
+									<div class="row justify-content-center">
+										<div class="col-md-2 col-sm-2 col-2 px-0"><img class="imagen" src="imagenes/asignacion-citas.png"></div>
+										<div class="col-md-9  titulo-home font-weight-bold">Agendamiento de citas</div>
+									</div>
+									<div class="card-block">
+									<div class="row">
+										<div class="col-9 card-text caja servicios">
+											<ul class="mb-0 pl-0 azul servicios">
+											<li><a href="https://www.dian.gov.co/atencionciudadano/Agendamiento-de-Citas/Paginas/Inicio.aspx" target="_blank">Sistema de agendamiento por medio del cual puede agendar, modificar, consultar o cancelar citas.</a></br></li>
+										</ul>
+										</div>
+									</div>
+                                   </div>
+								</div>
+							</div>
+						</div>
+                    
+						<!--*****************************caja 3******************************-->
+                        <div class="col-12 col-md-4 mt-3 mt-md-0 sliderH2Item">
+						<div class="card h-0">
+								<div class="card-body">
+									<div class="row justify-content-center">
+										<div class="col-md-2 col-sm-2 col-2 px-0"><img class="imagen" src="imagenes/notificacion.png">
+										</div>
+									<div class="col-md-9 titulo-home font-weight-bold">Notificaciones</div>
+									</div>
+								<div class="card-block">
+									<div class="row">
+										<div class="col-9 caja card-text servicios">
+											<ul class="mb-0 pl-0 azul servicios">
+											<li><a href="https://www.dian.gov.co/atencionciudadano/notificacion/Paginas/default.aspx" target="_blank">Verifique la publicaci&oacute;n del acto administrativo en las dos opciones: tr&aacute;mite e hist&oacute;rico y publicaciones.</a></li>
+                                            <li><a href="https://muisca.dian.gov.co/WebCmnNotificaciones/" target="_blank">Registro P&uacute;blico de Notificaciones Electr&oacute;nicas</a></li>
+                                            </ul>
+										</div>
+									</div>
+                                </div>
+								</div>
+							</div>
+						</div>
+						<!--*************************************caja 4*************************************-->
+                        
+						<div class="col-12 col-md-4 mt-3 sliderH2Item">
+								<div class="card h-0">
+									<div class="card-body">
+										<div class="row justify-content-center">
+											<div class="col-md-2 col-sm-2 col-2 px-0"><img class="imagen" src="imagenes/verificacion-correo.png">
+											</div>
+											<div class="col-md-9 titulo-home font-weight-bold">Verificaci&oacute;n de correos</div>
+										</div>
+									</div>
+										<div class="card-block">
+											<div class="row">
+												<div class="col-9 card-text caja servicios">
+                                                <ul class="mb-0 pl-0 azul servicios">
+                                                <li><a href="https://muisca.dian.gov.co/WebComunicaciones/DefVerificarCorreoDian.faces">Verifica autenticidad de correos DIAN.</a> 
+                                                 </li>
+												 <li><a href="https://webazure.dian.gov.co/comunicaciones/busqueda/verificacion" target="_blank">ValidaciÃ³n de Cadena de Correo con QR.</a> 
+                                                 </li>
+                                                 <li><a href="https://www.dian.gov.co/atencionciudadano/Seguridad-de-la-Informacion/Paginas/Inicio.aspx">Temas relacionados con la Seguridad de la InformaciÃ³n.</a> 
+                                                 </li>
+                                                 </ul>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+                        
+                       <!--***********************************caja 5***************************************-->
+                        
+                        <div class="col-12 col-md-4 mt-3 sliderH2Item">
+								<div class="card h-0">
+								<div class="card-body">
+									<div class="row justify-content-center">
+										<div class="col-md-2 col-sm-2 col-2 px-0"><img class="imagen" src="imagenes/PQRS_y_denuncias.png">
+										</div>
+										<div class="col-md-9 titulo-home font-weight-bold">PQSR y denuncias</div>
+									</div>
+								</div>
+								<div class="card-block">
+									<div class="row">										
+										<div class="col-9 card-text caja servicios">
+										<ul class="mb-0 pl-0 azul servicios">
+										<li><a href="https://www.dian.gov.co/atencionciudadano/PQSRD/Paginas/Inicio.aspx">Encuentre informaci&oacute;n general, quejas, reclamos, sugerencias, glosario, marco normativo y preguntas.</a> 
+										</li>
+										</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+                        <!--************************************caja 6****************************************-->
+                        
+						<div class="col-12 col-md-4 mt-3 sliderH2Item">
+							<div class="card h-0">
+								<div class="card-body">
+									<div class="row justify-content-center">
+										<div class="col-md-2 col-sm-2 col-2 px-0"><img class="imagen" src="imagenes/ubicacion.png">
+										</div>
+										<div class="col-md-9 titulo-home font-weight-bold">ContÃ¡ctanos</div>
+									</div>
+								</div>
+								<div class="card-block">
+									<div class="row">
+										<div class="col-9 card-text caja servicios">
+										<ul class="mb-0 pl-0 azul servicios">
+											<li><a href="https://portaldian.cyc-bpo.com/" target="_blank">Utilice los canales de atenciÃ³n habilitados por la entidad</a></li>
+																														
+										</ul>
+									  </div>
+									</div>
+								</div>
+							</div>
+						</div>
+<!--Otro item-->
+<div class="col-12 col-md-4 mt-3 sliderH2Item">
+	<div class="card h-0">
+		<div class="card-body">
+			<div class="row justify-content-center">
+				<div class="col-md-2 col-sm-2 col-2 px-0"><img class="imagen" src="imagenes/notificacion.png">
+				</div>
+				<div class="col-md-9 titulo-home font-weight-bold">Facilidades de pago</div>
+			</div>
+		</div>
+		<div class="card-block">
+			<div class="row">
+				<div class="col-9 card-text caja servicios">
+				<ul class="mb-0 pl-0 azul servicios">
+					<li><a href="https://www.dian.gov.co/impuestos/Paginas/Pongase-al-dia-con-la-DIAN.aspx" target="_blank">PÃ³ngase al dÃ­a con la DIAN. Conozca cÃ³mo cumplir con sus obligaciones tributarias en mora.</a></li>
+															
+				</ul>
+			  </div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+					</div>
+				</div>
+				
+<!--************Cierre SecciÃ³n Cajas Centrales Derecha*************-->  
+ <!--************Inicio SecciÃ³n Temas de Interes*************-->                 
+ 				<h2 class="h2-responsive titulo font-weight-bold screen-sm h2-interes">Temas de inter&eacute;s</h2>
+				<div class="interes bg-azul" id="sliderHome4">
+					<h2 class="subtitulo-temas screen-md screen-lg ">Temas de inter&eacute;s</h2>
+					<div class="row" id="sliderH4Inner">
+						<div class="col-12 col-md-3 sliderH4Item">
+							<div class="card-block">
+								<div class="justify-content-center flex-center">
+									<div class="col-md-3 col-2 col-sm-2 img-responsive"><img class="imagen" src="imagenes/Factura_electronica.png"></div>
+									<div class="col-md-10 col-9 titulo-home caja1 font-weight-bold titulo-interes">Factura Electr&oacute;nica</div>
+								</div>
+								<div class="row" style="color:#189376">
+									<div class="col-md-11 listas">
+									  <ul class="mb-0 px-0 azul caja servicios">
+											<!--<li><a href="https://www.dian.gov.co/impuestos/Paginas/Sistema-de-Factura-Electronica/Inicio.aspx" target="_blank">Micrositio</a></li>-->
+											<li><a href="https://micrositios.dian.gov.co/sistema-de-facturacion-electronica/" target="_blank">Micrositio</a></li>
+                                            <li><a href="https://catalogo-vpfe-hab.dian.gov.co/User/Login" target="_blank">Habilitaci&oacute;n</a></li>
+											<li><a href="https://catalogo-vpfe.dian.gov.co/User/Login" target="_blank">Facturando Electr&oacute;nicamente</a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-md-3 sliderH4Item">
+							<div class="card-block">
+								<div class="justify-content-center flex-center">
+									<div class="col-md-3 col-2 col-sm-2 img-responsive"><img class="imagen" src="imagenes/RUT.png"></div>
+									<div class="col-md-10 col-9 titulo-home caja1 font-weight-bold titulo-interes">RUT</div>
+								</div>
+								<div class="row" style="color:#189376">
+									<div class="col-md-11 listas">
+										<!--<ul class="mb-0 pl-0 azul">-->
+                                      <ul class="mb-0 px-0 azul caja servicios">
+											<li><a href="https://www.dian.gov.co/impuestos/RUT/Paginas/Inicio.aspx" target="_blank">Micrositio</a></li>
+											<li><a href="https://muisca.dian.gov.co/WebRutVirtualInscripcion/" target="_blank">InscripciÃ³n virtual RUT</a></li>
+											<li><a href="https://www.dian.gov.co/tramitesservicios/tramites-y-servicios/tributarios/Paginas/RUT.aspx" target="_blank">TrÃ¡mites y servicios</a></li>								
+                                            
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-md-3 sliderH4Item">
+							<div class="card-block">
+								<div class="justify-content-center flex-center">
+									<div class="col-md-3 col-2 col-sm-2 img-responsive"><img class="imagen" src="imagenes/RST.png"></div>
+									<div class="col-md-10 col-9 titulo-home caja1 font-weight-bold titulo-interes">RST</div>
+									</div>
+									<div class="row" style="color:#189376">
+										<div class="col-md-11  listas">
+											<ul class="mb-0 px-0 azul caja servicios">
+												<li><a href="https://micrositios.dian.gov.co/regimen-simple-tributacion/" target="_blank">Portal del r&eacute;gimen simple de tributaci&oacute;n.</a>
+												</li>
+											</ul>
+										</div>
+									</div>
+							</div>
+						</div>
+						<div class="col-12 col-md-3 sliderH4Item">
+							<div class="card-block">
+								<div class="justify-content-center flex-center">
+									<div class="col-md-3 col-2 col-sm-2 img-responsive"><img class="imagen" src="imagenes/OEA.png"></div>
+									<div class="col-md-10 col-9 titulo-home caja1 font-weight-bold titulo-interes">OEA</div>
+								</div>
+								<div class="row" style="color:#189376">
+									<div class="col-md-11 listas">
+										<ul class="mb-0 px-0 azul caja servicios">
+										<li>
+										  <a href="https://www.dian.gov.co/aduanas/oea/inicio/Paginas/default.aspx" target="_blank">Operador Econ&oacute;mico Autorizado</a>
+										</li>
+                                      </ul>
+									</div>
+								</div>
+							</div>
+						</div>
+							<!--Esta es la secciÃ³n nueva de Tramites y Servicios-->                        
+							<!--Probando-->
+						<div class="col-12 col-md-3 sliderH4Item">
+							<div class="card-block">
+								<div class="justify-content-center flex-center">
+									<div class="col-md-3 col-2 col-sm-2 img-responsive"><img class="imagen" src="imagenes/tramiles-servicios.png"></div>
+									<div class="col-md-10 col-9 titulo-home caja1 font-weight-bold titulo-interes">Tr&aacute;mites y servicios</div>
+								</div>
+								<div class="row" style="color:#189376">
+									<div class="col-md-11 listas">
+									  <ul class="mb-0 px-0 azul caja servicios">
+											<li><a href="https://www.dian.gov.co/tramitesservicios/tramites-y-servicios/Paginas/default.aspx" target="_blank">Encuentre en un solo lugar la normativa, procedimientos, costos, formularios, preguntas frecuentes y glosario.</a></li>
+                                      </ul>
+									</div>
+								</div>
+							</div>
+						</div>
+
+							<!--Cierre Probando-->
+							<!--Cierra la secciÃ³n nueva de Tramites y Servicios-->
+
+							<!--Inicio la secciÃ³n nueva de Firma Electronica-->
+
+					<div class="col-12 col-md-3 sliderH4Item">
+							<div class="card-block">
+								<div class="justify-content-center flex-center">
+									<div class="col-md-3 col-2 col-sm-2 img-responsive"><img class="imagen" src="imagenes/firma-e.png"></div>
+									<div class="col-md-10 col-9 titulo-home caja1 font-weight-bold titulo-interes">Firma Electr&oacute;nica</div>
+								</div>
+								<div class="row" style="color:#189376">
+									<div class="col-md-11 listas">
+									  <ul class="mb-0 px-0 azul caja servicios">
+										<li><a href="https://muisca.dian.gov.co/WebArquitectura/DefLoginOld.faces" target="_blank">Generar Firma Electr&oacute;nica</a></li>
+										<li><a href="https://www.dian.gov.co/Prensa/Aprendelo-en-un-DIAN-X3/Paginas/Habilitacion-y-recuperacion-de-cuenta-de-usuario-y-generacion-de-firma-electronica.aspx" target="_blank">Cuenta de Usuario y Firma ElectrÃ³nica</a></li>									
+                                      </ul>
+									</div>
+									
+								</div>
+								
+							</div>
+						</div>
+
+					<!--Cierre la secciÃ³n nueva de Firma Electronica -->
+					<!--Inicio de contribuyentes plus-->
+					<div class="col-12 col-md-3 sliderH4Item">
+							<div class="card-block">
+								<div class="justify-content-center flex-center">
+									<div class="col-md-3 col-2 col-sm-2 img-responsive"><img class="imagen" src="imagenes/DGC_OS_AS.png"></div>
+									<div class="col-md-10 col-9 titulo-home caja1 font-weight-bold titulo-interes">Grandes Contribuyentes</div>
+								</div>
+								<div class="row" style="color:#189376">
+									<div class="col-md-11 listas">
+									  <ul class="mb-0 px-0 azul caja servicios">
+										<li><a href="https://www.dian.gov.co/Contribuyentes-Plus/Paginas/Inicio.aspx" target="_blank">Micrositio</a></li>
+                                      </ul>
+									</div>									
+								</div>								
+							</div>
+						</div>
+					<!--Cierre de contribuyentes plus-->
+
+					</div>
+               </div>
+			</div>
+		</div>
+	</div>
+<!--************Cierre SecciÃ³n Temas de Interes*************-->  
+  
+<!--********Inicio SecciÃ³n Servicios a la Ciudadania********--> 
+    
+	<div class="card-block bg-white mt-5 p-3">
+		<div class="container">
+			<div class="row">
+				<div class="col-12">&nbsp;
+					<h2 class="h2-responsive titulo-home font-weight-bold">Servicios a la ciudadan&iacute;a</h2>
+				</div>
+			</div>&nbsp;
+			<div class="row" style="color: #009166">
+					<div class="col-12 col-md-3">
+						<div class="card-block">
+							<div class="row justify-content-center flex-center">
+                                <div class="col-12 font-weight-bold subtitulo">Servicios Aduaneros</div>
+							</div>
+							<div class="row">
+								<div class="col-12 servicios">
+									<!--<ul class="mb-0 azul">-->
+                                    &nbsp;
+                                    <ul class="mb-0 azul bodypreval">
+										<li><a href="https://salidademercancias.dian.gov.co/WebArquitectura/DefLogin.faces" target="_blank">Exportaciones</a></li>
+										<li><a href="https://webazure.dian.gov.co/importacionestemporales/validate-email" target="_blank">Importaci&oacute;n Temporal de Medios de Transporte de Turista.</a></li>                                        
+										<li><a href="https://certificadosdeorigen.dian.gov.co/Verifica/indexmex.php" target="_blank">Certificado de Origen Digital</a></li>
+										<li><a href="https://importacionescarga.dian.gov.co/WebArquitectura/DefLogin.faces" target="_blank">Carga Importaciones</a></li>
+                                        <li><a href="https://transitoaduanero.dian.gov.co/WebArquitectura/DefLogin.faces" target="_blank">Tr&aacute;nsito Aduanero</a></li>
+										<li><a href="https://importaciones.dian.gov.co" target="_blank">Importaciones</a></li>
+                                        <li><a href="https://muisca.dian.gov.co/WebArancel/DefMenuConsultas.faces" target="_blank">Consulta Arancel</a></li>
+                                        <li><a href="https://muisca.dian.gov.co/WebParametrizacion/DefSelProcesoTblsParametricas.faces" target="_blank">Tablas Param&eacute;tricas</a></li>
+										<li><a href="https://muisca.dian.gov.co/WebArancel/DefControlCupo.faces" target="_blank">Consulta de Consumo contingentes arancelarios</a></li>
+										<li><a href="https://muisca.dian.gov.co/WebRutMuisca/DefConsultaEstadoRUT.faces" target="_blank">Consulta RUT</a></li>
+                                        <li><a href="https://muisca.dian.gov.co/WebArquitectura/DefPasswordRecuperacion.faces" target="_blank">Recuperar Contrase&ntilde;a</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-md-3">
+						<div class="card-block">
+							<div class="row justify-content-center flex-center">
+								<!--<div class="col-12 font-weight-bold">Servicios tributarios</div>-->
+                               <div class="col-12 font-weight-bold subtitulo">Servicios tributarios</div>
+							</div>
+							<div class="row">
+								<div class="col-12 servicios">
+                                &nbsp;
+									<ul class="mb-0 azul bodypreval">
+										<li><a href="https://muisca.dian.gov.co/WebRutMuisca/DefConsultaEstadoRUT.faces" target="_blank">Consulta Estado RUT</a></li>
+                                        <li><a href="https://muisca.dian.gov.co/WebArquitectura/DefPasswordRecuperacion.faces" target="_blank">Recuperaci&oacute;n Contrase&ntilde;a</a></li>
+										<li><a href="https://muisca.dian.gov.co/WebGestionmasiva/DefSelPublicacionesExterna.faces" target="_blank">Consulta de Inconsistencias</a></li>
+                                        <li><a href="https://muisca.dian.gov.co/WebArquitectura/DefLoginMb.faces" target="_blank">Radicaci&oacute;n electr&oacute;nica de recursos de reconsideraci&oacute;n</a></li>
+                                        <li><a href="https://devolucion.dian.gov.co/WebArquitectura/DefLogin.faces" target="_blank">Solicitud devoluci&oacute;n y/o compensaci&oacute;n</a></li>
+										<li><a href="https://muisca.dian.gov.co/WebRutMuisca/DefActualizarActividadesCIIU.faces" target="_blank">Actividad Econ&oacute;mica</a></li>
+										<li><a href="https://muisca.dian.gov.co/WebArquitectura/DefFormulariosGratuitos.faces" target="_blank">Usuarios no registrados diligenciar formularios</a></li>
+										<li><a href="https://muisca.dian.gov.co/WebComunicaciones/DefVerificarCorreoDian.faces" target="_blank">Verificaci&oacute;n de correos DIAN</a></li>
+                                       
+                                        <li><a href="https://muisca.dian.gov.co/WebArquitectura/DefLogin.faces" target="_blank">Planeaci&oacute;n</a></li>
+                                        <li><a href="https://muisca.dian.gov.co/WebRutVirtualInscripcion/" target="_blank">RUT- Definir tipo de inscripci&oacute;n</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-md-3">
+						<div class="card-block">
+							<div class="row justify-content-center flex-center">
+								<div class="col-12 font-weight-bold subtitulo">Prevalidadores aduaneros</div>
+							</div>
+							<div class="row">
+								<div class="col-12 servicios">
+                                &nbsp;
+									<ul class="mb-0 azul bodypreval">										
+                                        <li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/Certificado-al-Proveedor.zip" target="_blank">Certificado al proveedor</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/Prevalidador-CP-PROFIA-V3-0-023.zip" target="_blank">Certificado de Producci&oacute;n PROFIA V2 â 2023</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/Prevalidador-CP-PROFIA-V-2-7-0-2023.zip" target="_blank">Certificado de Producci&oacute;n PROFIA - 2023</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/Certificado de ProducciÃ³n PROFIA-2020.zip" target="_blank">Certificado de Producci&oacute;n PROFIA</a></li>
+										<li><a href="https://www.dian.gov.co/Transaccional/Prevalidadores%20aduanas/Contingencia%20Carga%20(Versi%C3%B3n%20optimizada).zip" target="_blank">Contingencia Carga (Versi&oacute;n optimizada)</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/Cuadro Insumo Producto PROFIA.zip" target="_blank">Cuadro Insumo Producto PROFIA</a></li>
+                                        <li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/Cuadro Insumo Producto.zip" target="_blank">Cuadro Insumo Producto</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/DeclaraciÃ³n de ExportaciÃ³n.zip" target="_blank">Declaraci&oacute;n de Exportaci&oacute;n</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/Hojas 2 formularios 520 y 540.zip" target="_blank">Hojas 2 formularios 520 y 540</a></li>
+										<li><a href="https://cutt.ly/btmwFugn" target="_blank">PlÃ¡sticos de un solo uso</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores%20aduanas/Importacion-Carga-Version-optimizada.zip" target="_blank">Importaci&oacute;n Carga (Versi&oacute;n optimizada)</a></li>
+                                        <li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/Registro aduanero.zip" target="_blank">Registro Aduanero</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/Salida de mercancÃ­as.zip" target="_blank">Salida de mercancias</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/Prevalidador_Aduanero_v1_8_0_22.zip" target="_blank">Hojas 2 formularios 520 y 540 (2022)</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-md-3">
+						<div class="card-block">
+							<div class="row justify-content-center flex-center">
+								<div class="col-12 font-weight-bold subtitulo">Prevalidadores tributarios</div>
+							</div>
+							<div class="row">
+								<div class="col-12 servicios">
+                                &nbsp;
+									<ul class="mb-0 azul bodypreval">
+                      					<li><a href="https://www.dian.gov.co/impuestos/sociedades/ExogenaTributaria/Prevalidadores/Paginas/default.aspx" target="_blank">Informaci&oacute;n Tributaria</a></li>
+										<li><a href="https://cutt.ly/Yt11Amqk">Programa Ayuda Renta 2025</a></li>
+										<li><a href="https://cutt.ly/5rcw9FEm">Programa Ayuda Renta 2024</a></li>
+										<li><a href="https://cutt.ly/fetlwr67">Programa Ayuda Renta 2023</a></li>
+										<li><a href="https://cutt.ly/Q6BdKbm">Programa Ayuda Renta 2022</a></li>										
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/PREVALIDADORES/Programa-Ayuda-Renta-DIAN-2021.zip">Programa Ayuda Renta 2021</a></li>
+                                        <li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/PREVALIDADORES/Programa-Ayuda-Renta-2020.zip">Programa Ayuda Renta 2020</a></li>
+                                                                   
+										<li><a href="https://www.dian.gov.co/Transaccional/Paginas/Prevalidadores.aspx" target="_blank">Reporte ConciliaciÃ³n Fiscal</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/PREVALIDADORES/Entidades Financieras.zip" target="_blank">Entidades Financieras</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/PREVALIDADORES/Factura electrÃ³nica.zip" target="_blank">Factura electr&oacute;nica</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/PREVALIDADORES/FrigorÃ­ficos y Pieles 2016 VersiÃ³n 1.2.zip" target="_blank">Frigor&iacute;ficos y pieles</a></li>
+                                        <li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/PREVALIDADORES/InformaciÃ³n de Relevancia Tributaria aÃ±o gravable 2012 .zip" target="_blank">Impuesto Nacional a la Gasolina y ACPM</a></li>
+										<li><a href="https://www.dian.gov.co/Transaccional/Paginas/Prevalidadores.aspx" target="_blank">Informaci&oacute;n de Relevancia Tributaria</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/PREVALIDADORES/InformaciÃ³n Usuarios de Entidades PÃºblicas o Privadas.zip" target="_blank">Informaci&oacute;n Usuarios de Entidades P&uacute;blicas o Privadas</a></li>
+                                        <li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/PREVALIDADORES/Informacion_Ventas_con_Exencion_de_IVA.zip" target="_blank">Informaci&oacute;n Ventas con Exenci&oacute;n de IVA</a></li>
+                                        <li><a href="https://www.dian.gov.co/Transaccional/Paginas/Prevalidadores.aspx" target="_blank">Precios de Transferencia</a></li>
+                                        <li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/PREVALIDADORES/Prevalidador_RUB_v2.0.0-24.zip" target="_blank">Registro Ãnico de Beneficiarios Finales - RUB</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+			    </div>
+			</div>
+			<div class="row pt-4">
+				<div class="col-12"><h5 class="h5-responsive font-weight-bold subtitulo">Prevalidadores</h5></div>
+			</div>
+			<div class="row">
+				<div class="col-12 col-md-3">
+					<div class="card-block">
+						<div class="row justify-content-center flex-center">
+							<div class="col-12 subtitulo1 font-weight-bold">Prevalidadores Cambios</div>
+						</div>
+						<div class="row">
+							<div class="col-12 servicios">&nbsp;
+								<ul class="mb-0 azul bodypreval">                               
+                                <li><a href="https://cutt.ly/prduCwcK">InformaciÃ³n Cambiaria a partir del cuarto trimestre de 2023</a></li>
+								<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/prevalidador cambios/PrevalidadorCambiario_v2.5.1.zip">InformaciÃ³n Cambiaria aÃ±os 2022, segundo trimestre - a 2023, tercer trimestre</a></li>
+								<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/prevalidador cambios/Informacion-cambiaria-2021.zip">InformaciÃ³n Cambiaria </a></li>
+                                								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-12 col-md-3">
+					<div class="card-block">
+						<div class="row justify-content-center flex-center">
+							<div class="col-12 subtitulo1 font-weight-bold">Prevalidadores Min Cultura</div>
+						</div>
+						<div class="row">
+							<div class="col-12 servicios">&nbsp;
+								<ul class="mb-0 azul bodypreval">
+									<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/prevalidador MinCultura/Prevalidador MinCultura (AÃ±o gravable 2016).zip" target="_blank">Contribuci&oacute;n Parafiscal y Retenciones</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-12 col-md-6">
+					<div class="card-block">
+						<div class="row justify-content-center flex-center">
+							<div class="col-12 subtitulo1 font-weight-bold">Prevalidadores R&eacute;gimen Tributario Especial</div>
+						</div>
+						<div class="row">
+							<div class="col-12 servicios">&nbsp;
+								<ul class="mb-0 azul bodypreval">
+									<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/PrevalidadoresRTE/RÃ©gimen Tributario Especial.zip" target="_blank">R&eacute;gimen Tributario Especial</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<!--********Cierre SecciÃ³n Servicios a la Ciudadania********--> 
+&nbsp;
+<!--********SecciÃ³n Redes Sociales********--> 
+    <footer class="he_footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-xl-2 col-lg-3 col-12 col-sm-12 split screen-lg logos">
+            <div class="logo">
+              <a href="https://www.gov.co">
+                <img src="imagenes/logo_footer.png" alt="logo">
+              </a>
+            </div>
+            <div class="logo_co">
+              <a href="https://www.colombia.co">
+                <img src="imagenes/logo_co_footer.png" alt="logo co">
+              </a>
+            </div>
+          </div>
+          <div class="col-xl-6 col-lg-5 col-12 col-sm-12 split">
+            <h4>Direcci&oacute;n de Impuestos y Aduanas Nacionales</h4>
+            <h7>NIT: 800.197.268-4</h7>
+            <p></p>
+            <p>
+              Direcci&oacute;n: Sede principal | Bogot&aacute;, Nivel Central, carrera 8 NÂº 6C - 38 Edificio San Agust&iacute;n<br>
+              C&oacute;digo Postal: 111711<br>
+              Horario Contact Center: Lunes a Viernes 8:00 a.m. a 7:00 p.m. y S&aacute;bados de 8:00 a.m. a 12:00 m. 
+            </p>
+            <ul class="he_footer_redes">
+               <li><a href="https://twitter.com/DIANColombia" target="_blank"><i aria-hidden="true"><img src="imagenes/X-54x54C.png" alt="Twitter"></i></a>
+                <div class="fa_text"></div>
+               		</li>
+                    <li><a href="https://www.youtube.com/channel/UCkaPJ8afIoa_RDKEHaQIxrw" target="_blank"><i aria-hidden="true"><img src="imagenes/youtube.png" alt="Youtube"></i></a>                 
+                 	<div class="fa_text"></div>
+                	</li>
+              		<li><a href="https://www.linkedin.com/company/diancolombia/" target="_blank"><i aria-hidden="true"><img src="imagenes/linkedin.png" alt="Linkedin"></i></a>                 
+                 	<div class="fa_text"></div>
+                	</li>
+                    <li><a href="https://www.facebook.com/DIANCol/" target="_blank"><i aria-hidden="true"><img src="imagenes/facebook.png" alt="Facebook"></i></a>
+                  	<div class="fa_text"></div>
+                	</li>
+                    <li><a href="https://www.instagram.com/diancolombia/?hl=es-la" target="_blank"><i aria-hidden="true"><img src="imagenes/instagram.png" alt="Instagram"></i></a>                 
+                 	<div class="fa_text"></div>
+               		</li>
+					<li><a href="https://www.tiktok.com/@diancolombia" target="_blank"><i aria-hidden="true"><img src="imagenes/Tiktok-54x54C.png" alt="Tiktok"></i></a>                 
+                 	<div class="fa_text"></div>
+               		</li>									
+            </ul>
+            <br>
+          </div>
+          <div class="col-lg-4 col-12 col-sm-12 no-split">
+            <h4><img src="imagenes/Phone.png" alt="Contacto"><i class="fa fa-phone" aria-hidden="true"></i> Contacto</h4>
+            <h4><i class="fa fa-phone" aria-hidden="true"></i> Contact Center</h4>
+            <p>
+              
+              57 601 489 9000 LÃ­nea de Contact Center atenciÃ³n de Impuestos<br>
+              57 601 794 8880 LÃ­nea de Contact Center atenciÃ³n de Aduanas<br>
+			  57 601 794 8883 LÃ­nea Centro Nacional de Cobro<br>
+			  Conmutador Nivel central: PBX 601 4823294 / (+57) 3009140830 <br>
+              <br>
+              <!--Fax (57+1) 607 94 50<br>-->
+              <h4><strong><b>Servicio en L&iacute;nea de Contacto</b></strong> <br></h4>
+              <a href="https://www.dian.gov.co/atencionciudadano/PQSRD/Paginas/PQSR.aspx">PQSR</a> | <a href="https://www.dian.gov.co/atencionciudadano/contactenos/Paginas/puntosdecontacto.aspx" target="_blank" style="text-decoration: underline;">Puntos de contacto</a><br><a href="https://www.dian.gov.co/atencionciudadano/PQSRD/Paginas/Denuncias-TAC.aspx" target="_blank" style="text-decoration: underline;">Denuncias tributarias, aduaneras y cambiarias</a><br><a href="https://www.dian.gov.co/atencionciudadano/PQSRD/Paginas/ITRC.aspx" target="_blank" style="text-decoration: underline;">Denuncias de corrupciÃ³n</a><br>
+              <a href="https://www.dian.gov.co/Documents/POLITICA_GENERAL_DE_SEGURIDAD_Y_PRIVACIDAD_DE_LA_INFORMACION.pdf" style="text-decoration: underline;" target="_blank">PolÃ­tica de Seguridad de la Informaci&oacute;n</a><br><b>
+              <p><!--<h4><i class="fa fa-phone" aria-hidden="true"></i> Contact Center: 057(1) 3556922</h4>-->
+              <a href="https://www.dian.gov.co/Paginas/Privacidad.aspx" style="text-decoration: underline;" target="_blank">PolÃ­tica de Privacidad y AutorizaciÃ³n de uso de los datos y contenidos</a><br><a href="https://www.dian.gov.co/normatividad/Normatividad/Circular-000001-de-25-01-2019.pdf" style="text-decoration: underline;" target="_blank">Pol&iacute;tica de tratamiento de datos personales</a> <br> <a href="https://www.dian.gov.co/Paginas/Notificaciones-Judiciales-Formulario.aspx" style="text-decoration: underline;" target="_blank">Notificaciones Judiciales</a> | <a href="#" style="text-decoration: underline;" target="_blank">Mapa del sitio</a>
+            </p>
+          </div>
+          <div class="col-lg-2 col-12 col-sm-12 no-split split-top screen-md-sm logos_movil">
+            <div class="logo">
+              <a href="https://www.gov.co">
+                <img src="imagenes/logo_footer.png" alt="logo">
+              </a>
+            </div>
+            <div class="logo_co">
+              <a href="https://www.colombia.co">
+                <img src="imagenes/logo_co_footer.png" alt="logo co">
+              </a>
+            </div>
+		</div>
+        </div>
+      </div>
+	</footer>
+</body>
+</html>
+
+=== 860002964 status=200 ===
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <link rel="shortcut icon" href="imagenes/favicon.ico?rev=1" type="image/vnd.microsoft.icon" id="favicon">
+  <title>Direcci&oacute;n de Impuestos y Aduanas Nacionales - DIAN</title>
+  
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+
+  <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+  <script type="text/javascript" src="js/popper.min.js"></script>
+  <script type="text/javascript" src="js/carousel.js"></script>
+  <script type="text/javascript" src="js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="js/jquery-latest.js"></script>  
+  <script type="text/javascript" src="js/jquery.signalR-2.2.2.min.js"></script>
+   <!--Inicio del cargue del chatbot-->
+  	<!--<script type="text/javascript" src="js/SignalrHubs.js"></script>
+	<script>
+	fetch('js/TxtButton_2.txt') // Reemplaza con la URL del sitio web que deseas convertir en una cadena de texto
+	.then(response => response.text())
+	.then(html => {
+	// AquÃ­ tienes el contenido HTML como una cadena de texto
+	jQuery('body').append(html);
+	})
+	.catch(error => {
+	console.log('Error:', error);
+	});
+	</script>-->	
+
+<!--fin del cargue del chatbot-->
+
+<!-- Google tag (gtag.js) -->
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-104176853-1"></script>
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-104176853-1');
+</script> 
+<!--Script para mapas de calos-->
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "mujnnx5pad"); 
+</script>  
+
+ </head>
+<body>
+	<header class="he_header">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-1 col-sm-2 col-4 he_logo">
+            <a href="https://www.gov.co">
+              <img src="imagenes/logo_header.png" alt="logo">
+            </a>
+          </div>
+          <div class="col-lg-11 col-sm-10 col-8 he_menu">
+            <div class="row">
+              <div class="col-lg-6 col-md-5">
+                <p class="screen-lg">Direcci&oacute;n de Impuestos y Aduanas Nacionales</p>
+                <p class="screen-md">Â¿Sabes que es GOV.CO?</p>
+                <p class="screen-sm">Â¿Sabes que es GOV.CO? ConÃ³celo aquÃ­</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+	<div class="card-block white">
+		<div class="container">
+			<div class="row">
+				<div class="logo-escudo col-12 col-md-6 py-3 bg-white text-center text-md-left"><img src="imagenes/Escudo_Colombia.png"></div>
+				<div class="logo-dian col-12 col-md-6 py-3 bg-white text-center text-md-right"><img src="imagenes/Logo_Dian_Derecho.png"></div>
+			</div>
+		</div>
+<!--Aqui es para colocar el banner-->
+
+	<center>
+	<div col-md-12>
+   	    <a href="https://micrositios.dian.gov.co/renta-personas-naturales-ag-2025/" target="_blank"><img src="imagenes/banner-landing-renta-2025.jpg" width="1200px" heigth="549px" alt="Personas rodeadas de naturaleza en una campaÃ±a de la DIAN sobre Renta 2025 que resalta el impacto de cada declaraciÃ³n en el bienestar ambiental." border=0 class="img-fluid"></a>
+    </div>
+	
+	
+	</center>
+	
+<!--Aqui cierra es para colocar el banner-->
+       	<hr class="hr">
+	</div>
+<!--***********************Cierre SecciÃ³n Logos Institucionales***********************-->
+   &nbsp; 
+<!--***********************SecciÃ³n Titulos web***********************-->
+	<div class="container">
+		<div class="row">
+			<div class="portales pt-2">
+				<div class="card-block pb-2">
+					<h2 class="h2-responsive titulo font-weight-bold">Portales</h2>
+					<h5 class="h5-responsive subtitulo">Nuestros portales web</h5>
+				</div>
+<!--***********************Cierre SecciÃ³n Titulos web***********************-->
+
+<!--***********************SecciÃ³n Menu***********************-->
+				<div id="sliderHome" class="bg-verde">
+				  <div id="sliderHInner">
+					<div class="sliderHItem px-2 px-md-2 py-2 linea">
+					 	&nbsp;
+						<div class="justify-content-center flex-center">
+							<div class="col-md-1 col-2 col-sm-2 px-0 img-responsive"><img class="imagen" src="imagenes/transaccional_blanco.png"></div>
+                        	<div class="col-md-9 titulo-home font-weight-bold">Transaccional</div>
+						</div>
+						<div class="row bodypreval">
+							<div class="col-9 texto">
+								<ul class="mb-0 pl-0">
+									<li><a href="https://muisca.dian.gov.co/WebArquitectura/DefLogin.faces" target="_blank">Usuario Registrado</a></li>
+									<li><a href="https://muisca.dian.gov.co/WebArquitectura/DefNuevosUsuarios.faces" target="_blank">Usuario Nuevo</a></li>
+									<li><a href="https://muisca.dian.gov.co/WebArquitectura/DefLogin.faces" target="_blank">Servicios Tributarios y Cambiarios</a></li>
+									<li><a href="https://muisca.dian.gov.co/WebDilUsuariosNoRegistrados/" target="_blank">Usuarios no registrados diligenciar formularios</a></li>
+									<br>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="sliderHItem px-2 px-md-2 py-2 linea">
+					 	&nbsp;<div class="justify-content-center flex-center">
+							<div class="col-md-1 col-2 col-sm-2 px-0 img-responsive"><img class="imagen" src="imagenes/sitio_web.png"></div>
+							<div class="col-md-9 titulo-home font-weight-bold">Sitio web institucional</div>
+						</div>
+						<div class="row  bodypreval">
+							<div class="col-9 texto">
+								<ul class="mb-0 pl-0">
+									<p><a href="https://www.dian.gov.co/Paginas/Inicio.aspx" target="_blank">Direcci&oacute;n de Impuestos y Aduanas Nacionales. Portal Institucional</a></p>
+									<br>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="sliderHItem px-2 px-md-2 py-2 linea">
+					 	&nbsp;<div class="justify-content-center flex-center">
+							<div class="col-md-1 col-2 col-sm-2 px-0 img-responsive"><img class="imagen" src="imagenes/normograma_blanco.png">
+							</div>
+							<div class="col-md-9 titulo-home font-weight-bold">Normograma DIAN</div>
+						</div>
+						<div class="row bodypreval">
+							<div class="col-9 texto">
+								<ul class="mb-0 pl-0">
+									<p><a href="https://normograma.dian.gov.co/dian/" target="_blank">Encuentre aquÃ­ normativa, doctrina y jurisprudencia en materia tributaria, aduanera, cambiaria y otras materias de competencia de la entidad</a></p>
+									<br>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="sliderHItem px-2 px-md-2 py-2 linea">
+					 	&nbsp;<div class="justify-content-center flex-center">
+							<div class="col-md-1 col-2 col-sm-2 px-0 img-responsive"><img class="imagen" src="imagenes/transparencia_blanco.png">
+							</div>
+							<div class="col-md-9 titulo-home font-weight-bold">Transparencia y acceso a la informaci&oacute;n</div>
+						</div>
+						<div class="row  bodypreval">
+							  <div class="col-9 texto">
+									<p><a href="https://www.dian.gov.co/atencionciudadano/Paginas/Transparencia.aspx" target="_blank">Encuentre aqu&iacute; informaci&oacute;n sobre estructura org&aacute;nica y talento humano, normatividad, presupuesto</a></p>
+									<br>
+							   </div>
+						    </div>
+					      </div>
+
+						  <!--Este es un movimiento del siguiente item-->
+
+						  <div class="sliderHItem px-2 px-md-2 py-2 linea">
+							&nbsp;<div class="justify-content-center flex-center">
+							   <div class="col-md-1 col-2 col-sm-2 px-0 img-responsive"><img class="imagen" src="imagenes/portal_ninos_blanco.png">
+							   </div>
+							   <div class="col-md-9 titulo-home font-weight-bold">Portal de ni&ntilde;os</div>
+						   </div>
+						   <div class="row bodypreval">
+							   <div class="col-9 texto">
+								   <ul class="mb-0 pl-0">
+									   <p><a href="https://www.dian.gov.co/atencionciudadano/portal_de_ninos/Videojuego_MisionC/Paginas/default.aspx" target="_blank">Educar a los ni&ntilde;os y ni&ntilde;as de Colombia, para la construcci&oacute;n y el desarrollo de nuestro pa&iacute;s</a></p>
+									   <br>
+								   </ul>
+							   </div>
+						   </div>
+					   </div>
+
+					   <!--Cierre de este es un movimiento del siguiente item-->
+
+				        </div>
+                    </div>
+            </div>
+			<div class="col-12 col-md-9 pt-2 ayudar">
+				<div class="card-block pb-2">
+					<h2 class="h2-responsive titulo font-weight-bold">C&oacute;mo podemos ayudarle</h2>
+					<h5 class="h5-responsive subtitulo">Encuentre aqu&iacute; el acceso directo a  nuestros diferentes servicios.</h5>
+				</div>
+                
+<!--*********************Cierre SecciÃ³n Menu***********************-->   
+<!--************Inicio SecciÃ³n Cajas Centrales Derecha*************-->  
+   <!--***********************************caja1**************************************-->
+           
+				<div class="card-block" id="sliderHome2">
+                  <div class="row px-0" id="sliderH2Inner">
+					<div class="col-12 col-md-4 mt-3 mt-md-0 sliderH2Item">
+                            <div class="card h-0">
+								<div class="card-body">
+									<div class="row justify-content-center">
+										<div class="col-md-2 col-sm-2 col-2 px-0"><img class="imagen" src="imagenes/calendarios_active.png">
+										</div>
+									<div class="col-md-9 titulo-home font-weight-bold">Calendarios</div>
+									</div>
+								<div class="card-block">
+									<div class="row">
+										<div class="col-9 caja card-text">
+											<ul class="mb-0 pl-0 azul servicios">
+												<li><a href="https://www.dian.gov.co/Paginas/CalendarioTributario.aspx" target="_blank">Tributarios</a></li>
+												<li><a href="https://www.dian.gov.co/Paginas/CalendarioCambiario.aspx" target="_blank">Cambiarios</a></li>
+											</ul>
+									</div>
+									</div>
+                                    </div>
+								</div>
+							</div>
+						</div>
+                        
+                        <!--***********************************caja2**************************************-->
+                        <div class="col-12 col-md-4 mt-3 mt-md-0 sliderH2Item">
+                            <div class="card h-0">
+								<div class="card-body">
+									<div class="row justify-content-center">
+										<div class="col-md-2 col-sm-2 col-2 px-0"><img class="imagen" src="imagenes/asignacion-citas.png"></div>
+										<div class="col-md-9  titulo-home font-weight-bold">Agendamiento de citas</div>
+									</div>
+									<div class="card-block">
+									<div class="row">
+										<div class="col-9 card-text caja servicios">
+											<ul class="mb-0 pl-0 azul servicios">
+											<li><a href="https://www.dian.gov.co/atencionciudadano/Agendamiento-de-Citas/Paginas/Inicio.aspx" target="_blank">Sistema de agendamiento por medio del cual puede agendar, modificar, consultar o cancelar citas.</a></br></li>
+										</ul>
+										</div>
+									</div>
+                                   </div>
+								</div>
+							</div>
+						</div>
+                    
+						<!--*****************************caja 3******************************-->
+                        <div class="col-12 col-md-4 mt-3 mt-md-0 sliderH2Item">
+						<div class="card h-0">
+								<div class="card-body">
+									<div class="row justify-content-center">
+										<div class="col-md-2 col-sm-2 col-2 px-0"><img class="imagen" src="imagenes/notificacion.png">
+										</div>
+									<div class="col-md-9 titulo-home font-weight-bold">Notificaciones</div>
+									</div>
+								<div class="card-block">
+									<div class="row">
+										<div class="col-9 caja card-text servicios">
+											<ul class="mb-0 pl-0 azul servicios">
+											<li><a href="https://www.dian.gov.co/atencionciudadano/notificacion/Paginas/default.aspx" target="_blank">Verifique la publicaci&oacute;n del acto administrativo en las dos opciones: tr&aacute;mite e hist&oacute;rico y publicaciones.</a></li>
+                                            <li><a href="https://muisca.dian.gov.co/WebCmnNotificaciones/" target="_blank">Registro P&uacute;blico de Notificaciones Electr&oacute;nicas</a></li>
+                                            </ul>
+										</div>
+									</div>
+                                </div>
+								</div>
+							</div>
+						</div>
+						<!--*************************************caja 4*************************************-->
+                        
+						<div class="col-12 col-md-4 mt-3 sliderH2Item">
+								<div class="card h-0">
+									<div class="card-body">
+										<div class="row justify-content-center">
+											<div class="col-md-2 col-sm-2 col-2 px-0"><img class="imagen" src="imagenes/verificacion-correo.png">
+											</div>
+											<div class="col-md-9 titulo-home font-weight-bold">Verificaci&oacute;n de correos</div>
+										</div>
+									</div>
+										<div class="card-block">
+											<div class="row">
+												<div class="col-9 card-text caja servicios">
+                                                <ul class="mb-0 pl-0 azul servicios">
+                                                <li><a href="https://muisca.dian.gov.co/WebComunicaciones/DefVerificarCorreoDian.faces">Verifica autenticidad de correos DIAN.</a> 
+                                                 </li>
+												 <li><a href="https://webazure.dian.gov.co/comunicaciones/busqueda/verificacion" target="_blank">ValidaciÃ³n de Cadena de Correo con QR.</a> 
+                                                 </li>
+                                                 <li><a href="https://www.dian.gov.co/atencionciudadano/Seguridad-de-la-Informacion/Paginas/Inicio.aspx">Temas relacionados con la Seguridad de la InformaciÃ³n.</a> 
+                                                 </li>
+                                                 </ul>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+                        
+                       <!--***********************************caja 5***************************************-->
+                        
+                        <div class="col-12 col-md-4 mt-3 sliderH2Item">
+								<div class="card h-0">
+								<div class="card-body">
+									<div class="row justify-content-center">
+										<div class="col-md-2 col-sm-2 col-2 px-0"><img class="imagen" src="imagenes/PQRS_y_denuncias.png">
+										</div>
+										<div class="col-md-9 titulo-home font-weight-bold">PQSR y denuncias</div>
+									</div>
+								</div>
+								<div class="card-block">
+									<div class="row">										
+										<div class="col-9 card-text caja servicios">
+										<ul class="mb-0 pl-0 azul servicios">
+										<li><a href="https://www.dian.gov.co/atencionciudadano/PQSRD/Paginas/Inicio.aspx">Encuentre informaci&oacute;n general, quejas, reclamos, sugerencias, glosario, marco normativo y preguntas.</a> 
+										</li>
+										</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+                        <!--************************************caja 6****************************************-->
+                        
+						<div class="col-12 col-md-4 mt-3 sliderH2Item">
+							<div class="card h-0">
+								<div class="card-body">
+									<div class="row justify-content-center">
+										<div class="col-md-2 col-sm-2 col-2 px-0"><img class="imagen" src="imagenes/ubicacion.png">
+										</div>
+										<div class="col-md-9 titulo-home font-weight-bold">ContÃ¡ctanos</div>
+									</div>
+								</div>
+								<div class="card-block">
+									<div class="row">
+										<div class="col-9 card-text caja servicios">
+										<ul class="mb-0 pl-0 azul servicios">
+											<li><a href="https://portaldian.cyc-bpo.com/" target="_blank">Utilice los canales de atenciÃ³n habilitados por la entidad</a></li>
+																														
+										</ul>
+									  </div>
+									</div>
+								</div>
+							</div>
+						</div>
+<!--Otro item-->
+<div class="col-12 col-md-4 mt-3 sliderH2Item">
+	<div class="card h-0">
+		<div class="card-body">
+			<div class="row justify-content-center">
+				<div class="col-md-2 col-sm-2 col-2 px-0"><img class="imagen" src="imagenes/notificacion.png">
+				</div>
+				<div class="col-md-9 titulo-home font-weight-bold">Facilidades de pago</div>
+			</div>
+		</div>
+		<div class="card-block">
+			<div class="row">
+				<div class="col-9 card-text caja servicios">
+				<ul class="mb-0 pl-0 azul servicios">
+					<li><a href="https://www.dian.gov.co/impuestos/Paginas/Pongase-al-dia-con-la-DIAN.aspx" target="_blank">PÃ³ngase al dÃ­a con la DIAN. Conozca cÃ³mo cumplir con sus obligaciones tributarias en mora.</a></li>
+															
+				</ul>
+			  </div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+					</div>
+				</div>
+				
+<!--************Cierre SecciÃ³n Cajas Centrales Derecha*************-->  
+ <!--************Inicio SecciÃ³n Temas de Interes*************-->                 
+ 				<h2 class="h2-responsive titulo font-weight-bold screen-sm h2-interes">Temas de inter&eacute;s</h2>
+				<div class="interes bg-azul" id="sliderHome4">
+					<h2 class="subtitulo-temas screen-md screen-lg ">Temas de inter&eacute;s</h2>
+					<div class="row" id="sliderH4Inner">
+						<div class="col-12 col-md-3 sliderH4Item">
+							<div class="card-block">
+								<div class="justify-content-center flex-center">
+									<div class="col-md-3 col-2 col-sm-2 img-responsive"><img class="imagen" src="imagenes/Factura_electronica.png"></div>
+									<div class="col-md-10 col-9 titulo-home caja1 font-weight-bold titulo-interes">Factura Electr&oacute;nica</div>
+								</div>
+								<div class="row" style="color:#189376">
+									<div class="col-md-11 listas">
+									  <ul class="mb-0 px-0 azul caja servicios">
+											<!--<li><a href="https://www.dian.gov.co/impuestos/Paginas/Sistema-de-Factura-Electronica/Inicio.aspx" target="_blank">Micrositio</a></li>-->
+											<li><a href="https://micrositios.dian.gov.co/sistema-de-facturacion-electronica/" target="_blank">Micrositio</a></li>
+                                            <li><a href="https://catalogo-vpfe-hab.dian.gov.co/User/Login" target="_blank">Habilitaci&oacute;n</a></li>
+											<li><a href="https://catalogo-vpfe.dian.gov.co/User/Login" target="_blank">Facturando Electr&oacute;nicamente</a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-md-3 sliderH4Item">
+							<div class="card-block">
+								<div class="justify-content-center flex-center">
+									<div class="col-md-3 col-2 col-sm-2 img-responsive"><img class="imagen" src="imagenes/RUT.png"></div>
+									<div class="col-md-10 col-9 titulo-home caja1 font-weight-bold titulo-interes">RUT</div>
+								</div>
+								<div class="row" style="color:#189376">
+									<div class="col-md-11 listas">
+										<!--<ul class="mb-0 pl-0 azul">-->
+                                      <ul class="mb-0 px-0 azul caja servicios">
+											<li><a href="https://www.dian.gov.co/impuestos/RUT/Paginas/Inicio.aspx" target="_blank">Micrositio</a></li>
+											<li><a href="https://muisca.dian.gov.co/WebRutVirtualInscripcion/" target="_blank">InscripciÃ³n virtual RUT</a></li>
+											<li><a href="https://www.dian.gov.co/tramitesservicios/tramites-y-servicios/tributarios/Paginas/RUT.aspx" target="_blank">TrÃ¡mites y servicios</a></li>								
+                                            
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-md-3 sliderH4Item">
+							<div class="card-block">
+								<div class="justify-content-center flex-center">
+									<div class="col-md-3 col-2 col-sm-2 img-responsive"><img class="imagen" src="imagenes/RST.png"></div>
+									<div class="col-md-10 col-9 titulo-home caja1 font-weight-bold titulo-interes">RST</div>
+									</div>
+									<div class="row" style="color:#189376">
+										<div class="col-md-11  listas">
+											<ul class="mb-0 px-0 azul caja servicios">
+												<li><a href="https://micrositios.dian.gov.co/regimen-simple-tributacion/" target="_blank">Portal del r&eacute;gimen simple de tributaci&oacute;n.</a>
+												</li>
+											</ul>
+										</div>
+									</div>
+							</div>
+						</div>
+						<div class="col-12 col-md-3 sliderH4Item">
+							<div class="card-block">
+								<div class="justify-content-center flex-center">
+									<div class="col-md-3 col-2 col-sm-2 img-responsive"><img class="imagen" src="imagenes/OEA.png"></div>
+									<div class="col-md-10 col-9 titulo-home caja1 font-weight-bold titulo-interes">OEA</div>
+								</div>
+								<div class="row" style="color:#189376">
+									<div class="col-md-11 listas">
+										<ul class="mb-0 px-0 azul caja servicios">
+										<li>
+										  <a href="https://www.dian.gov.co/aduanas/oea/inicio/Paginas/default.aspx" target="_blank">Operador Econ&oacute;mico Autorizado</a>
+										</li>
+                                      </ul>
+									</div>
+								</div>
+							</div>
+						</div>
+							<!--Esta es la secciÃ³n nueva de Tramites y Servicios-->                        
+							<!--Probando-->
+						<div class="col-12 col-md-3 sliderH4Item">
+							<div class="card-block">
+								<div class="justify-content-center flex-center">
+									<div class="col-md-3 col-2 col-sm-2 img-responsive"><img class="imagen" src="imagenes/tramiles-servicios.png"></div>
+									<div class="col-md-10 col-9 titulo-home caja1 font-weight-bold titulo-interes">Tr&aacute;mites y servicios</div>
+								</div>
+								<div class="row" style="color:#189376">
+									<div class="col-md-11 listas">
+									  <ul class="mb-0 px-0 azul caja servicios">
+											<li><a href="https://www.dian.gov.co/tramitesservicios/tramites-y-servicios/Paginas/default.aspx" target="_blank">Encuentre en un solo lugar la normativa, procedimientos, costos, formularios, preguntas frecuentes y glosario.</a></li>
+                                      </ul>
+									</div>
+								</div>
+							</div>
+						</div>
+
+							<!--Cierre Probando-->
+							<!--Cierra la secciÃ³n nueva de Tramites y Servicios-->
+
+							<!--Inicio la secciÃ³n nueva de Firma Electronica-->
+
+					<div class="col-12 col-md-3 sliderH4Item">
+							<div class="card-block">
+								<div class="justify-content-center flex-center">
+									<div class="col-md-3 col-2 col-sm-2 img-responsive"><img class="imagen" src="imagenes/firma-e.png"></div>
+									<div class="col-md-10 col-9 titulo-home caja1 font-weight-bold titulo-interes">Firma Electr&oacute;nica</div>
+								</div>
+								<div class="row" style="color:#189376">
+									<div class="col-md-11 listas">
+									  <ul class="mb-0 px-0 azul caja servicios">
+										<li><a href="https://muisca.dian.gov.co/WebArquitectura/DefLoginOld.faces" target="_blank">Generar Firma Electr&oacute;nica</a></li>
+										<li><a href="https://www.dian.gov.co/Prensa/Aprendelo-en-un-DIAN-X3/Paginas/Habilitacion-y-recuperacion-de-cuenta-de-usuario-y-generacion-de-firma-electronica.aspx" target="_blank">Cuenta de Usuario y Firma ElectrÃ³nica</a></li>									
+                                      </ul>
+									</div>
+									
+								</div>
+								
+							</div>
+						</div>
+
+					<!--Cierre la secciÃ³n nueva de Firma Electronica -->
+					<!--Inicio de contribuyentes plus-->
+					<div class="col-12 col-md-3 sliderH4Item">
+							<div class="card-block">
+								<div class="justify-content-center flex-center">
+									<div class="col-md-3 col-2 col-sm-2 img-responsive"><img class="imagen" src="imagenes/DGC_OS_AS.png"></div>
+									<div class="col-md-10 col-9 titulo-home caja1 font-weight-bold titulo-interes">Grandes Contribuyentes</div>
+								</div>
+								<div class="row" style="color:#189376">
+									<div class="col-md-11 listas">
+									  <ul class="mb-0 px-0 azul caja servicios">
+										<li><a href="https://www.dian.gov.co/Contribuyentes-Plus/Paginas/Inicio.aspx" target="_blank">Micrositio</a></li>
+                                      </ul>
+									</div>									
+								</div>								
+							</div>
+						</div>
+					<!--Cierre de contribuyentes plus-->
+
+					</div>
+               </div>
+			</div>
+		</div>
+	</div>
+<!--************Cierre SecciÃ³n Temas de Interes*************-->  
+  
+<!--********Inicio SecciÃ³n Servicios a la Ciudadania********--> 
+    
+	<div class="card-block bg-white mt-5 p-3">
+		<div class="container">
+			<div class="row">
+				<div class="col-12">&nbsp;
+					<h2 class="h2-responsive titulo-home font-weight-bold">Servicios a la ciudadan&iacute;a</h2>
+				</div>
+			</div>&nbsp;
+			<div class="row" style="color: #009166">
+					<div class="col-12 col-md-3">
+						<div class="card-block">
+							<div class="row justify-content-center flex-center">
+                                <div class="col-12 font-weight-bold subtitulo">Servicios Aduaneros</div>
+							</div>
+							<div class="row">
+								<div class="col-12 servicios">
+									<!--<ul class="mb-0 azul">-->
+                                    &nbsp;
+                                    <ul class="mb-0 azul bodypreval">
+										<li><a href="https://salidademercancias.dian.gov.co/WebArquitectura/DefLogin.faces" target="_blank">Exportaciones</a></li>
+										<li><a href="https://webazure.dian.gov.co/importacionestemporales/validate-email" target="_blank">Importaci&oacute;n Temporal de Medios de Transporte de Turista.</a></li>                                        
+										<li><a href="https://certificadosdeorigen.dian.gov.co/Verifica/indexmex.php" target="_blank">Certificado de Origen Digital</a></li>
+										<li><a href="https://importacionescarga.dian.gov.co/WebArquitectura/DefLogin.faces" target="_blank">Carga Importaciones</a></li>
+                                        <li><a href="https://transitoaduanero.dian.gov.co/WebArquitectura/DefLogin.faces" target="_blank">Tr&aacute;nsito Aduanero</a></li>
+										<li><a href="https://importaciones.dian.gov.co" target="_blank">Importaciones</a></li>
+                                        <li><a href="https://muisca.dian.gov.co/WebArancel/DefMenuConsultas.faces" target="_blank">Consulta Arancel</a></li>
+                                        <li><a href="https://muisca.dian.gov.co/WebParametrizacion/DefSelProcesoTblsParametricas.faces" target="_blank">Tablas Param&eacute;tricas</a></li>
+										<li><a href="https://muisca.dian.gov.co/WebArancel/DefControlCupo.faces" target="_blank">Consulta de Consumo contingentes arancelarios</a></li>
+										<li><a href="https://muisca.dian.gov.co/WebRutMuisca/DefConsultaEstadoRUT.faces" target="_blank">Consulta RUT</a></li>
+                                        <li><a href="https://muisca.dian.gov.co/WebArquitectura/DefPasswordRecuperacion.faces" target="_blank">Recuperar Contrase&ntilde;a</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-md-3">
+						<div class="card-block">
+							<div class="row justify-content-center flex-center">
+								<!--<div class="col-12 font-weight-bold">Servicios tributarios</div>-->
+                               <div class="col-12 font-weight-bold subtitulo">Servicios tributarios</div>
+							</div>
+							<div class="row">
+								<div class="col-12 servicios">
+                                &nbsp;
+									<ul class="mb-0 azul bodypreval">
+										<li><a href="https://muisca.dian.gov.co/WebRutMuisca/DefConsultaEstadoRUT.faces" target="_blank">Consulta Estado RUT</a></li>
+                                        <li><a href="https://muisca.dian.gov.co/WebArquitectura/DefPasswordRecuperacion.faces" target="_blank">Recuperaci&oacute;n Contrase&ntilde;a</a></li>
+										<li><a href="https://muisca.dian.gov.co/WebGestionmasiva/DefSelPublicacionesExterna.faces" target="_blank">Consulta de Inconsistencias</a></li>
+                                        <li><a href="https://muisca.dian.gov.co/WebArquitectura/DefLoginMb.faces" target="_blank">Radicaci&oacute;n electr&oacute;nica de recursos de reconsideraci&oacute;n</a></li>
+                                        <li><a href="https://devolucion.dian.gov.co/WebArquitectura/DefLogin.faces" target="_blank">Solicitud devoluci&oacute;n y/o compensaci&oacute;n</a></li>
+										<li><a href="https://muisca.dian.gov.co/WebRutMuisca/DefActualizarActividadesCIIU.faces" target="_blank">Actividad Econ&oacute;mica</a></li>
+										<li><a href="https://muisca.dian.gov.co/WebArquitectura/DefFormulariosGratuitos.faces" target="_blank">Usuarios no registrados diligenciar formularios</a></li>
+										<li><a href="https://muisca.dian.gov.co/WebComunicaciones/DefVerificarCorreoDian.faces" target="_blank">Verificaci&oacute;n de correos DIAN</a></li>
+                                       
+                                        <li><a href="https://muisca.dian.gov.co/WebArquitectura/DefLogin.faces" target="_blank">Planeaci&oacute;n</a></li>
+                                        <li><a href="https://muisca.dian.gov.co/WebRutVirtualInscripcion/" target="_blank">RUT- Definir tipo de inscripci&oacute;n</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-md-3">
+						<div class="card-block">
+							<div class="row justify-content-center flex-center">
+								<div class="col-12 font-weight-bold subtitulo">Prevalidadores aduaneros</div>
+							</div>
+							<div class="row">
+								<div class="col-12 servicios">
+                                &nbsp;
+									<ul class="mb-0 azul bodypreval">										
+                                        <li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/Certificado-al-Proveedor.zip" target="_blank">Certificado al proveedor</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/Prevalidador-CP-PROFIA-V3-0-023.zip" target="_blank">Certificado de Producci&oacute;n PROFIA V2 â 2023</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/Prevalidador-CP-PROFIA-V-2-7-0-2023.zip" target="_blank">Certificado de Producci&oacute;n PROFIA - 2023</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/Certificado de ProducciÃ³n PROFIA-2020.zip" target="_blank">Certificado de Producci&oacute;n PROFIA</a></li>
+										<li><a href="https://www.dian.gov.co/Transaccional/Prevalidadores%20aduanas/Contingencia%20Carga%20(Versi%C3%B3n%20optimizada).zip" target="_blank">Contingencia Carga (Versi&oacute;n optimizada)</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/Cuadro Insumo Producto PROFIA.zip" target="_blank">Cuadro Insumo Producto PROFIA</a></li>
+                                        <li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/Cuadro Insumo Producto.zip" target="_blank">Cuadro Insumo Producto</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/DeclaraciÃ³n de ExportaciÃ³n.zip" target="_blank">Declaraci&oacute;n de Exportaci&oacute;n</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/Hojas 2 formularios 520 y 540.zip" target="_blank">Hojas 2 formularios 520 y 540</a></li>
+										<li><a href="https://cutt.ly/btmwFugn" target="_blank">PlÃ¡sticos de un solo uso</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores%20aduanas/Importacion-Carga-Version-optimizada.zip" target="_blank">Importaci&oacute;n Carga (Versi&oacute;n optimizada)</a></li>
+                                        <li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/Registro aduanero.zip" target="_blank">Registro Aduanero</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/Salida de mercancÃ­as.zip" target="_blank">Salida de mercancias</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/Prevalidadores aduanas/Prevalidador_Aduanero_v1_8_0_22.zip" target="_blank">Hojas 2 formularios 520 y 540 (2022)</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-md-3">
+						<div class="card-block">
+							<div class="row justify-content-center flex-center">
+								<div class="col-12 font-weight-bold subtitulo">Prevalidadores tributarios</div>
+							</div>
+							<div class="row">
+								<div class="col-12 servicios">
+                                &nbsp;
+									<ul class="mb-0 azul bodypreval">
+                      					<li><a href="https://www.dian.gov.co/impuestos/sociedades/ExogenaTributaria/Prevalidadores/Paginas/default.aspx" target="_blank">Informaci&oacute;n Tributaria</a></li>
+										<li><a href="https://cutt.ly/Yt11Amqk">Programa Ayuda Renta 2025</a></li>
+										<li><a href="https://cutt.ly/5rcw9FEm">Programa Ayuda Renta 2024</a></li>
+										<li><a href="https://cutt.ly/fetlwr67">Programa Ayuda Renta 2023</a></li>
+										<li><a href="https://cutt.ly/Q6BdKbm">Programa Ayuda Renta 2022</a></li>										
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/PREVALIDADORES/Programa-Ayuda-Renta-DIAN-2021.zip">Programa Ayuda Renta 2021</a></li>
+                                        <li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/PREVALIDADORES/Programa-Ayuda-Renta-2020.zip">Programa Ayuda Renta 2020</a></li>
+                                                                   
+										<li><a href="https://www.dian.gov.co/Transaccional/Paginas/Prevalidadores.aspx" target="_blank">Reporte ConciliaciÃ³n Fiscal</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/PREVALIDADORES/Entidades Financieras.zip" target="_blank">Entidades Financieras</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/PREVALIDADORES/Factura electrÃ³nica.zip" target="_blank">Factura electr&oacute;nica</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/PREVALIDADORES/FrigorÃ­ficos y Pieles 2016 VersiÃ³n 1.2.zip" target="_blank">Frigor&iacute;ficos y pieles</a></li>
+                                        <li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/PREVALIDADORES/InformaciÃ³n de Relevancia Tributaria aÃ±o gravable 2012 .zip" target="_blank">Impuesto Nacional a la Gasolina y ACPM</a></li>
+										<li><a href="https://www.dian.gov.co/Transaccional/Paginas/Prevalidadores.aspx" target="_blank">Informaci&oacute;n de Relevancia Tributaria</a></li>
+										<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/PREVALIDADORES/InformaciÃ³n Usuarios de Entidades PÃºblicas o Privadas.zip" target="_blank">Informaci&oacute;n Usuarios de Entidades P&uacute;blicas o Privadas</a></li>
+                                        <li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/PREVALIDADORES/Informacion_Ventas_con_Exencion_de_IVA.zip" target="_blank">Informaci&oacute;n Ventas con Exenci&oacute;n de IVA</a></li>
+                                        <li><a href="https://www.dian.gov.co/Transaccional/Paginas/Prevalidadores.aspx" target="_blank">Precios de Transferencia</a></li>
+                                        <li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/PREVALIDADORES/Prevalidador_RUB_v2.0.0-24.zip" target="_blank">Registro Ãnico de Beneficiarios Finales - RUB</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+			    </div>
+			</div>
+			<div class="row pt-4">
+				<div class="col-12"><h5 class="h5-responsive font-weight-bold subtitulo">Prevalidadores</h5></div>
+			</div>
+			<div class="row">
+				<div class="col-12 col-md-3">
+					<div class="card-block">
+						<div class="row justify-content-center flex-center">
+							<div class="col-12 subtitulo1 font-weight-bold">Prevalidadores Cambios</div>
+						</div>
+						<div class="row">
+							<div class="col-12 servicios">&nbsp;
+								<ul class="mb-0 azul bodypreval">                               
+                                <li><a href="https://cutt.ly/prduCwcK">InformaciÃ³n Cambiaria a partir del cuarto trimestre de 2023</a></li>
+								<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/prevalidador cambios/PrevalidadorCambiario_v2.5.1.zip">InformaciÃ³n Cambiaria aÃ±os 2022, segundo trimestre - a 2023, tercer trimestre</a></li>
+								<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/prevalidador cambios/Informacion-cambiaria-2021.zip">InformaciÃ³n Cambiaria </a></li>
+                                								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-12 col-md-3">
+					<div class="card-block">
+						<div class="row justify-content-center flex-center">
+							<div class="col-12 subtitulo1 font-weight-bold">Prevalidadores Min Cultura</div>
+						</div>
+						<div class="row">
+							<div class="col-12 servicios">&nbsp;
+								<ul class="mb-0 azul bodypreval">
+									<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/prevalidador MinCultura/Prevalidador MinCultura (AÃ±o gravable 2016).zip" target="_blank">Contribuci&oacute;n Parafiscal y Retenciones</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-12 col-md-6">
+					<div class="card-block">
+						<div class="row justify-content-center flex-center">
+							<div class="col-12 subtitulo1 font-weight-bold">Prevalidadores R&eacute;gimen Tributario Especial</div>
+						</div>
+						<div class="row">
+							<div class="col-12 servicios">&nbsp;
+								<ul class="mb-0 azul bodypreval">
+									<li><a href="https://storagecdndian.blob.core.windows.net/site/Transaccional/PrevalidadoresRTE/RÃ©gimen Tributario Especial.zip" target="_blank">R&eacute;gimen Tributario Especial</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<!--********Cierre SecciÃ³n Servicios a la Ciudadania********--> 
+&nbsp;
+<!--********SecciÃ³n Redes Sociales********--> 
+    <footer class="he_footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-xl-2 col-lg-3 col-12 col-sm-12 split screen-lg logos">
+            <div class="logo">
+              <a href="https://www.gov.co">
+                <img src="imagenes/logo_footer.png" alt="logo">
+              </a>
+            </div>
+            <div class="logo_co">
+              <a href="https://www.colombia.co">
+                <img src="imagenes/logo_co_footer.png" alt="logo co">
+              </a>
+            </div>
+          </div>
+          <div class="col-xl-6 col-lg-5 col-12 col-sm-12 split">
+            <h4>Direcci&oacute;n de Impuestos y Aduanas Nacionales</h4>
+            <h7>NIT: 800.197.268-4</h7>
+            <p></p>
+            <p>
+              Direcci&oacute;n: Sede principal | Bogot&aacute;, Nivel Central, carrera 8 NÂº 6C - 38 Edificio San Agust&iacute;n<br>
+              C&oacute;digo Postal: 111711<br>
+              Horario Contact Center: Lunes a Viernes 8:00 a.m. a 7:00 p.m. y S&aacute;bados de 8:00 a.m. a 12:00 m. 
+            </p>
+            <ul class="he_footer_redes">
+               <li><a href="https://twitter.com/DIANColombia" target="_blank"><i aria-hidden="true"><img src="imagenes/X-54x54C.png" alt="Twitter"></i></a>
+                <div class="fa_text"></div>
+               		</li>
+                    <li><a href="https://www.youtube.com/channel/UCkaPJ8afIoa_RDKEHaQIxrw" target="_blank"><i aria-hidden="true"><img src="imagenes/youtube.png" alt="Youtube"></i></a>                 
+                 	<div class="fa_text"></div>
+                	</li>
+              		<li><a href="https://www.linkedin.com/company/diancolombia/" target="_blank"><i aria-hidden="true"><img src="imagenes/linkedin.png" alt="Linkedin"></i></a>                 
+                 	<div class="fa_text"></div>
+                	</li>
+                    <li><a href="https://www.facebook.com/DIANCol/" target="_blank"><i aria-hidden="true"><img src="imagenes/facebook.png" alt="Facebook"></i></a>
+                  	<div class="fa_text"></div>
+                	</li>
+                    <li><a href="https://www.instagram.com/diancolombia/?hl=es-la" target="_blank"><i aria-hidden="true"><img src="imagenes/instagram.png" alt="Instagram"></i></a>                 
+                 	<div class="fa_text"></div>
+               		</li>
+					<li><a href="https://www.tiktok.com/@diancolombia" target="_blank"><i aria-hidden="true"><img src="imagenes/Tiktok-54x54C.png" alt="Tiktok"></i></a>                 
+                 	<div class="fa_text"></div>
+               		</li>									
+            </ul>
+            <br>
+          </div>
+          <div class="col-lg-4 col-12 col-sm-12 no-split">
+            <h4><img src="imagenes/Phone.png" alt="Contacto"><i class="fa fa-phone" aria-hidden="true"></i> Contacto</h4>
+            <h4><i class="fa fa-phone" aria-hidden="true"></i> Contact Center</h4>
+            <p>
+              
+              57 601 489 9000 LÃ­nea de Contact Center atenciÃ³n de Impuestos<br>
+              57 601 794 8880 LÃ­nea de Contact Center atenciÃ³n de Aduanas<br>
+			  57 601 794 8883 LÃ­nea Centro Nacional de Cobro<br>
+			  Conmutador Nivel central: PBX 601 4823294 / (+57) 3009140830 <br>
+              <br>
+              <!--Fax (57+1) 607 94 50<br>-->
+              <h4><strong><b>Servicio en L&iacute;nea de Contacto</b></strong> <br></h4>
+              <a href="https://www.dian.gov.co/atencionciudadano/PQSRD/Paginas/PQSR.aspx">PQSR</a> | <a href="https://www.dian.gov.co/atencionciudadano/contactenos/Paginas/puntosdecontacto.aspx" target="_blank" style="text-decoration: underline;">Puntos de contacto</a><br><a href="https://www.dian.gov.co/atencionciudadano/PQSRD/Paginas/Denuncias-TAC.aspx" target="_blank" style="text-decoration: underline;">Denuncias tributarias, aduaneras y cambiarias</a><br><a href="https://www.dian.gov.co/atencionciudadano/PQSRD/Paginas/ITRC.aspx" target="_blank" style="text-decoration: underline;">Denuncias de corrupciÃ³n</a><br>
+              <a href="https://www.dian.gov.co/Documents/POLITICA_GENERAL_DE_SEGURIDAD_Y_PRIVACIDAD_DE_LA_INFORMACION.pdf" style="text-decoration: underline;" target="_blank">PolÃ­tica de Seguridad de la Informaci&oacute;n</a><br><b>
+              <p><!--<h4><i class="fa fa-phone" aria-hidden="true"></i> Contact Center: 057(1) 3556922</h4>-->
+              <a href="https://www.dian.gov.co/Paginas/Privacidad.aspx" style="text-decoration: underline;" target="_blank">PolÃ­tica de Privacidad y AutorizaciÃ³n de uso de los datos y contenidos</a><br><a href="https://www.dian.gov.co/normatividad/Normatividad/Circular-000001-de-25-01-2019.pdf" style="text-decoration: underline;" target="_blank">Pol&iacute;tica de tratamiento de datos personales</a> <br> <a href="https://www.dian.gov.co/Paginas/Notificaciones-Judiciales-Formulario.aspx" style="text-decoration: underline;" target="_blank">Notificaciones Judiciales</a> | <a href="#" style="text-decoration: underline;" target="_blank">Mapa del sitio</a>
+            </p>
+          </div>
+          <div class="col-lg-2 col-12 col-sm-12 no-split split-top screen-md-sm logos_movil">
+            <div class="logo">
+              <a href="https://www.gov.co">
+                <img src="imagenes/logo_footer.png" alt="logo">
+              </a>
+            </div>
+            <div class="logo_co">
+              <a href="https://www.colombia.co">
+                <img src="imagenes/logo_co_footer.png" alt="logo co">
+              </a>
+            </div>
+		</div>
+        </div>
+      </div>
+	</footer>
+</body>
+</html>
+

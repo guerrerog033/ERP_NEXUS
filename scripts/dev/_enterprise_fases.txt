@@ -1,0 +1,161 @@
+# Diagnóstico ERP NEXUS vs. tu visión completa
+
+**Estado real hoy: ~25–30%** de la lista que planteas. Lo más maduro es **ventas operativas + integración DIAN**; lo más ausente es **contabilidad NIIF, nómina, CRM, reportes y normativa completa**.
+
+**Base de datos real:** ~30 tablas SQLAlchemy (no 250). Sin procedimientos almacenados ni motor de reportes masivo todavía.
+
+---
+
+## Resumen por bloque
+
+| Área | % | Lo que ya cumple | Lo que falta |
+|------|---|------------------|--------------|
+| **Seguridad** | 20% | Login, roles base, permisos por módulo, multiempresa parcial | UI usuarios/roles, auditoría activa, sucursales, bitácora |
+| **Contabilidad NIIF** | 12% | Plan básico (10 cuentas), asientos automáticos desde docs | PUC completo, comprobantes manuales, libros, EEFF, cierre, depreciaciones |
+| **Ventas** | 55% | Cotizaciones → pedidos → remisiones → facturas, FE DIAN, cartera básica, recibos caja | POS, NC/ND, anticipos |
+| **Compras** | 35% | Facturas compra, import/sync DIAN, acuse RADIAN 030, proveedores, CxP parcial | Solicitudes, OC, recepción formal, retenciones aplicadas |
+| **Inventarios** | 25% | Productos/variantes, movimientos backend (entrada compra, salida venta) | UI kardex, bodegas, FIFO, lotes, traslados, conteo físico |
+| **Nómina Colombia** | 1% | Carpeta placeholder | Todo el módulo |
+| **Tesorería** | 25% | RC y comprobantes egreso con contabilización | Bancos, conciliaciones, cheques |
+| **Activos fijos** | 2% | Etiquetas en hub contabilidad | Modelos, depreciación NIIF |
+| **Impuestos** | 30% | Catálogo IVA, retenciones en maestros | Aplicación transaccional, ICA, exógena |
+| **Informes** | 5% | PDF/HTML por documento | Catálogo 200+, Excel, estados financieros |
+| **FE / DIAN** | 55% | Emisión UBL 2.1, CUFE, recepción compras, acuse 030 | Documento soporte, más eventos RADIAN, nómina electrónica |
+| **CRM** | 0% | — | Clientes, oportunidades, agenda |
+| **Dashboard** | 25% | KPIs básicos inicio | Gráficos, cartera, flujo caja, rentabilidad |
+
+---
+
+## Lo que sí cumples hoy (con evidencia)
+
+### Operación comercial
+- **Ciclo ventas completo:** cotizaciones, pedidos, remisiones, facturas (`aplicacion/modulos/ventas/`).
+- **Compras:** facturas + sync DIAN + acuse crédito (`compras/facturas/`, `integraciones/dian/`).
+- **Tesorería básica:** recibos de caja y comprobantes de egreso con hook contable.
+- **Maestros:** empresas, categorías, marcas, productos (variantes, códigos de barras), terceros (clientes/proveedores), **impuestos y listas de precio** (ahora visibles en menú).
+
+### Integración DIAN (tu punto más fuerte)
+- Emisión FE venta: XML UBL 2.1, CUFE, firma, API emisión.
+- Recepción compras: token Bearer, import automático, validación CUFE.
+- RADIAN: acuse de recibo evento 030 en facturas a crédito.
+- Consulta DIAN/RUES en terceros.
+
+### Contabilidad mínima operativa
+- Asientos automáticos al contabilizar facturas compra/venta y movimientos de tesorería (`contabilidad/servicios.py`).
+- Inventario se mueve en backend al comprar/vender/remisionar (sin pantallas de consulta).
+
+### Seguridad base
+- Autenticación, roles predefinidos, licencias por usuarios.
+- Sesión con empresa activa.
+
+---
+
+## Lo que falta y cómo se haría
+
+### 1. Contabilidad NIIF (prioridad alta)
+**Cómo:** ampliar `PlanCuenta` con importador PUC oficial → módulo de comprobantes manuales → motor de reportes SQL sobre `AsientoContable`/`AsientoDetalle` → procesos de cierre en `contabilidad/procesos.py` (hoy son placeholders).
+
+Entregables: libro diario, mayor, balance de prueba, balance general, P&G, flujo de efectivo.
+
+### 2. Inventario con UI
+**Cómo:** maestro bodegas, pantalla kardex por producto, traslados entre bodegas, ajustes. El servicio ya existe; falta CRUD + reportes sobre `MovimientoInventario`.
+
+### 3. Compras completas
+**Cómo:** replicar patrón ventas (cotización→pedido) para solicitud→orden compra→recepción→factura. La recepción DIAN puede alimentar el paso “recepción”.
+
+### 4. Impuestos transaccionales
+**Cómo:** calcular retenciones en línea de factura compra/venta usando `retenciones_catalogo.py` + campos ya migrados en terceros. Generar asientos de retención y reportes DIAN/exógena.
+
+### 5. Tesorería bancaria
+**Cómo:** maestro cuentas bancarias/cajas → movimientos → conciliación importando extractos → cheques/transferencias como tipos de comprobante.
+
+### 6. Nómina Colombia
+**Cómo:** módulo nuevo grande: contratos, novedades, liquidación, PILA, nómina electrónica DIAN. Es un proyecto aparte (6–12 meses típico).
+
+### 7. CRM + Dashboard avanzado
+**Cómo:** oportunidades/seguimientos sobre terceros existentes; dashboard con consultas agregadas (ventas mes, cartera vencida, AP, inventario valorizado).
+
+### 8. Normas y cumplimiento
+| Norma | Estado | Acción |
+|-------|--------|--------|
+| NIIF / NIC | Parcial | Estados financieros + políticas contables |
+| DIAN FE | Avanzado | Completar NC/ND, documento soporte, más RADIAN |
+| Nómina electrónica | No | Módulo nómina |
+| Ley 1581 | No | Política datos, consentimiento, auditoría accesos |
+| Exógena | No | Exportadores magnéticos desde contabilidad |
+
+---
+
+## Limpieza realizada en esta sesión
+
+Se eliminó código muerto/roto y se conectó lo ya construido:
+
+| Acción | Detalle |
+|--------|---------|
+| Eliminado | `maestro_terceros.py` (import roto), `menu_maestros.py`, carpeta `controladores/` legacy vacía, `qt_layouts.py.py`, ZIPs de respaldo en `aplicacion/` |
+| Corregido | **Impuestos** y **Listas de precio** ahora aparecen en el menú Maestros |
+| Pendiente de limpieza | `nucleo/auditoria.py` (nunca se llama), `init_db.py` obsoleto, `exportador.py` vacío, docs desactualizados (`PLAN_DESARROLLO.md`) |
+
+---
+
+## Fases recomendadas para una versión impecable
+
+```mermaid
+flowchart LR
+    F0[Fase 0<br/>Estabilización] --> F1[Fase 1<br/>Contabilidad + Inventario UI]
+    F1 --> F2[Fase 2<br/>Compras + Tesorería]
+    F2 --> F3[Fase 3<br/>Impuestos + Reportes core]
+    F3 --> F4[Fase 4<br/>Ventas completo + DIAN]
+    F4 --> F5[Fase 5<br/>Nómina Colombia]
+    F5 --> F6[Fase 6<br/>CRM + BI + Normativa]
+```
+
+### Fase 0 — Estabilización (2–4 semanas)
+- Auditoría activa en altas/cambios/borrados.
+- UI administración usuarios/roles/permisos.
+- Unificar arquitectura (solo framework CRUD moderno).
+- Tests smoke por módulo + documentación al día.
+- **Meta:** trabajar sin código muerto ni sorpresas.
+
+### Fase 1 — Contabilidad + Inventario (6–8 semanas)
+- PUC importable, comprobantes manuales, libros contables.
+- Kardex, bodegas, traslados, ajustes, valorización.
+- **Meta:** operación contable-inventario cerrada.
+
+### Fase 2 — Compras + Tesorería (6 semanas)
+- Solicitud → OC → recepción → factura.
+- Bancos, conciliaciones, cheques.
+- Retenciones en compras aplicadas.
+- **Meta:** ciclo AP completo.
+
+### Fase 3 — Impuestos + Reportes (8 semanas)
+- Retenciones venta/compra, ICA, exógena básica.
+- 30–50 reportes core (cartera, proveedores, inventario, auxiliares).
+- Export Excel/PDF unificado.
+- **Meta:** cumplimiento tributario operativo.
+
+### Fase 4 — Ventas completo + DIAN (6 semanas)
+- Notas crédito/débito, POS básico, anticipos.
+- Documento soporte, más eventos RADIAN.
+- **Meta:** FE venta/compra redonda.
+
+### Fase 5 — Nómina Colombia (12–16 semanas)
+- Contratos, liquidación, seguridad social, nómina electrónica.
+- **Meta:** cumplimiento laboral.
+
+### Fase 6 — CRM + BI + Normativa (continuo)
+- CRM, dashboard ejecutivo, Ley 1581, activos fijos NIIF.
+- Escalar reportes hacia los 200+.
+- **Meta:** ERP integral enterprise.
+
+---
+
+## Conclusión honesta
+
+Tu lista describe un **ERP enterprise colombiano completo** (tipo Siigo/WorldOffice a escala mayor). Hoy NEXUS es un **ERP operativo sólido en ventas/compras/DIAN**, con contabilidad e inventario en capa de servicio pero sin la capa financiera/reporting que exige NIIF.
+
+La ruta más inteligente: **Fase 0 → Fase 1 → Fase 2** antes de nómina o CRM. Eso te da una base estable donde se puede trabajar cómodo y cumplir operación real de una PYME.
+
+Si quieres, el siguiente paso concreto puede ser **Fase 0 completa** (auditoría + admin usuarios + comprobantes contables manuales) o profundizar en un módulo específico de la lista.
+
+[REDACTED]
