@@ -850,6 +850,7 @@ class ContextoFormato:
     titulo_documento: str = "Cotización"
     info_adicional: str = ""
     mostrar_imagenes: bool = True
+    etiqueta_contraparte: str = "Cliente"
 
 
 def _crear_contexto(
@@ -1050,9 +1051,15 @@ def _html_carta(
             detalle.descripcion,
         )
 
+        celda_imagen = (
+            f"<td class='col-imagen' align='center'>{_imagen_html(detalle.producto_id)}</td>"
+            if ctx.mostrar_imagenes
+            else ""
+        )
+
         filas += (
             "<tr>"
-            f"<td class='col-imagen' align='center'>{_imagen_html(detalle.producto_id)}</td>"
+            f"{celda_imagen}"
             f"<td class='col-codigo'>{codigo}</td>"
             f"<td>{detalle.descripcion}</td>"
             f"<td class='col-cant' align='right'>{detalle.cantidad:,.2f}</td>"
@@ -1074,6 +1081,14 @@ def _html_carta(
             f"{ctx.observaciones}</p>"
         )
 
+    th_imagen = (
+        '<th class="col-imagen">Imagen</th>'
+        if ctx.mostrar_imagenes
+        else ""
+    )
+
+    colspan_totales = 6 if ctx.mostrar_imagenes else 5
+
     return f"""
     <html><head><meta charset="utf-8">
     <style>
@@ -1092,15 +1107,15 @@ def _html_carta(
     <div class="documento">
         <h1>{ctx.titulo_documento} No. {ctx.cotizacion.numero}</h1>
         <p><strong>Fecha:</strong> {ctx.fecha}<br>
-        <strong>Cliente:</strong> {ctx.nombre_cliente}</p>
+        <strong>{ctx.etiqueta_contraparte}:</strong> {ctx.nombre_cliente}</p>
         {ctx.info_adicional}
         <table>
             <thead><tr>
-                <th class="col-imagen">Imagen</th><th class="col-codigo">Código</th><th>Descripción</th>
+                {th_imagen}<th class="col-codigo">Código</th><th>Descripción</th>
                 <th class="col-cant">Cant.</th><th class="col-precio">Precio</th><th class="col-iva">IVA</th><th class="col-total">Total</th>
             </tr></thead>
             <tbody>{filas}</tbody>
-            <tfoot>{_bloque_totales_html(ctx, colspan=6)}</tfoot>
+            <tfoot>{_bloque_totales_html(ctx, colspan=colspan_totales)}</tfoot>
         </table>
         {obs}
     </div>
@@ -1159,10 +1174,16 @@ def _html_corporativo(
             detalle.descripcion,
         )
 
+        celda_imagen = (
+            f"<td align='center'>{_imagen_html(detalle.producto_id, 44)}</td>"
+            if ctx.mostrar_imagenes
+            else ""
+        )
+
         filas += (
             "<tr>"
             f"<td align='center'>{indice}</td>"
-            f"<td align='center'>{_imagen_html(detalle.producto_id, 44)}</td>"
+            f"{celda_imagen}"
             f"<td>{codigo}</td>"
             f"<td>{detalle.descripcion}</td>"
             f"<td align='center'>{detalle.cantidad:,.2f}</td>"
@@ -1183,6 +1204,14 @@ def _html_corporativo(
             "<p style='margin-top:18px;'><strong>Observaciones:</strong><br>"
             f"{ctx.observaciones}</p>"
         )
+
+    th_imagen = (
+        '<th class="col-img">Imagen</th>'
+        if ctx.mostrar_imagenes
+        else ""
+    )
+
+    colspan_totales = 7 if ctx.mostrar_imagenes else 6
 
     return f"""
     <html><head><meta charset="utf-8">
@@ -1212,16 +1241,16 @@ def _html_corporativo(
         </tr></table>
         <table class="meta"><tr>
             <td class="etq">Fecha</td><td>{ctx.fecha}</td>
-            <td class="etq">Cliente</td><td>{ctx.nombre_cliente}</td>
+            <td class="etq">{ctx.etiqueta_contraparte}</td><td>{ctx.nombre_cliente}</td>
         </tr></table>
         <table class="items">
             <thead><tr>
-                <th class="col-num">#</th><th class="col-img">Imagen</th><th class="col-cod">Código</th>
+                <th class="col-num">#</th>{th_imagen}<th class="col-cod">Código</th>
                 <th>Descripción</th><th>Cant.</th>
                 <th>Vr. unitario</th><th>IVA</th><th>Total</th>
             </tr></thead>
             <tbody>{filas}</tbody>
-            <tfoot>{_bloque_totales_html(ctx, colspan=7)}</tfoot>
+            <tfoot>{_bloque_totales_html(ctx, colspan=colspan_totales)}</tfoot>
         </table>
         {obs}
         <p class="pie">
@@ -1230,7 +1259,7 @@ def _html_corporativo(
         </p>
         <table width="100%" class="firmas"><tr>
             <td>Elaborado por<br>{empresa['nombre']}</td>
-            <td>Aprobado cliente<br>{ctx.nombre_cliente}</td>
+            <td>Aprobado {ctx.etiqueta_contraparte.lower()}<br>{ctx.nombre_cliente}</td>
         </tr></table>
     </div>
     </body></html>
@@ -1258,9 +1287,15 @@ def _html_moderno(
             else ""
         )
 
+        celda_imagen = (
+            f"<td align='center' valign='middle'>{_imagen_html(detalle.producto_id, 44)}</td>"
+            if ctx.mostrar_imagenes
+            else ""
+        )
+
         filas += (
             "<tr>"
-            f"<td align='center' valign='middle'>{_imagen_html(detalle.producto_id, 44)}</td>"
+            f"{celda_imagen}"
             f"<td>{referencia}{detalle.descripcion}</td>"
             f"<td align='center'>{detalle.cantidad:,.2f}</td>"
             f"<td align='right'>"
@@ -1283,6 +1318,12 @@ def _html_moderno(
         )
 
     resumen = ctx.resumen
+
+    th_imagen = (
+        '<th class="col-img">Img</th>'
+        if ctx.mostrar_imagenes
+        else ""
+    )
 
     return f"""
     <html><head><meta charset="utf-8">
@@ -1311,13 +1352,13 @@ def _html_moderno(
         </div>
         <div class="contenido">
             <table class="tarjetas"><tr>
-                <td><div class="lbl">Cliente</div>{ctx.nombre_cliente}</td>
+                <td><div class="lbl">{ctx.etiqueta_contraparte}</div>{ctx.nombre_cliente}</td>
                 <td width="20"></td>
                 <td><div class="lbl">Documento</div>{ctx.cotizacion.numero}</td>
             </tr></table>
             <table class="items">
                 <thead><tr>
-                    <th class="col-img">Img</th><th>Producto / servicio</th><th>Cant.</th>
+                    {th_imagen}<th>Producto / servicio</th><th>Cant.</th>
                     <th>Precio</th><th>IVA</th><th>Total</th>
                 </tr></thead>
                 <tbody>{filas}</tbody>
@@ -1361,9 +1402,15 @@ def _html_compacto(
 
     for detalle in ctx.detalles:
 
+        celda_imagen = (
+            f"<td align='center'>{_imagen_html(detalle.producto_id, 40)}</td>"
+            if ctx.mostrar_imagenes
+            else ""
+        )
+
         filas += (
             "<tr>"
-            f"<td align='center'>{_imagen_html(detalle.producto_id, 40)}</td>"
+            f"{celda_imagen}"
             f"<td>{detalle.descripcion}</td>"
             f"<td align='right'>{detalle.cantidad:g}</td>"
             f"<td align='right'>"
@@ -1381,6 +1428,12 @@ def _html_compacto(
 
     resumen = ctx.resumen
 
+    th_imagen = (
+        '<th class="col-img">Img</th>'
+        if ctx.mostrar_imagenes
+        else ""
+    )
+
     return f"""
     <html><head><meta charset="utf-8">
     <style>
@@ -1397,11 +1450,11 @@ def _html_compacto(
         <h2>{ctx.etiqueta_documento} {ctx.cotizacion.numero}</h2>
         <div class="info">
             <strong>Fecha:</strong> {ctx.fecha}<br>
-            <strong>Cliente:</strong> {ctx.nombre_cliente}
+            <strong>{ctx.etiqueta_contraparte}:</strong> {ctx.nombre_cliente}
         </div>
         <table>
             <thead><tr>
-                <th class="col-img">Img</th><th>Concepto</th><th>Cant.</th><th>Precio</th><th>Total</th>
+                {th_imagen}<th>Concepto</th><th>Cant.</th><th>Precio</th><th>Total</th>
             </tr></thead>
             <tbody>{filas}</tbody>
         </table>
@@ -1475,7 +1528,7 @@ def _html_tirilla(
         <div class="sep"></div>
         <p class="centro"><strong>{ctx.etiqueta_documento}</strong><br>
         No. {ctx.cotizacion.numero}<br>{ctx.fecha}</p>
-        <p><strong>Cliente:</strong><br>{ctx.nombre_cliente}</p>
+        <p><strong>{ctx.etiqueta_contraparte}:</strong><br>{ctx.nombre_cliente}</p>
         {ctx.info_adicional}
         <div class="sep"></div>
         <table>{lineas}</table>

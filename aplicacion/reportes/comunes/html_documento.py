@@ -240,6 +240,7 @@ def contexto_formato_desde_dto(
     titulo_documento: str = "Documento",
     info_adicional: str = "",
     mostrar_imagenes: bool = True,
+    etiqueta_contraparte: str = "Cliente",
 ):
 
     from aplicacion.modulos.ventas.cotizaciones.formatos_impresion import (
@@ -303,6 +304,7 @@ def contexto_formato_desde_dto(
         titulo_documento=titulo_documento,
         info_adicional=info_adicional,
         mostrar_imagenes=mostrar_imagenes,
+        etiqueta_contraparte=etiqueta_contraparte,
     )
 
 
