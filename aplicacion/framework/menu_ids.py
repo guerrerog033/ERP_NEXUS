@@ -12,6 +12,10 @@ MODULOS_IDS = frozenset({
 
 
 
+    "ConfiguracionDian",
+
+
+
     "Categorías",
 
 
