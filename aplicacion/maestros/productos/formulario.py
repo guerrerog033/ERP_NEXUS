@@ -38,6 +38,9 @@ from aplicacion.maestros.productos.imagen_producto import (
 from aplicacion.maestros.productos.lista_precios_widget import (
     ListaPreciosProductoWidget,
 )
+from aplicacion.maestros.productos.precio_volumen_servicio import (
+    ServicioPrecioVolumenProducto,
+)
 
 from aplicacion.maestros.productos.producto_definition import (
     ProductoDefinition,
@@ -339,6 +342,35 @@ class FormularioProducto(FormularioBase):
             self._crear_grupo_contenedor(
                 "Listas de precio",
                 self.lista_precios_widget,
+            ),
+        )
+
+        self.precio_volumen_widget = ListaRegistrosWidget(
+            servicio=ServicioPrecioVolumenProducto,
+            columnas=[
+                ("cantidad_minima", "Cantidad mínima"),
+                ("precio", "Precio"),
+            ],
+            campos=[
+                CampoRegistro(
+                    "cantidad_minima",
+                    "Cantidad mínima",
+                    requerido=True,
+                ),
+                CampoRegistro(
+                    "precio",
+                    "Precio",
+                    requerido=True,
+                ),
+            ],
+            titulo_dialogo="Escalón de precio por volumen",
+            campo_padre="producto_id",
+        )
+
+        layout_raiz.addWidget(
+            self._crear_grupo_contenedor(
+                "Precios por volumen",
+                self.precio_volumen_widget,
             ),
         )
 
@@ -737,6 +769,10 @@ class FormularioProducto(FormularioBase):
         )
 
         self._actualizar_lote_serie_visible()
+
+        self.precio_volumen_widget.cargar(
+            self.id_registro,
+        )
 
     def valores(self):
 
