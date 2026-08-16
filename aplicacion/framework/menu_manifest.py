@@ -159,6 +159,9 @@ from aplicacion.modulos.compras.hub import (
 from aplicacion.modulos.compras.ordenes.vista import (
     OrdenesCompraPage,
 )
+from aplicacion.modulos.compras.ordenes.configuracion_pagina import (
+    ConfiguracionAprobacionComprasPage,
+)
 from aplicacion.modulos.compras.recepciones.vista import (
     RecepcionesCompraPage,
 )
@@ -326,6 +329,8 @@ MODULOS = {
     "Compras": HubCompras,
 
     "OrdenesCompra": OrdenesCompraPage,
+
+    "ConfiguracionAprobacionCompras": ConfiguracionAprobacionComprasPage,
 
     "RecepcionesCompra": RecepcionesCompraPage,
 

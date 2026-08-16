@@ -228,6 +228,10 @@ MODULOS_IDS = frozenset({
 
 
 
+    "ConfiguracionAprobacionCompras",
+
+
+
     "RecepcionesCompra",
 
 

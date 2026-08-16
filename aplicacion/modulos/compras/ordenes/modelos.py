@@ -70,6 +70,32 @@ class OrdenCompra(Base):
         default="pendiente",
     )
 
+    estado_aprobacion = Column(
+        String(20),
+        nullable=False,
+        default="no_aplica",
+    )
+
+    aprobado_nivel1_por = Column(
+        String(120),
+    )
+
+    aprobado_nivel1_en = Column(
+        DateTime(timezone=True),
+    )
+
+    aprobado_nivel2_por = Column(
+        String(120),
+    )
+
+    aprobado_nivel2_en = Column(
+        DateTime(timezone=True),
+    )
+
+    motivo_rechazo = Column(
+        String(300),
+    )
+
     formato_impresion = Column(
         String(20),
         nullable=False,

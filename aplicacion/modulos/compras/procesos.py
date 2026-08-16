@@ -33,6 +33,15 @@ PROCESOS_COMPRAS: list[
         ],
     ),
 
+    (
+        "Configuración",
+        [
+
+            "Aprobación de compras",
+
+        ],
+    ),
+
 ]
 
 MODULOS_ENLACE: dict[
@@ -51,5 +60,7 @@ MODULOS_ENLACE: dict[
     "Documentos soporte": "DocumentosSoporte",
 
     "Comprobantes de egreso": "ComprobantesEgreso",
+
+    "Aprobación de compras": "ConfiguracionAprobacionCompras",
 
 }
