@@ -62,6 +62,9 @@ from aplicacion.maestros.productos.imagen_producto import (
 from aplicacion.maestros.productos.servicios import (
     ServicioProducto,
 )
+from aplicacion.maestros.productos.precio_volumen_servicio import (
+    ServicioPrecioVolumenProducto,
+)
 from aplicacion.maestros.terceros.cliente_lookup import (
     ClienteLookup,
 )
@@ -2066,6 +2069,12 @@ class FormularioCotizacion(Page):
             envolver=True,
         )
 
+        spin_cantidad.valueChanged.connect(
+            lambda _valor, f=fila: self._aplicar_precio_volumen(
+                f,
+            ),
+        )
+
         spin_precio = self._crear_spin_decimal(
             float(
                 precio
@@ -2360,6 +2369,8 @@ class FormularioCotizacion(Page):
                 ),
             )
 
+        self._aplicar_precio_volumen(fila)
+
         celda_impuesto = self._celda_impuesto_fila(
             fila,
         )
@@ -2381,6 +2392,73 @@ class FormularioCotizacion(Page):
                 "variante",
             ),
         )
+
+        self._recalcular_totales()
+
+    def _aplicar_precio_volumen(
+        self,
+        fila: int,
+    ) -> None:
+        """
+        Si el producto de la fila tiene escalones de precio por
+        volumen configurados, ajusta el precio unitario según la
+        cantidad actual de la línea. No hace nada si el producto
+        no tiene escalones definidos (no altera precios editados
+        manualmente en el caso normal).
+        """
+
+        celda_producto = self.tabla.cellWidget(
+            fila,
+            COL_PRODUCTO,
+        )
+
+        producto_id = getattr(
+            celda_producto,
+            "producto_id",
+            None,
+        )
+
+        if not producto_id:
+
+            return
+
+        spin_cantidad = self._widget_celda(
+            fila,
+            COL_CANTIDAD,
+        )
+
+        spin_precio = self._widget_celda(
+            fila,
+            COL_PRECIO,
+        )
+
+        if spin_cantidad is None or spin_precio is None:
+
+            return
+
+        producto = ServicioProducto.obtener_por_id(
+            producto_id,
+        )
+
+        if producto is None:
+
+            return
+
+        precio = ServicioPrecioVolumenProducto.precio_para_cantidad(
+            producto_id,
+            spin_cantidad.value(),
+            precio_base=float(
+                producto.precio_venta or 0,
+            ),
+        )
+
+        if precio is None:
+
+            return
+
+        spin_precio.blockSignals(True)
+        spin_precio.setValue(precio)
+        spin_precio.blockSignals(False)
 
         self._recalcular_totales()
 

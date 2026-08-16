@@ -226,6 +226,13 @@ class Producto(Base):
         order_by="ProductoPrecio.id",
     )
 
+    precios_volumen = relationship(
+        "ProductoPrecioVolumen",
+        back_populates="producto",
+        cascade="all, delete-orphan",
+        order_by="ProductoPrecioVolumen.cantidad_minima",
+    )
+
     variantes = relationship(
         "ProductoVariante",
         back_populates="producto",
@@ -588,3 +595,4 @@ class ProductoKitComponente(Base):
 
 
 from .precio_modelo import ProductoPrecio  # noqa: E402,F401
+from .precio_volumen_modelo import ProductoPrecioVolumen  # noqa: E402,F401

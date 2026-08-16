@@ -21,6 +21,7 @@ def importar_modelos() -> None:
         Producto,
         ProductoKitComponente,
         ProductoPrecio,
+        ProductoPrecioVolumen,
         ProductoVariante,
     )
 
