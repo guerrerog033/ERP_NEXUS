@@ -797,6 +797,86 @@ class ServicioCartera:
         )
 
     @classmethod
+    def verificar_bloqueo_por_mora(
+        cls,
+        cliente_id: int,
+    ) -> str | None:
+        """
+        Devuelve un mensaje de error si el cliente tiene cartera
+        vencida y el bloqueo automático está habilitado; ``None``
+        si puede facturarse con normalidad.
+        """
+
+        from aplicacion.nucleo.configuracion import (
+            Configuracion,
+        )
+
+        if not Configuracion.obtener(
+            "cartera",
+            "bloquear_facturacion_por_mora",
+        ):
+
+            return None
+
+        db = SessionLocal()
+
+        try:
+
+            tercero = (
+                db.query(Tercero)
+                .filter(
+                    Tercero.id == cliente_id,
+                )
+                .first()
+            )
+
+            if (
+                tercero is None
+                or tercero.exento_bloqueo_cartera
+            ):
+
+                return None
+
+        finally:
+
+            db.close()
+
+        dias_gracia = int(
+            Configuracion.obtener(
+                "cartera",
+                "dias_gracia_mora",
+            )
+            or 0,
+        )
+
+        facturas_vencidas = [
+            fila
+            for fila in cls.listar_cxc(
+                tercero_id=cliente_id,
+                solo_vencidos=True,
+            )
+            if int(fila["dias_mora"]) > dias_gracia
+        ]
+
+        if not facturas_vencidas:
+
+            return None
+
+        saldo_vencido = sum(
+            float(fila["saldo"])
+            for fila in facturas_vencidas
+        )
+
+        return (
+            "Este cliente tiene cartera vencida por "
+            f"${saldo_vencido:,.0f} "
+            f"({len(facturas_vencidas)} factura(s)). "
+            "No se puede generar una nueva factura de venta "
+            "hasta que se ponga al día, o márquelo como "
+            "exento en su ficha."
+        )
+
+    @classmethod
     def asegurar_fecha_vencimiento_factura_compra(
         cls,
         factura: FacturaCompra,

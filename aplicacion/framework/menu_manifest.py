@@ -123,6 +123,9 @@ from aplicacion.modulos.cartera.antiguedad.vista import (
 from aplicacion.modulos.cartera.estado_cuenta.vista import (
     CarteraEstadoCuentaPage,
 )
+from aplicacion.modulos.cartera.configuracion_pagina import (
+    ConfiguracionCarteraPage,
+)
 from aplicacion.modulos.reportes.hub import (
     HubReportes,
 )
@@ -299,6 +302,8 @@ MODULOS = {
     "CarteraAntiguedad": CarteraAntiguedadPage,
 
     "CarteraEstadoCuenta": CarteraEstadoCuentaPage,
+
+    "ConfiguracionCartera": ConfiguracionCarteraPage,
 
     "Reportes": HubReportes,
 

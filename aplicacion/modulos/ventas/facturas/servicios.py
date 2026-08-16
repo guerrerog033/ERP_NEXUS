@@ -660,6 +660,24 @@ class ServicioFacturaVenta(ServicioBase):
                 "Seleccione un cliente.",
             )
 
+        if id_registro is None:
+
+            from aplicacion.modulos.cartera.servicios import (
+                ServicioCartera,
+            )
+
+            mensaje_bloqueo = (
+                ServicioCartera.verificar_bloqueo_por_mora(
+                    cliente_id,
+                )
+            )
+
+            if mensaje_bloqueo:
+
+                raise ValueError(
+                    mensaje_bloqueo,
+                )
+
         cabecera["numero"] = numero
 
     @classmethod
