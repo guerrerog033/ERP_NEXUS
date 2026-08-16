@@ -47,6 +47,15 @@ PROCESOS_REPORTES: list[
     ),
 
     (
+        "Tributario",
+        [
+
+            "Información exógena",
+
+        ],
+    ),
+
+    (
         "Contabilidad",
         [
 
@@ -81,6 +90,8 @@ MODULOS_ENLACE: dict[
     "Retenciones aplicadas": "ReporteRetenciones",
 
     "Resumen de nómina": "ReporteNomina",
+
+    "Información exógena": "InformacionExogena",
 
     "Libro mayor": "LibroMayor",
 

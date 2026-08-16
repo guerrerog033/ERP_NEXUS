@@ -212,6 +212,10 @@ MODULOS_IDS = frozenset({
 
 
 
+    "InformacionExogena",
+
+
+
     "Compras",
 
 
