@@ -147,6 +147,9 @@ from aplicacion.modulos.reportes.cartera.vista import (
 from aplicacion.modulos.reportes.impuestos.vista import (
     ReporteRetencionesPage,
 )
+from aplicacion.modulos.reportes.exogena.vista import (
+    InformacionExogenaPage,
+)
 from aplicacion.modulos.compras.hub import (
     HubCompras,
 )
@@ -312,6 +315,8 @@ MODULOS = {
     "ReporteCartera": ReporteCarteraPage,
 
     "ReporteRetenciones": ReporteRetencionesPage,
+
+    "InformacionExogena": InformacionExogenaPage,
 
     "Compras": HubCompras,
 

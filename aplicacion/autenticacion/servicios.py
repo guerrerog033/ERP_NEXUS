@@ -148,6 +148,8 @@ ROLES_PREDETERMINADOS: dict[
 
             "ReporteRetenciones",
 
+            "InformacionExogena",
+
             "Compras",
 
             "OrdenesCompra",
