@@ -1,4 +1,10 @@
-from PySide6.QtWidgets import QTabWidget
+from PySide6.QtWidgets import (
+    QDialog,
+    QGroupBox,
+    QHBoxLayout,
+    QPushButton,
+    QVBoxLayout,
+)
 
 from aplicacion.framework.base.formulario_base import (
     FormularioBase,
@@ -32,9 +38,9 @@ class TerceroFormulario(FormularioBase):
 
     titulo = "Terceros"
 
-    ancho = 820
+    ancho = 900
 
-    alto = 600
+    alto = 780
 
     definition = TerceroDefinition
 
@@ -121,8 +127,6 @@ class TerceroFormulario(FormularioBase):
         if not self.es_edicion:
 
             return
-
-        tabs = QTabWidget()
 
         opciones_tipo_cuenta = [
             ("Ahorros", "Ahorros"),
@@ -249,6 +253,14 @@ class TerceroFormulario(FormularioBase):
 
         self._widgets_registros_relacionados = []
 
+        grupo = QGroupBox(
+            "Registros relacionados",
+        )
+
+        layout_botones = QHBoxLayout(
+            grupo,
+        )
+
         for (
             titulo_pestana,
             servicio,
@@ -262,35 +274,106 @@ class TerceroFormulario(FormularioBase):
                 columnas=columnas,
                 campos=campos,
                 titulo_dialogo=titulo_dialogo,
+                parent=self,
             )
+
+            widget.hide()
 
             widget.cargar(
                 self.id_registro,
-            )
-
-            tabs.addTab(
-                widget,
-                titulo_pestana,
             )
 
             self._widgets_registros_relacionados.append(
                 widget,
             )
 
-        tabs.addTab(
-            PortalAccesoWidget(
-                self.id_registro,
-            ),
-            "Portal",
+            layout_botones.addWidget(
+                self._boton_registro_relacionado(
+                    titulo_pestana,
+                    widget,
+                ),
+            )
+
+        widget_portal = PortalAccesoWidget(
+            self.id_registro,
+            parent=self,
         )
 
-        tabs.setMinimumHeight(
-            180,
+        widget_portal.hide()
+
+        layout_botones.addWidget(
+            self._boton_registro_relacionado(
+                "Portal",
+                widget_portal,
+            ),
         )
+
+        layout_botones.addStretch()
 
         self.card.agregar_widget(
-            tabs,
+            grupo,
         )
+
+    def _boton_registro_relacionado(
+        self,
+        titulo: str,
+        widget,
+    ) -> QPushButton:
+
+        boton = QPushButton(
+            titulo,
+        )
+
+        boton.clicked.connect(
+            lambda: self._abrir_ventana_registro(
+                titulo,
+                widget,
+            ),
+        )
+
+        return boton
+
+    def _abrir_ventana_registro(
+        self,
+        titulo: str,
+        widget,
+    ) -> None:
+
+        ventana = QDialog(
+            self,
+        )
+
+        ventana.setWindowTitle(
+            titulo,
+        )
+
+        ventana.resize(
+            720,
+            480,
+        )
+
+        layout = QVBoxLayout(
+            ventana,
+        )
+
+        layout.setContentsMargins(
+            12,
+            12,
+            12,
+            12,
+        )
+
+        layout.addWidget(
+            widget,
+        )
+
+        ventana.exec()
+
+        widget.setParent(
+            self,
+        )
+
+        widget.hide()
 
     def _configurar_eventos(
         self,
