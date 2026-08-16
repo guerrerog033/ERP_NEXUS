@@ -78,6 +78,8 @@ ROLES_PREDETERMINADOS: dict[
 
             "OrdenesCompra",
 
+            "ConfiguracionAprobacionCompras",
+
             "RecepcionesCompra",
 
             "ComprobantesEgreso",

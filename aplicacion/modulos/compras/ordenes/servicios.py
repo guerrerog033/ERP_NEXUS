@@ -126,6 +126,9 @@ class ServicioOrdenCompra:
                             orden.total or 0,
                         ),
                         "estado": orden.estado,
+                        "estado_aprobacion": (
+                            orden.estado_aprobacion
+                        ),
                     },
                 )
 
@@ -429,6 +432,11 @@ class ServicioOrdenCompra:
             orden.observaciones = observaciones
             orden.subtotal = subtotal
             orden.total = subtotal
+            orden.estado_aprobacion = (
+                cls._calcular_estado_aprobacion(
+                    subtotal,
+                )
+            )
 
             if formato_impresion:
 
@@ -494,6 +502,206 @@ class ServicioOrdenCompra:
             orden.estado = "pendiente"
 
     @classmethod
+    def _calcular_estado_aprobacion(
+        cls,
+        total: float,
+    ) -> str:
+
+        from aplicacion.nucleo.configuracion import (
+            Configuracion,
+        )
+
+        nivel1 = float(
+            Configuracion.obtener(
+                "compras",
+                "aprobacion_nivel1_monto",
+            )
+            or 0,
+        )
+
+        if nivel1 and float(total or 0) >= nivel1:
+
+            return "pendiente_nivel1"
+
+        return "no_aplica"
+
+    @classmethod
+    def aprobar_nivel1(
+        cls,
+        orden_id: int,
+        usuario: str,
+    ) -> OrdenCompra:
+
+        from aplicacion.nucleo.configuracion import (
+            Configuracion,
+        )
+        from datetime import datetime
+
+        db = SessionLocal()
+
+        try:
+
+            orden = (
+                db.query(OrdenCompra)
+                .filter(OrdenCompra.id == orden_id)
+                .first()
+            )
+
+            if orden is None:
+
+                raise ValueError(
+                    "Orden no encontrada.",
+                )
+
+            if orden.estado_aprobacion != "pendiente_nivel1":
+
+                raise ValueError(
+                    "Esta orden no está pendiente de "
+                    "aprobación de primer nivel.",
+                )
+
+            orden.aprobado_nivel1_por = usuario
+            orden.aprobado_nivel1_en = datetime.now()
+
+            nivel2 = float(
+                Configuracion.obtener(
+                    "compras",
+                    "aprobacion_nivel2_monto",
+                )
+                or 0,
+            )
+
+            if nivel2 and float(orden.total or 0) >= nivel2:
+
+                orden.estado_aprobacion = "pendiente_nivel2"
+
+            else:
+
+                orden.estado_aprobacion = "aprobada"
+
+            db.commit()
+            db.refresh(orden)
+
+            return orden
+
+        except Exception:
+
+            db.rollback()
+
+            raise
+
+        finally:
+
+            db.close()
+
+    @classmethod
+    def aprobar_nivel2(
+        cls,
+        orden_id: int,
+        usuario: str,
+    ) -> OrdenCompra:
+
+        from datetime import datetime
+
+        db = SessionLocal()
+
+        try:
+
+            orden = (
+                db.query(OrdenCompra)
+                .filter(OrdenCompra.id == orden_id)
+                .first()
+            )
+
+            if orden is None:
+
+                raise ValueError(
+                    "Orden no encontrada.",
+                )
+
+            if orden.estado_aprobacion != "pendiente_nivel2":
+
+                raise ValueError(
+                    "Esta orden no está pendiente de "
+                    "aprobación de segundo nivel.",
+                )
+
+            orden.aprobado_nivel2_por = usuario
+            orden.aprobado_nivel2_en = datetime.now()
+            orden.estado_aprobacion = "aprobada"
+
+            db.commit()
+            db.refresh(orden)
+
+            return orden
+
+        except Exception:
+
+            db.rollback()
+
+            raise
+
+        finally:
+
+            db.close()
+
+    @classmethod
+    def rechazar_aprobacion(
+        cls,
+        orden_id: int,
+        usuario: str,
+        motivo: str = "",
+    ) -> OrdenCompra:
+
+        db = SessionLocal()
+
+        try:
+
+            orden = (
+                db.query(OrdenCompra)
+                .filter(OrdenCompra.id == orden_id)
+                .first()
+            )
+
+            if orden is None:
+
+                raise ValueError(
+                    "Orden no encontrada.",
+                )
+
+            if orden.estado_aprobacion not in (
+                "pendiente_nivel1",
+                "pendiente_nivel2",
+            ):
+
+                raise ValueError(
+                    "Esta orden no está pendiente de "
+                    "aprobación.",
+                )
+
+            orden.estado_aprobacion = "rechazada"
+            orden.motivo_rechazo = (
+                f"{usuario}: {motivo}"
+                if motivo
+                else usuario
+            )
+
+            db.commit()
+            db.refresh(orden)
+
+            return orden
+
+        except Exception:
+
+            db.rollback()
+
+            raise
+
+        finally:
+
+            db.close()
+
+    @classmethod
     def registrar_recepcion(
         cls,
         *,
@@ -531,6 +739,16 @@ class ServicioOrdenCompra:
 
                 raise ValueError(
                     "Orden no encontrada.",
+                )
+
+            if orden.estado_aprobacion not in (
+                "no_aplica",
+                "aprobada",
+            ):
+
+                raise ValueError(
+                    "Esta orden de compra requiere aprobación "
+                    "antes de poder recibir mercancía.",
                 )
 
             db.refresh(

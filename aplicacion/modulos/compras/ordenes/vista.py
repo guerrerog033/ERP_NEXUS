@@ -20,6 +20,8 @@ from PySide6.QtWidgets import (
 
     QHBoxLayout,
 
+    QInputDialog,
+
     QLabel,
 
     QLineEdit,
@@ -696,7 +698,17 @@ class OrdenesCompraPage(InquiryPage):
 
         "Estado",
 
+        "Aprobación",
+
     ]
+
+    _ETIQUETAS_APROBACION = {
+        "no_aplica": "",
+        "pendiente_nivel1": "Pendiente de aprobación",
+        "pendiente_nivel2": "Pendiente 2da. aprobación",
+        "aprobada": "Aprobada",
+        "rechazada": "Rechazada",
+    }
 
 
 
@@ -742,6 +754,22 @@ class OrdenesCompraPage(InquiryPage):
 
         )
 
+        btn_aprobar = QPushButton(
+            "Aprobar",
+        )
+
+        btn_aprobar.clicked.connect(
+            self._aprobar_seleccionada,
+        )
+
+        btn_rechazar = QPushButton(
+            "Rechazar",
+        )
+
+        btn_rechazar.clicked.connect(
+            self._rechazar_seleccionada,
+        )
+
         self._filas: list[dict] = []
 
         self._layout_filtros.addWidget(
@@ -760,6 +788,14 @@ class OrdenesCompraPage(InquiryPage):
 
             btn_pdf,
 
+        )
+
+        self._layout_filtros.addWidget(
+            btn_aprobar,
+        )
+
+        self._layout_filtros.addWidget(
+            btn_rechazar,
         )
 
 
@@ -821,6 +857,11 @@ class OrdenesCompraPage(InquiryPage):
                 f"{fila['total']:,.2f}",
 
                 fila["estado"],
+
+                self._ETIQUETAS_APROBACION.get(
+                    fila["estado_aprobacion"],
+                    fila["estado_aprobacion"],
+                ),
 
             ]
 
@@ -973,4 +1014,126 @@ class OrdenesCompraPage(InquiryPage):
             proveedor=proveedor,
 
         )
+
+    def _usuario_actual(self) -> str:
+
+        from aplicacion.framework.app_context import (
+            AppContext,
+        )
+
+        usuario = getattr(
+            AppContext,
+            "usuario",
+            None,
+        )
+
+        if usuario is None:
+
+            return "Sistema"
+
+        return (
+            getattr(usuario, "nombre", None)
+            or getattr(usuario, "usuario", None)
+            or "Sistema"
+        )
+
+    def _aprobar_seleccionada(self) -> None:
+
+        fila = self._orden_seleccionada()
+
+        if fila is None:
+
+            return
+
+        estado = fila["estado_aprobacion"]
+
+        try:
+
+            if estado == "pendiente_nivel1":
+
+                ServicioOrdenCompra.aprobar_nivel1(
+                    fila["id"],
+                    self._usuario_actual(),
+                )
+
+            elif estado == "pendiente_nivel2":
+
+                ServicioOrdenCompra.aprobar_nivel2(
+                    fila["id"],
+                    self._usuario_actual(),
+                )
+
+            else:
+
+                QMessageBox.information(
+                    self,
+                    "Orden de compra",
+                    "Esta orden no está pendiente de "
+                    "aprobación.",
+                )
+
+                return
+
+        except ValueError as error:
+
+            QMessageBox.warning(
+                self,
+                "Orden de compra",
+                str(error),
+            )
+
+            return
+
+        self._consultar()
+
+    def _rechazar_seleccionada(self) -> None:
+
+        fila = self._orden_seleccionada()
+
+        if fila is None:
+
+            return
+
+        if fila["estado_aprobacion"] not in (
+            "pendiente_nivel1",
+            "pendiente_nivel2",
+        ):
+
+            QMessageBox.information(
+                self,
+                "Orden de compra",
+                "Esta orden no está pendiente de aprobación.",
+            )
+
+            return
+
+        motivo, aceptado = QInputDialog.getText(
+            self,
+            "Rechazar orden de compra",
+            "Motivo del rechazo (opcional):",
+        )
+
+        if not aceptado:
+
+            return
+
+        try:
+
+            ServicioOrdenCompra.rechazar_aprobacion(
+                fila["id"],
+                self._usuario_actual(),
+                motivo,
+            )
+
+        except ValueError as error:
+
+            QMessageBox.warning(
+                self,
+                "Orden de compra",
+                str(error),
+            )
+
+            return
+
+        self._consultar()
 
