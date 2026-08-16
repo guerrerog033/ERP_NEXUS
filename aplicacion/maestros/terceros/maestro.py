@@ -1,3 +1,5 @@
+from PySide6.QtWidgets import QFileDialog, QMessageBox
+
 from aplicacion.framework.crud.crud_master import CrudMaster
 
 
@@ -52,6 +54,121 @@ class MaestroTerceros(CrudMaster):
     tipo_filtro = None
 
 
+
+    def crear_interfaz(self):
+
+        super().crear_interfaz()
+
+        menu = self.toolbar.btn_mas.menu()
+
+        menu.addSeparator()
+
+        accion_plantilla = menu.addAction(
+            "Descargar plantilla de importación",
+        )
+
+        accion_plantilla.triggered.connect(
+            self._descargar_plantilla_terceros,
+        )
+
+        accion_importar = menu.addAction(
+            "Importar terceros desde Excel",
+        )
+
+        accion_importar.triggered.connect(
+            self._importar_terceros_excel,
+        )
+
+    def _descargar_plantilla_terceros(self):
+
+        from aplicacion.maestros.terceros.importacion_excel import (
+            generar_plantilla,
+        )
+
+        ruta, _ = QFileDialog.getSaveFileName(
+            self,
+            "Guardar plantilla de importación",
+            "plantilla_terceros.xlsx",
+            "Excel (*.xlsx)",
+        )
+
+        if not ruta:
+
+            return
+
+        try:
+
+            generar_plantilla(ruta)
+
+        except OSError as error:
+
+            self.mostrar_error(
+                f"No se pudo generar la plantilla: {error}",
+            )
+
+            return
+
+        self.mostrar_info(
+            f"Plantilla guardada en:\n{ruta}",
+        )
+
+    def _importar_terceros_excel(self):
+
+        from aplicacion.maestros.terceros.importacion_excel import (
+            importar_desde_excel,
+        )
+
+        ruta, _ = QFileDialog.getOpenFileName(
+            self,
+            "Importar terceros desde Excel",
+            "",
+            "Excel (*.xlsx)",
+        )
+
+        if not ruta:
+
+            return
+
+        try:
+
+            resultado = importar_desde_excel(ruta)
+
+        except Exception as error:  # noqa: BLE001
+
+            self.mostrar_error(
+                f"No se pudo leer el archivo: {error}",
+            )
+
+            return
+
+        mensaje = (
+            f"Creados: {resultado.creados}\n"
+            f"Actualizados: {resultado.actualizados}\n"
+            f"Con error: {len(resultado.errores)}"
+        )
+
+        if resultado.errores:
+
+            detalle = "\n".join(
+                f"Fila {fila}: {error}"
+                for fila, error in resultado.errores[:15]
+            )
+
+            if len(resultado.errores) > 15:
+
+                detalle += (
+                    f"\n… y {len(resultado.errores) - 15} más."
+                )
+
+            mensaje = f"{mensaje}\n\n{detalle}"
+
+        QMessageBox.information(
+            self,
+            "Importación de terceros",
+            mensaje,
+        )
+
+        self.cargar_datos()
 
     def crear_formulario(
 
