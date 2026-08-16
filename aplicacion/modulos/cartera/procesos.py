@@ -29,6 +29,15 @@ PROCESOS_CARTERA: list[
         ],
     ),
 
+    (
+        "Configuración",
+        [
+
+            "Bloqueo por mora",
+
+        ],
+    ),
+
 ]
 
 MODULOS_ENLACE: dict[
@@ -43,5 +52,7 @@ MODULOS_ENLACE: dict[
     "Antigüedad de saldos": "CarteraAntiguedad",
 
     "Estado de cuenta": "CarteraEstadoCuenta",
+
+    "Bloqueo por mora": "ConfiguracionCartera",
 
 }

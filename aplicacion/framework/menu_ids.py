@@ -180,6 +180,10 @@ MODULOS_IDS = frozenset({
 
 
 
+    "ConfiguracionCartera",
+
+
+
     "Reportes",
 
 

@@ -252,6 +252,11 @@ class TerceroDefinition(FormDefinition):
                     titulo="Vendedor asignado",
                     longitud_maxima=120,
                 ),
+
+                CheckField(
+                    "exento_bloqueo_cartera",
+                    titulo="Exento de bloqueo por cartera vencida",
+                ),
             ],
         ),
 

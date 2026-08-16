@@ -136,6 +136,8 @@ ROLES_PREDETERMINADOS: dict[
 
             "CarteraEstadoCuenta",
 
+            "ConfiguracionCartera",
+
             "Reportes",
 
             "ReporteVentas",
