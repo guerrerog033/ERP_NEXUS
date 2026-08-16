@@ -105,46 +105,6 @@ class MaestroTerceros(CrudMaster):
 
 
 
-    def _tamanio_dialogo_formulario(
-
-        self,
-
-        formulario,
-
-    ) -> tuple[int, int]:
-
-
-
-        ancho, alto = super()._tamanio_dialogo_formulario(
-
-            formulario,
-
-        )
-
-
-
-        return (
-
-            min(
-
-                ancho,
-
-                820,
-
-            ),
-
-            min(
-
-                alto,
-
-                600,
-
-            ),
-
-        )
-
-
-
     def _limites_dialogo_formulario(
 
         self,
