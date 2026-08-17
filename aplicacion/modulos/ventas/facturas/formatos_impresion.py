@@ -43,6 +43,34 @@ def _info_adicional_factura(
             f"{factura.cufe}</span></p>",
         )
 
+    moneda = getattr(
+        factura,
+        "moneda_referencia",
+        None,
+    )
+
+    tasa = getattr(
+        factura,
+        "tasa_cambio_referencia",
+        None,
+    )
+
+    if moneda and tasa:
+
+        valor_referencia = float(
+            factura.total or 0,
+        ) / float(
+            tasa,
+        )
+
+        partes.append(
+            "<p>Valor de referencia: "
+            f"{moneda} {valor_referencia:,.2f} "
+            f"(TRM: ${float(tasa):,.2f} COP) — "
+            "Los valores legales de esta factura están en "
+            "pesos colombianos (COP).</p>",
+        )
+
     return "".join(
         partes,
     )

@@ -680,6 +680,55 @@ class ServicioFacturaVenta(ServicioBase):
 
         cabecera["numero"] = numero
 
+        cls._normalizar_moneda_referencia(
+            cabecera,
+        )
+
+    @classmethod
+    def _normalizar_moneda_referencia(
+        cls,
+        cabecera: dict,
+    ) -> None:
+
+        moneda = str(
+            cabecera.get(
+                "moneda_referencia",
+                "",
+            )
+            or "",
+        ).strip().upper()
+
+        if not moneda or moneda == "COP":
+
+            cabecera["moneda_referencia"] = None
+            cabecera["tasa_cambio_referencia"] = None
+
+            return
+
+        try:
+
+            tasa = float(
+                cabecera.get(
+                    "tasa_cambio_referencia",
+                    0,
+                )
+                or 0,
+            )
+
+        except (TypeError, ValueError):
+
+            tasa = 0
+
+        if tasa <= 0:
+
+            raise ValueError(
+                "Indique la tasa de cambio para la moneda "
+                "de referencia seleccionada.",
+            )
+
+        cabecera["moneda_referencia"] = moneda
+        cabecera["tasa_cambio_referencia"] = tasa
+
     @classmethod
     def _normalizar_retenciones(
         cls,

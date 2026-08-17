@@ -14,6 +14,7 @@ from sqlalchemy import (
 from aplicacion.base_datos.tipos import (
     CANTIDAD,
     DINERO,
+    TASA,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -170,6 +171,14 @@ class FacturaVenta(Base):
         String(30),
         nullable=False,
         default="carta",
+    )
+
+    moneda_referencia = Column(
+        String(3),
+    )
+
+    tasa_cambio_referencia = Column(
+        TASA,
     )
 
     contabilizado = Column(
