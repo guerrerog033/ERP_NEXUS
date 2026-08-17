@@ -21,6 +21,9 @@ from aplicacion.maestros.terceros.maestro import (
 from aplicacion.modulos.ventas.cotizaciones.maestro import (
     MaestroCotizaciones,
 )
+from aplicacion.modulos.ventas.facturacion_recurrente.vista import (
+    FacturasRecurrentesPage,
+)
 from aplicacion.modulos.ventas.pedidos.maestro import (
     MaestroPedidos,
 )
@@ -240,6 +243,8 @@ MODULOS = {
 
     "Cotizaciones": MaestroCotizaciones,
 
+    "FacturasRecurrentes": FacturasRecurrentesPage,
+
     "Pedidos": MaestroPedidos,
 
     "FacturasVenta": MaestroFacturasVenta,
@@ -417,6 +422,8 @@ GRUPOS: list[
                     ("Guías remisión electrónica", "GuiasRemisionElectronica"),
 
                     ("Recibos de caja", "RecibosCaja"),
+
+                    ("Facturación recurrente", "FacturasRecurrentes"),
 
                 ],
             },
