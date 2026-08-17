@@ -3,6 +3,7 @@ from __future__ import annotations
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import (
     QComboBox,
+    QDoubleSpinBox,
     QGridLayout,
     QHBoxLayout,
     QHeaderView,
@@ -618,6 +619,50 @@ class FormularioFacturaVenta(
             "",
         )
 
+        etiqueta_moneda = QLabel(
+            "Moneda de referencia",
+        )
+
+        etiqueta_tasa_cambio = QLabel(
+            "Tasa de cambio",
+        )
+
+        self.cmb_moneda_referencia = QComboBox()
+
+        self.cmb_moneda_referencia.addItem(
+            "COP (sin referencia)",
+            "",
+        )
+
+        self.cmb_moneda_referencia.addItem(
+            "USD",
+            "USD",
+        )
+
+        self.cmb_moneda_referencia.addItem(
+            "EUR",
+            "EUR",
+        )
+
+        self.spin_tasa_cambio_referencia = (
+            QDoubleSpinBox()
+        )
+
+        self.spin_tasa_cambio_referencia.setRange(
+            0,
+            9999999,
+        )
+
+        self.spin_tasa_cambio_referencia.setDecimals(
+            2,
+        )
+
+        self.spin_tasa_cambio_referencia.setToolTip(
+            "Valor en COP de 1 unidad de la moneda de "
+            "referencia (ej. TRM del día). Los totales de "
+            "la factura siempre quedan en COP.",
+        )
+
         altura_campo = 34
 
         for campo in (
@@ -728,6 +773,30 @@ class FormularioFacturaVenta(
             3,
         )
 
+        grid.addWidget(
+            etiqueta_moneda,
+            4,
+            0,
+        )
+
+        grid.addWidget(
+            self.cmb_moneda_referencia,
+            4,
+            1,
+        )
+
+        grid.addWidget(
+            etiqueta_tasa_cambio,
+            4,
+            2,
+        )
+
+        grid.addWidget(
+            self.spin_tasa_cambio_referencia,
+            4,
+            3,
+        )
+
         grid.setColumnMinimumWidth(
             0,
             140,
@@ -757,6 +826,30 @@ class FormularioFacturaVenta(
             0,
             cabecera,
         )
+
+        pendiente = getattr(
+            self,
+            "_moneda_referencia_pendiente",
+            None,
+        )
+
+        if pendiente is not None:
+
+            moneda, tasa = pendiente
+
+            indice_moneda = (
+                self.cmb_moneda_referencia.findData(
+                    moneda or "",
+                )
+            )
+
+            self.cmb_moneda_referencia.setCurrentIndex(
+                indice_moneda if indice_moneda >= 0 else 0,
+            )
+
+            self.spin_tasa_cambio_referencia.setValue(
+                float(tasa or 0),
+            )
 
     def _adaptar_formas_pago(
         self,
@@ -1468,6 +1561,11 @@ class FormularioFacturaVenta(
             vendedor,
         )
 
+        self._moneda_referencia_pendiente = (
+            factura.moneda_referencia,
+            factura.tasa_cambio_referencia,
+        )
+
         self.tabla.setRowCount(
             0,
         )
@@ -1582,6 +1680,12 @@ class FormularioFacturaVenta(
             "retefuente_id": self.celda_retefuente.valor(),
             "reteica_id": self.celda_reteica.valor(),
             "reteiva_id": self.celda_reteiva.valor(),
+            "moneda_referencia": (
+                self.cmb_moneda_referencia.currentData()
+            ),
+            "tasa_cambio_referencia": (
+                self.spin_tasa_cambio_referencia.value()
+            ),
         }
 
     def guardar(
