@@ -50,6 +50,8 @@ ROLES_PREDETERMINADOS: dict[
 
             "RecibosCaja",
 
+            "FacturasRecurrentes",
+
             "Clientes",
 
             "Productos",

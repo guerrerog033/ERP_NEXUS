@@ -116,6 +116,10 @@ MODULOS_IDS = frozenset({
 
 
 
+    "FacturasRecurrentes",
+
+
+
     "ComprobantesEgreso",
 
 

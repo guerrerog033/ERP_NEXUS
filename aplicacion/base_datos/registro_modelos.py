@@ -43,6 +43,11 @@ def importar_modelos() -> None:
         ProformaDetalle,
     )
 
+    from aplicacion.modulos.ventas.facturacion_recurrente.modelos import (  # noqa: F401
+        FacturaRecurrente,
+        FacturaRecurrenteDetalle,
+    )
+
     from aplicacion.modulos.ventas.pedidos.modelos import (  # noqa: F401
         OrdenPedido,
         OrdenPedidoDetalle,
