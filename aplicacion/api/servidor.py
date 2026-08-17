@@ -96,6 +96,17 @@ class ServidorApiErp:
                 self.end_headers()
                 self.wfile.write(cuerpo)
 
+            def _redirigir(
+                self,
+                ubicacion: str,
+            ):
+                self.send_response(302)
+                self.send_header(
+                    "Location",
+                    ubicacion,
+                )
+                self.end_headers()
+
             def _archivo(
                 self,
                 ruta,
@@ -134,6 +145,24 @@ class ServidorApiErp:
                     )
                     if p
                 ]
+
+                query = {
+                    clave: valores[0]
+                    for clave, valores in parse_qs(
+                        ruta.query,
+                    ).items()
+                }
+
+                if (
+                    len(partes) >= 2
+                    and partes[0] == "portal"
+                    and partes[1] == "empleado"
+                ):
+                    self._portal_empleado_get(
+                        partes,
+                        query,
+                    )
+                    return
 
                 if partes == ["api", "salud"]:
                     self._responder(
@@ -237,6 +266,101 @@ class ServidorApiErp:
                     tipo_contenido=tipo_contenido,
                 )
 
+            def _portal_empleado_get(
+                self,
+                partes: list[str],
+                query: dict,
+            ):
+                from aplicacion.api.sesion_movil import (
+                    ServicioSesionMovil,
+                )
+
+                resto = partes[2:]
+
+                if not resto:
+
+                    self._html(
+                        200,
+                        api._empleado_pagina_login(),
+                    )
+                    return
+
+                if resto == ["salir"]:
+
+                    ServicioSesionMovil.cerrar_sesion(
+                        query.get(
+                            "token",
+                            "",
+                        ),
+                    )
+
+                    self._redirigir(
+                        "/portal/empleado",
+                    )
+                    return
+
+                sesion = ServicioSesionMovil.obtener_sesion(
+                    query.get(
+                        "token",
+                        "",
+                    ),
+                )
+
+                if sesion is None:
+
+                    self._redirigir(
+                        "/portal/empleado",
+                    )
+                    return
+
+                token = query["token"]
+                nombre = sesion["nombre"]
+
+                if resto == ["panel"]:
+
+                    html = api._empleado_pagina_panel(
+                        nombre,
+                        token,
+                    )
+
+                elif resto == ["cartera"]:
+
+                    html = api._empleado_pagina_cartera(
+                        nombre,
+                        token,
+                    )
+
+                elif resto == ["ventas"]:
+
+                    html = api._empleado_pagina_ventas(
+                        nombre,
+                        token,
+                    )
+
+                elif resto == ["inventario"]:
+
+                    html = api._empleado_pagina_inventario(
+                        nombre,
+                        token,
+                        query.get(
+                            "q",
+                            "",
+                        ),
+                    )
+
+                else:
+
+                    self._responder(
+                        404,
+                        {"error": "No encontrado"},
+                    )
+                    return
+
+                self._html(
+                    200,
+                    html,
+                )
+
             def do_POST(self):
                 ruta = urlparse(
                     self.path,
@@ -280,6 +404,44 @@ class ServidorApiErp:
                                 )
                             ).items()
                         }
+
+                if partes == [
+                    "portal",
+                    "empleado",
+                    "login",
+                ]:
+
+                    token = api._empleado_login(
+                        str(
+                            datos.get(
+                                "usuario",
+                                "",
+                            )
+                        ),
+                        str(
+                            datos.get(
+                                "password",
+                                "",
+                            )
+                        ),
+                    )
+
+                    if token is None:
+
+                        self._html(
+                            401,
+                            api._empleado_pagina_login(
+                                "Usuario o contraseña "
+                                "incorrectos.",
+                            ),
+                        )
+                        return
+
+                    self._redirigir(
+                        "/portal/empleado/panel"
+                        f"?token={token}",
+                    )
+                    return
 
                 if (
                     len(partes) == 4
@@ -569,6 +731,137 @@ class ServidorApiErp:
         return metodo(
             token,
             factura_id,
+        )
+
+    @classmethod
+    def _empleado_login(
+        cls,
+        usuario: str,
+        password: str,
+    ) -> str | None:
+
+        from aplicacion.api.sesion_movil import (
+            ServicioSesionMovil,
+        )
+        from aplicacion.autenticacion.servicios import (
+            autenticar,
+        )
+
+        registro = autenticar(
+            usuario,
+            password,
+        )
+
+        if registro is None:
+
+            return None
+
+        return ServicioSesionMovil.iniciar_sesion(
+            registro,
+        )
+
+    @classmethod
+    def _empleado_pagina_login(
+        cls,
+        error: str = "",
+    ) -> str:
+
+        from aplicacion.api.portal_empleado_html import (
+            pagina_login,
+        )
+
+        return pagina_login(
+            error,
+        )
+
+    @classmethod
+    def _empleado_pagina_panel(
+        cls,
+        nombre: str,
+        token: str,
+    ) -> str:
+
+        from aplicacion.api.portal_empleado_html import (
+            pagina_panel,
+        )
+
+        return pagina_panel(
+            nombre,
+            token,
+        )
+
+    @classmethod
+    def _empleado_pagina_cartera(
+        cls,
+        nombre: str,
+        token: str,
+    ) -> str:
+
+        from aplicacion.api.portal_empleado_html import (
+            pagina_cartera,
+        )
+        from aplicacion.api.portal_empleado_servicio import (
+            ServicioPortalEmpleado,
+        )
+
+        resumen = ServicioPortalEmpleado.resumen_cartera()
+
+        return pagina_cartera(
+            nombre,
+            token,
+            resumen,
+        )
+
+    @classmethod
+    def _empleado_pagina_ventas(
+        cls,
+        nombre: str,
+        token: str,
+    ) -> str:
+
+        from aplicacion.api.portal_empleado_html import (
+            pagina_ventas,
+        )
+        from aplicacion.api.portal_empleado_servicio import (
+            ServicioPortalEmpleado,
+        )
+
+        datos = ServicioPortalEmpleado.ventas_del_dia()
+
+        return pagina_ventas(
+            nombre,
+            token,
+            datos,
+        )
+
+    @classmethod
+    def _empleado_pagina_inventario(
+        cls,
+        nombre: str,
+        token: str,
+        texto: str,
+    ) -> str:
+
+        from aplicacion.api.portal_empleado_html import (
+            pagina_inventario,
+        )
+        from aplicacion.api.portal_empleado_servicio import (
+            ServicioPortalEmpleado,
+        )
+
+        resultados = (
+            ServicioPortalEmpleado.buscar_inventario(
+                texto,
+            )
+            if texto
+            else []
+        )
+
+        return pagina_inventario(
+            nombre,
+            token,
+            texto,
+            resultados,
         )
 
     @classmethod
