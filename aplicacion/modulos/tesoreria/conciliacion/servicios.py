@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import csv
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
+from itertools import combinations
 from pathlib import Path
+
+DIAS_VENTANA_MATCH_AVANZADO = 60
 
 from aplicacion.base_datos.conexion import SessionLocal
 
@@ -114,25 +117,26 @@ class ServicioConciliacionBancaria:
             )
 
             for extracto in extractos:
-                match = cls._buscar_documento(
+                matches = cls._buscar_documentos(
                     db,
                     extracto,
                 )
 
-                if match is None:
+                if not matches:
                     pendientes += 1
                     continue
 
-                tipo_doc, doc_id = match
+                for tipo_doc, doc_id, valor_aplicado, estado in matches:
 
-                db.add(
-                    ConciliacionBancaria(
-                        extracto_id=extracto.id,
-                        tipo_documento=tipo_doc,
-                        documento_id=doc_id,
-                        valor=extracto.valor,
+                    db.add(
+                        ConciliacionBancaria(
+                            extracto_id=extracto.id,
+                            tipo_documento=tipo_doc,
+                            documento_id=doc_id,
+                            valor=valor_aplicado,
+                            estado=estado,
+                        )
                     )
-                )
 
                 extracto.conciliado = True
                 conciliados += 1
@@ -273,6 +277,267 @@ class ServicioConciliacionBancaria:
                         "factura_venta",
                         factura.id,
                     )
+
+        return None
+
+    @classmethod
+    def _buscar_documentos(
+        cls,
+        db,
+        extracto: ExtractoBancario,
+    ) -> list[tuple[str, int, float, str]] | None:
+        """
+        Intenta, en orden: (1) el match exacto de un solo documento
+        que ya maneja `_buscar_documento`, (2) una combinación de
+        varias facturas pendientes cuya suma cuadra con el
+        movimiento (pago único que cubre varias facturas), y (3) un
+        pago parcial de una sola factura identificada por su número
+        en la referencia/descripción del movimiento.
+        """
+
+        match_simple = cls._buscar_documento(
+            db,
+            extracto,
+        )
+
+        if match_simple is not None:
+
+            tipo_doc, doc_id = match_simple
+
+            return [
+                (
+                    tipo_doc,
+                    doc_id,
+                    float(extracto.valor or 0),
+                    "conciliado",
+                )
+            ]
+
+        combinacion = cls._buscar_combinacion_facturas(
+            db,
+            extracto,
+        )
+
+        if combinacion is not None:
+
+            return combinacion
+
+        parcial = cls._buscar_pago_parcial(
+            db,
+            extracto,
+        )
+
+        if parcial is not None:
+
+            return [parcial]
+
+        return None
+
+    @classmethod
+    def _facturas_pendientes_por_tipo(
+        cls,
+        db,
+        extracto: ExtractoBancario,
+    ):
+        if extracto.tipo == "debito":
+            from aplicacion.modulos.compras.facturas.modelos import (
+                FacturaCompra,
+            )
+
+            return (
+                "factura_compra",
+                db.query(FacturaCompra)
+                .filter(
+                    FacturaCompra.estado_pago == "pendiente",
+                )
+                .all(),
+            )
+
+        from aplicacion.modulos.ventas.facturas.modelos import (
+            FacturaVenta,
+        )
+
+        return (
+            "factura_venta",
+            db.query(FacturaVenta)
+            .filter(
+                FacturaVenta.estado_pago == "pendiente",
+            )
+            .all(),
+        )
+
+    @classmethod
+    def _filtrar_por_ventana_fecha(
+        cls,
+        facturas,
+        extracto: ExtractoBancario,
+    ):
+        """
+        Los matches combinado/parcial no exigen coincidencia de
+        texto contra cada factura (o solo la exigen para una de
+        varias, en el caso combinado), así que sin este filtro se
+        arriesga a emparejar facturas pendientes viejas y sin
+        relación cuya suma cuadra por pura coincidencia. Se limita
+        la búsqueda a facturas emitidas dentro de una ventana
+        razonable alrededor de la fecha del movimiento bancario.
+        """
+
+        if extracto.fecha is None:
+            return facturas
+
+        desde = extracto.fecha - timedelta(
+            days=DIAS_VENTANA_MATCH_AVANZADO,
+        )
+        hasta = extracto.fecha + timedelta(
+            days=DIAS_VENTANA_MATCH_AVANZADO,
+        )
+
+        return [
+            factura
+            for factura in facturas
+            if factura.fecha is not None
+            and desde <= factura.fecha <= hasta
+        ]
+
+    @classmethod
+    def _buscar_combinacion_facturas(
+        cls,
+        db,
+        extracto: ExtractoBancario,
+        *,
+        maximo_candidatos: int = 15,
+        maximo_facturas: int = 4,
+    ) -> list[tuple[str, int, float, str]] | None:
+        """
+        Busca un subconjunto de facturas pendientes DEL MISMO
+        tercero cuya suma cuadre con el movimiento — el caso real
+        es un cliente/proveedor que paga varias facturas suyas de
+        una sola vez. Agrupar por tercero es la señal que evita
+        emparejar facturas de terceros distintos cuya suma coincide
+        por pura casualidad.
+        """
+
+        objetivo = float(extracto.valor or 0)
+
+        if objetivo <= 0:
+            return None
+
+        tipo_doc, facturas = cls._facturas_pendientes_por_tipo(
+            db,
+            extracto,
+        )
+
+        facturas = cls._filtrar_por_ventana_fecha(
+            facturas,
+            extracto,
+        )
+
+        campo_tercero = (
+            "proveedor_id"
+            if extracto.tipo == "debito"
+            else "cliente_id"
+        )
+
+        por_tercero: dict[int, list[tuple[int, float]]] = {}
+
+        for factura in facturas:
+
+            tercero_id = getattr(
+                factura,
+                campo_tercero,
+                None,
+            )
+
+            if not tercero_id:
+                continue
+
+            saldo = float(
+                factura.saldo_pendiente or factura.total or 0,
+            )
+
+            if not (0 < saldo < objetivo):
+                continue
+
+            por_tercero.setdefault(
+                tercero_id,
+                [],
+            ).append(
+                (factura.id, saldo),
+            )
+
+        for candidatos in por_tercero.values():
+
+            candidatos.sort(
+                key=lambda item: item[1],
+                reverse=True,
+            )
+            candidatos = candidatos[:maximo_candidatos]
+
+            for tamano in range(2, maximo_facturas + 1):
+
+                for combo in combinations(candidatos, tamano):
+
+                    suma = sum(valor for _, valor in combo)
+
+                    if cls._coincide_valor(objetivo, suma):
+
+                        return [
+                            (tipo_doc, doc_id, valor, "combinado")
+                            for doc_id, valor in combo
+                        ]
+
+        return None
+
+    @classmethod
+    def _buscar_pago_parcial(
+        cls,
+        db,
+        extracto: ExtractoBancario,
+    ) -> tuple[str, int, float, str] | None:
+        objetivo = float(extracto.valor or 0)
+
+        if objetivo <= 0:
+            return None
+
+        referencia = str(
+            extracto.referencia or "",
+        ).upper()
+
+        descripcion = str(
+            extracto.descripcion or "",
+        ).upper()
+
+        tipo_doc, facturas = cls._facturas_pendientes_por_tipo(
+            db,
+            extracto,
+        )
+
+        facturas = cls._filtrar_por_ventana_fecha(
+            facturas,
+            extracto,
+        )
+
+        for factura in facturas:
+
+            saldo = float(
+                factura.saldo_pendiente or factura.total or 0,
+            )
+
+            if not (0 < objetivo < saldo):
+                continue
+
+            if factura.numero and cls._coincide_texto(
+                referencia,
+                descripcion,
+                factura.numero,
+            ):
+
+                return (
+                    tipo_doc,
+                    factura.id,
+                    objetivo,
+                    "parcial",
+                )
 
         return None
 
