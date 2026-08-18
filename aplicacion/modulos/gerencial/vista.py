@@ -1,15 +1,27 @@
 from __future__ import annotations
 
+from PySide6.QtCharts import (
+    QBarCategoryAxis,
+    QBarSeries,
+    QBarSet,
+    QChart,
+    QChartView,
+    QValueAxis,
+)
 from PySide6.QtCore import QDate, Qt, Signal
+from PySide6.QtGui import QPainter
 from PySide6.QtWidgets import (
     QDateEdit,
     QFrame,
     QGridLayout,
     QHBoxLayout,
+    QHeaderView,
     QLabel,
     QProgressBar,
     QPushButton,
     QScrollArea,
+    QTableWidget,
+    QTableWidgetItem,
     QVBoxLayout,
     QWidget,
 )
@@ -17,6 +29,35 @@ from PySide6.QtWidgets import (
 from aplicacion.interfaz.kpis_inicio import (
     formatear_moneda,
 )
+
+_MESES_ABREV = (
+    "",
+    "Ene",
+    "Feb",
+    "Mar",
+    "Abr",
+    "May",
+    "Jun",
+    "Jul",
+    "Ago",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dic",
+)
+
+
+def _texto_variacion(valor: float | None) -> str:
+
+    if valor is None:
+
+        return ""
+
+    flecha = "▲" if valor >= 0 else "▼"
+
+    return f"{flecha} {abs(valor):.1f}% vs periodo anterior"
+
+
 from aplicacion.modulos.gerencial.servicios import (
     ServicioPanelGerencial,
 )
@@ -320,6 +361,10 @@ class PanelGerencialPage(QWidget):
             "etapas",
             {},
         )
+        variacion = resumen.get(
+            "variacion_periodo_anterior",
+            {},
+        )
 
         periodo = (
             f"{resumen.get('periodo_desde')} — "
@@ -452,6 +497,10 @@ class PanelGerencialPage(QWidget):
                             or 0,
                         ),
                     )
+                    + "  "
+                    + _texto_variacion(
+                        variacion.get("cobrado"),
+                    )
                 ),
                 "ReportePipelineComercial",
             ),
@@ -466,7 +515,9 @@ class PanelGerencialPage(QWidget):
                         or 0,
                     ),
                 ),
-                "",
+                _texto_variacion(
+                    variacion.get("cotizado"),
+                ),
                 "ReportePipelineComercial",
             ),
         ]
@@ -586,28 +637,6 @@ class PanelGerencialPage(QWidget):
                 barra,
             )
 
-        top_productos = resumen.get(
-            "top_productos",
-            [],
-        )
-
-        if top_productos:
-
-            layout_embudo.addWidget(
-                QLabel(
-                    "Top existencias",
-                ),
-            )
-
-            for producto in top_productos:
-
-                layout_embudo.addWidget(
-                    QLabel(
-                        f"{producto['nombre']}: "
-                        f"{producto['existencia']}"
-                    ),
-                )
-
         self.grid.addWidget(
             embudo,
             fila,
@@ -615,3 +644,183 @@ class PanelGerencialPage(QWidget):
             1,
             3,
         )
+
+        fila += 1
+
+        top_productos = resumen.get(
+            "top_productos",
+            [],
+        )
+
+        self.grid.addWidget(
+            self._construir_top_productos(
+                top_productos,
+            ),
+            fila,
+            0,
+            1,
+            3,
+        )
+
+        fila += 1
+
+        serie_mensual = resumen.get(
+            "serie_mensual",
+            [],
+        )
+
+        grafico = self._construir_grafico_mensual(
+            serie_mensual,
+        )
+
+        if grafico is not None:
+
+            self.grid.addWidget(
+                grafico,
+                fila,
+                0,
+                1,
+                3,
+            )
+
+    def _construir_top_productos(
+        self,
+        top_productos: list,
+    ) -> QFrame:
+
+        marco = QFrame()
+        marco.setObjectName(
+            "PanelGerencialEmbudo",
+        )
+        layout = QVBoxLayout(marco)
+
+        titulo = QLabel(
+            "Productos más vendidos (periodo seleccionado)",
+        )
+        titulo.setObjectName(
+            "PanelGerencialEmbudoTitulo",
+        )
+        layout.addWidget(titulo)
+
+        if not top_productos:
+
+            layout.addWidget(
+                QLabel(
+                    "Sin ventas registradas en el periodo.",
+                ),
+            )
+
+            return marco
+
+        tabla = QTableWidget(
+            len(top_productos),
+            3,
+        )
+        tabla.setHorizontalHeaderLabels(
+            ["Producto", "Cantidad", "Valor vendido"],
+        )
+        tabla.horizontalHeader().setSectionResizeMode(
+            0,
+            QHeaderView.ResizeMode.Stretch,
+        )
+        tabla.verticalHeader().setVisible(False)
+        tabla.setEditTriggers(
+            QTableWidget.EditTrigger.NoEditTriggers,
+        )
+
+        for fila_idx, producto in enumerate(top_productos):
+
+            tabla.setItem(
+                fila_idx,
+                0,
+                QTableWidgetItem(
+                    str(producto.get("nombre", "")),
+                ),
+            )
+            tabla.setItem(
+                fila_idx,
+                1,
+                QTableWidgetItem(
+                    f"{float(producto.get('cantidad', 0) or 0):,.0f}",
+                ),
+            )
+            tabla.setItem(
+                fila_idx,
+                2,
+                QTableWidgetItem(
+                    formatear_moneda(
+                        float(
+                            producto.get("valor", 0) or 0,
+                        ),
+                    ),
+                ),
+            )
+
+        tabla.setMaximumHeight(
+            32 * (len(top_productos) + 1),
+        )
+        layout.addWidget(tabla)
+
+        return marco
+
+    def _construir_grafico_mensual(
+        self,
+        serie_mensual: list,
+    ):
+
+        if not serie_mensual:
+
+            return None
+
+        set_ventas = QBarSet("Ventas")
+        set_compras = QBarSet("Compras")
+
+        categorias = []
+
+        for punto in serie_mensual:
+
+            set_ventas.append(
+                float(punto.get("ventas", 0) or 0),
+            )
+            set_compras.append(
+                float(punto.get("compras", 0) or 0),
+            )
+            categorias.append(
+                _MESES_ABREV[int(punto.get("mes", 0))]
+                + " "
+                + str(punto.get("anio", ""))[-2:]
+            )
+
+        series = QBarSeries()
+        series.append(set_ventas)
+        series.append(set_compras)
+
+        chart = QChart()
+        chart.addSeries(series)
+        chart.setTitle(
+            "Ventas vs. compras (últimos meses)",
+        )
+        chart.legend().setVisible(True)
+
+        eje_x = QBarCategoryAxis()
+        eje_x.append(categorias)
+        chart.addAxis(
+            eje_x,
+            Qt.AlignmentFlag.AlignBottom,
+        )
+        series.attachAxis(eje_x)
+
+        eje_y = QValueAxis()
+        chart.addAxis(
+            eje_y,
+            Qt.AlignmentFlag.AlignLeft,
+        )
+        series.attachAxis(eje_y)
+
+        vista_grafico = QChartView(chart)
+        vista_grafico.setRenderHint(
+            QPainter.RenderHint.Antialiasing,
+        )
+        vista_grafico.setMinimumHeight(260)
+
+        return vista_grafico
