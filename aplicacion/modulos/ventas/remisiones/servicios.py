@@ -55,10 +55,15 @@ class ServicioRemision(ServicioBase):
             ServicioNumeracion,
         )
 
+        prefijo = cls._prefijo()
+
         return ServicioNumeracion.siguiente_numero(
             "remision_venta",
-            cls._prefijo(),
+            prefijo,
             longitud=cls.LONGITUD,
+            consecutivo_minimo=(
+                cls.repositorio.siguiente_secuencia(prefijo) - 1
+            ),
         )
 
     @classmethod

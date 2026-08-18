@@ -53,10 +53,15 @@ class ServicioComprobanteEgreso(ServicioBase):
             ServicioNumeracion,
         )
 
+        prefijo = cls._prefijo()
+
         return ServicioNumeracion.siguiente_numero(
             "comprobante_egreso",
-            cls._prefijo(),
+            prefijo,
             longitud=cls._longitud(),
+            consecutivo_minimo=(
+                cls.repositorio.siguiente_secuencia(prefijo) - 1
+            ),
         )
 
     @classmethod

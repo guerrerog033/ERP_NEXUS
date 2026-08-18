@@ -38,6 +38,12 @@ class ServicioCotizacion(ServicioBase):
             "cotizacion_venta",
             cls.PREFIJO,
             longitud=cls.LONGITUD,
+            consecutivo_minimo=(
+                cls.repositorio.siguiente_secuencia(
+                    cls.PREFIJO,
+                )
+                - 1
+            ),
         )
 
     @classmethod

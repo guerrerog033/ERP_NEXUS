@@ -45,6 +45,9 @@ class ServicioDocumentoSoporte(ServicioBase):
             "documento_soporte_compra",
             prefijo,
             longitud=cls.LONGITUD,
+            consecutivo_minimo=(
+                cls.repositorio.siguiente_secuencia(prefijo) - 1
+            ),
         )
 
     @classmethod

@@ -91,10 +91,15 @@ class ServicioFacturaVenta(ServicioBase):
             ServicioNumeracion,
         )
 
+        prefijo = cls._prefijo()
+
         return ServicioNumeracion.siguiente_numero(
             "factura_venta",
-            cls._prefijo(),
+            prefijo,
             longitud=cls._longitud(),
+            consecutivo_minimo=(
+                cls.repositorio.siguiente_secuencia(prefijo) - 1
+            ),
         )
 
     @classmethod

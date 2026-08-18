@@ -20,6 +20,16 @@ class ServicioNumeracion:
     También valida contra el rango y la vigencia autorizados
     (relevante para prefijos amparados por una resolución DIAN),
     algo que el escaneo de máximos nunca pudo hacer.
+
+    Cuando se usa por primera vez para un (codigo_tipo, prefijo) en
+    una base de datos que ya tenía documentos de ese tipo creados
+    por fuera de esta numeración centralizada (por ejemplo, antes
+    de que este mecanismo existiera), arrancar el consecutivo en
+    ``rango_desde - 1`` chocaría de inmediato con esos documentos
+    ya existentes. Por eso el llamador puede pasar
+    ``consecutivo_minimo`` con el máximo consecutivo ya usado en su
+    propia tabla, y solo se aplica al CREAR el contador por primera
+    vez (nunca lo hace retroceder en llamadas posteriores).
     """
 
     @classmethod
@@ -34,6 +44,7 @@ class ServicioNumeracion:
         rango_hasta: int = 999999,
         fecha_inicio: date | None = None,
         fecha_fin: date | None = None,
+        consecutivo_minimo: int = 0,
     ) -> str:
 
         db = SessionLocal()
@@ -60,7 +71,10 @@ class ServicioNumeracion:
                     resolucion=resolucion,
                     rango_desde=rango_desde,
                     rango_hasta=rango_hasta,
-                    consecutivo_actual=rango_desde - 1,
+                    consecutivo_actual=max(
+                        rango_desde - 1,
+                        consecutivo_minimo,
+                    ),
                     fecha_inicio=fecha_inicio,
                     fecha_fin=fecha_fin,
                     activo=True,

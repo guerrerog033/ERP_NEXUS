@@ -19,6 +19,7 @@ from .modelos import (
 )
 from .repositorio import (
     RepositorioOrdenCompra,
+    RepositorioRecepcionCompra,
 )
 
 
@@ -47,10 +48,19 @@ class ServicioOrdenCompra:
             else "orden_compra"
         )
 
+        repositorio = (
+            RepositorioRecepcionCompra
+            if prefijo == cls.PREFIJO_REC
+            else RepositorioOrdenCompra
+        )
+
         return ServicioNumeracion.siguiente_numero(
             codigo_tipo,
             prefijo,
             longitud=cls.LONGITUD,
+            consecutivo_minimo=(
+                repositorio.siguiente_secuencia(prefijo) - 1
+            ),
         )
 
     @classmethod
