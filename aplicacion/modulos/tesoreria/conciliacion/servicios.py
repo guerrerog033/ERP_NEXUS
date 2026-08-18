@@ -364,6 +364,292 @@ class ServicioConciliacionBancaria:
             db.close()
 
     @classmethod
+    def listar_pendientes(cls) -> list[ExtractoBancario]:
+        db = SessionLocal()
+
+        try:
+            return (
+                db.query(ExtractoBancario)
+                .filter(
+                    ExtractoBancario.conciliado.is_(False),
+                )
+                .order_by(
+                    ExtractoBancario.fecha.desc(),
+                )
+                .all()
+            )
+
+        finally:
+            db.close()
+
+    @classmethod
+    def candidatos_documento(
+        cls,
+        extracto_id: int,
+        *,
+        limite: int = 20,
+    ) -> list[dict]:
+        db = SessionLocal()
+
+        try:
+            extracto = db.get(
+                ExtractoBancario,
+                extracto_id,
+            )
+
+            if extracto is None:
+                return []
+
+            candidatos = (
+                cls._candidatos_debito(db)
+                if extracto.tipo == "debito"
+                else cls._candidatos_credito(db)
+            )
+
+            candidatos.sort(
+                key=lambda fila: abs(
+                    fila["valor"] - float(extracto.valor or 0),
+                ),
+            )
+
+            return candidatos[:limite]
+
+        finally:
+            db.close()
+
+    @classmethod
+    def _nombres_terceros(cls, db, ids: set[int]) -> dict[int, str]:
+        from aplicacion.maestros.terceros.modelos import Tercero
+
+        ids = {id_ for id_ in ids if id_}
+
+        if not ids:
+            return {}
+
+        return {
+            tercero.id: tercero.nombre_completo
+            for tercero in (
+                db.query(Tercero)
+                .filter(Tercero.id.in_(ids))
+                .all()
+            )
+        }
+
+    @classmethod
+    def _candidatos_debito(cls, db) -> list[dict]:
+        from aplicacion.modulos.compras.facturas.modelos import (
+            FacturaCompra,
+        )
+        from aplicacion.modulos.tesoreria.comprobantes_egreso.modelos import (
+            ComprobanteEgreso,
+        )
+
+        egresos = (
+            db.query(ComprobanteEgreso)
+            .filter(ComprobanteEgreso.activo.is_(True))
+            .all()
+        )
+
+        facturas = (
+            db.query(FacturaCompra)
+            .filter(FacturaCompra.estado_pago == "pendiente")
+            .all()
+        )
+
+        nombres = cls._nombres_terceros(
+            db,
+            {e.proveedor_id for e in egresos}
+            | {f.proveedor_id for f in facturas},
+        )
+
+        candidatos = [
+            {
+                "tipo_documento": "comprobante_egreso",
+                "documento_id": egreso.id,
+                "numero": egreso.numero,
+                "tercero": nombres.get(egreso.proveedor_id, ""),
+                "valor": float(egreso.valor_total or 0),
+                "fecha": egreso.fecha,
+            }
+            for egreso in egresos
+        ]
+
+        candidatos += [
+            {
+                "tipo_documento": "factura_compra",
+                "documento_id": factura.id,
+                "numero": factura.numero,
+                "tercero": (
+                    nombres.get(factura.proveedor_id, "")
+                    or factura.razon_social_proveedor
+                    or ""
+                ),
+                "valor": float(
+                    factura.saldo_pendiente or factura.total or 0,
+                ),
+                "fecha": factura.fecha,
+            }
+            for factura in facturas
+        ]
+
+        return candidatos
+
+    @classmethod
+    def _candidatos_credito(cls, db) -> list[dict]:
+        from aplicacion.modulos.tesoreria.recibos_caja.modelos import (
+            ReciboCaja,
+        )
+        from aplicacion.modulos.ventas.facturas.modelos import (
+            FacturaVenta,
+        )
+
+        recibos = (
+            db.query(ReciboCaja)
+            .filter(ReciboCaja.activo.is_(True))
+            .all()
+        )
+
+        facturas = (
+            db.query(FacturaVenta)
+            .filter(FacturaVenta.estado_pago == "pendiente")
+            .all()
+        )
+
+        nombres = cls._nombres_terceros(
+            db,
+            {r.cliente_id for r in recibos}
+            | {f.cliente_id for f in facturas},
+        )
+
+        candidatos = [
+            {
+                "tipo_documento": "recibo_caja",
+                "documento_id": recibo.id,
+                "numero": recibo.numero,
+                "tercero": nombres.get(recibo.cliente_id, ""),
+                "valor": float(recibo.valor_total or 0),
+                "fecha": recibo.fecha,
+            }
+            for recibo in recibos
+        ]
+
+        candidatos += [
+            {
+                "tipo_documento": "factura_venta",
+                "documento_id": factura.id,
+                "numero": factura.numero,
+                "tercero": nombres.get(factura.cliente_id, ""),
+                "valor": float(
+                    factura.saldo_pendiente or factura.total or 0,
+                ),
+                "fecha": factura.fecha,
+            }
+            for factura in facturas
+        ]
+
+        return candidatos
+
+    @classmethod
+    def conciliar_manual(
+        cls,
+        extracto_id: int,
+        tipo_documento: str,
+        documento_id: int,
+    ) -> ConciliacionBancaria:
+        if tipo_documento not in (
+            "comprobante_egreso",
+            "factura_compra",
+            "recibo_caja",
+            "factura_venta",
+        ):
+            raise ValueError("Tipo de documento no soportado.")
+
+        db = SessionLocal()
+
+        try:
+            extracto = db.get(
+                ExtractoBancario,
+                extracto_id,
+            )
+
+            if extracto is None:
+                raise ValueError("Movimiento bancario no encontrado.")
+
+            if extracto.conciliado:
+                raise ValueError("El movimiento ya está conciliado.")
+
+            registro = ConciliacionBancaria(
+                extracto_id=extracto.id,
+                tipo_documento=tipo_documento,
+                documento_id=documento_id,
+                valor=extracto.valor,
+                estado="manual",
+            )
+
+            db.add(registro)
+            extracto.conciliado = True
+
+            db.commit()
+            db.refresh(registro)
+
+            return registro
+
+        except Exception:
+            db.rollback()
+            raise
+
+        finally:
+            db.close()
+
+    @classmethod
+    def deshacer(cls, conciliacion_id: int) -> None:
+        db = SessionLocal()
+
+        try:
+            registro = db.get(
+                ConciliacionBancaria,
+                conciliacion_id,
+            )
+
+            if registro is None:
+                raise ValueError("Conciliación no encontrada.")
+
+            extracto = db.get(
+                ExtractoBancario,
+                registro.extracto_id,
+            )
+
+            if extracto is not None:
+                extracto.conciliado = False
+
+            db.delete(registro)
+            db.commit()
+
+        except Exception:
+            db.rollback()
+            raise
+
+        finally:
+            db.close()
+
+    @classmethod
+    def listar_conciliadas(cls) -> list[ConciliacionBancaria]:
+        db = SessionLocal()
+
+        try:
+            return (
+                db.query(ConciliacionBancaria)
+                .order_by(
+                    ConciliacionBancaria.fecha_creacion.desc(),
+                )
+                .limit(100)
+                .all()
+            )
+
+        finally:
+            db.close()
+
+    @classmethod
     def resumen(cls) -> dict[str, int]:
         db = SessionLocal()
 
