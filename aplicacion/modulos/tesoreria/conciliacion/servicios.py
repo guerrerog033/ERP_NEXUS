@@ -1,20 +1,73 @@
 from __future__ import annotations
 
 import csv
+import io
 import re
+import unicodedata
 from datetime import datetime, timedelta
 from itertools import combinations
 from pathlib import Path
-
-DIAS_VENTANA_MATCH_AVANZADO = 60
 
 from aplicacion.base_datos.conexion import SessionLocal
 
 from .modelos import ConciliacionBancaria, ExtractoBancario
 
+DIAS_VENTANA_MATCH_AVANZADO = 60
+
 
 class ServicioConciliacionBancaria:
     """Importación de extractos y conciliación automática."""
+
+    _ALIAS_FECHA = (
+        "fecha",
+        "fecha transaccion",
+        "fecha movimiento",
+        "fecha valor",
+    )
+    _ALIAS_DESCRIPCION = (
+        "descripcion",
+        "detalle",
+        "concepto",
+        "descripcion transaccion",
+        "tipo de transaccion",
+        "nota",
+    )
+    _ALIAS_REFERENCIA = (
+        "referencia",
+        "documento",
+        "nro documento",
+        "numero documento",
+        "num documento",
+        "cheque/referencia",
+        "cheque referencia",
+    )
+    _ALIAS_VALOR = (
+        "valor",
+        "monto",
+        "importe",
+        "valor transaccion",
+    )
+    _ALIAS_DEBITO = (
+        "debito",
+        "valor debito",
+        "retiro",
+        "retiros",
+        "cargo",
+        "cargos",
+    )
+    _ALIAS_CREDITO = (
+        "credito",
+        "valor credito",
+        "deposito",
+        "depositos",
+        "abono",
+        "abonos",
+    )
+    _ALIAS_SALDO = (
+        "saldo",
+        "saldo disponible",
+        "saldo contable",
+    )
 
     @classmethod
     def importar_csv(
@@ -24,68 +77,84 @@ class ServicioConciliacionBancaria:
         banco: str = "Banco",
         cuenta: str = "000000",
     ) -> int:
+        """
+        Importa un extracto exportado como CSV/TXT delimitado.
+        Autodetecta la codificación (los extractos de bancos
+        colombianos suelen venir en cp1252, no utf-8), el
+        delimitador (algunos usan `;` en vez de `,`) y reconoce un
+        conjunto amplio de nombres de columna en español, incluyendo
+        formatos que separan débitos y créditos en dos columnas en
+        vez de un solo valor con signo.
+        """
+
         ruta = Path(ruta)
+        contenido = cls._leer_texto(ruta)
+        delimitador = cls._detectar_delimitador(contenido)
+
         importados = 0
         db = SessionLocal()
 
         try:
-            with ruta.open(
-                encoding="utf-8-sig",
-                newline="",
-            ) as archivo:
-                lector = csv.DictReader(
-                    archivo,
+            lector = csv.DictReader(
+                io.StringIO(contenido),
+                delimiter=delimitador,
+            )
+
+            for fila in lector:
+                fila_norm = {
+                    cls._normalizar_encabezado(clave): valor
+                    for clave, valor in fila.items()
+                    if clave is not None
+                }
+
+                fecha = cls._parsear_fecha(
+                    cls._valor_columna(
+                        fila_norm,
+                        cls._ALIAS_FECHA,
+                    )
+                    or "",
                 )
 
-                for fila in lector:
-                    fecha = cls._parsear_fecha(
-                        fila.get("fecha")
-                        or fila.get("Fecha")
-                        or "",
-                    )
+                valor, tipo = cls._resolver_valor_tipo(
+                    fila_norm,
+                )
 
-                    valor = cls._parsear_valor(
-                        fila.get("valor")
-                        or fila.get("Valor")
-                        or fila.get("monto")
+                if fecha is None or valor is None or valor == 0:
+                    continue
+
+                registro = ExtractoBancario(
+                    banco=banco,
+                    cuenta=cuenta,
+                    fecha=fecha,
+                    descripcion=str(
+                        cls._valor_columna(
+                            fila_norm,
+                            cls._ALIAS_DESCRIPCION,
+                        )
+                        or "",
+                    )[:250],
+                    referencia=str(
+                        cls._valor_columna(
+                            fila_norm,
+                            cls._ALIAS_REFERENCIA,
+                        )
+                        or "",
+                    )[:80],
+                    valor=abs(valor),
+                    tipo=tipo,
+                    saldo=cls._parsear_valor(
+                        cls._valor_columna(
+                            fila_norm,
+                            cls._ALIAS_SALDO,
+                        )
                         or "0",
                     )
+                    or None,
+                    origen="csv",
+                )
 
-                    if fecha is None or valor == 0:
-                        continue
-
-                    tipo = (
-                        "credito"
-                        if valor > 0
-                        else "debito"
-                    )
-
-                    registro = ExtractoBancario(
-                        banco=banco,
-                        cuenta=cuenta,
-                        fecha=fecha,
-                        descripcion=str(
-                            fila.get("descripcion")
-                            or fila.get("Descripcion")
-                            or "",
-                        )[:250],
-                        referencia=str(
-                            fila.get("referencia")
-                            or fila.get("Referencia")
-                            or "",
-                        )[:80],
-                        valor=abs(valor),
-                        tipo=tipo,
-                        saldo=cls._parsear_valor(
-                            fila.get("saldo")
-                            or "0",
-                        )
-                        or None,
-                        origen="csv",
-                    )
-
-                    db.add(registro)
-                    importados += 1
+                db.add(registro)
+                importados += 1
 
             db.commit()
 
@@ -100,6 +169,105 @@ class ServicioConciliacionBancaria:
             cls.conciliar_automatico()
 
         return importados
+
+    @classmethod
+    def _leer_texto(cls, ruta: Path) -> str:
+        for codificacion in ("utf-8-sig", "cp1252", "latin-1"):
+
+            try:
+                return ruta.read_text(
+                    encoding=codificacion,
+                )
+
+            except UnicodeDecodeError:
+                continue
+
+        return ruta.read_text(
+            encoding="utf-8",
+            errors="replace",
+        )
+
+    @classmethod
+    def _detectar_delimitador(cls, contenido: str) -> str:
+        primera_linea = contenido.splitlines()[0] if contenido else ""
+
+        try:
+            return csv.Sniffer().sniff(
+                primera_linea,
+                delimiters=",;\t",
+            ).delimiter
+
+        except csv.Error:
+            return ","
+
+    @classmethod
+    def _normalizar_encabezado(cls, texto) -> str:
+        texto = str(texto or "").strip().lower()
+
+        sin_tildes = "".join(
+            caracter
+            for caracter in unicodedata.normalize(
+                "NFKD",
+                texto,
+            )
+            if not unicodedata.combining(caracter)
+        )
+
+        return " ".join(sin_tildes.split())
+
+    @classmethod
+    def _valor_columna(cls, fila_norm: dict, alias) -> str | None:
+        for nombre in alias:
+
+            valor = fila_norm.get(nombre)
+
+            if valor not in (None, ""):
+
+                return valor
+
+        return None
+
+    @classmethod
+    def _resolver_valor_tipo(
+        cls,
+        fila_norm: dict,
+    ) -> tuple[float | None, str]:
+        debito_raw = cls._valor_columna(
+            fila_norm,
+            cls._ALIAS_DEBITO,
+        )
+        credito_raw = cls._valor_columna(
+            fila_norm,
+            cls._ALIAS_CREDITO,
+        )
+
+        if debito_raw is not None or credito_raw is not None:
+
+            debito = cls._parsear_valor(debito_raw or "0")
+            credito = cls._parsear_valor(credito_raw or "0")
+
+            if credito > 0:
+                return credito, "credito"
+
+            if debito > 0:
+                return debito, "debito"
+
+            return None, ""
+
+        valor_con_signo = cls._parsear_valor(
+            cls._valor_columna(
+                fila_norm,
+                cls._ALIAS_VALOR,
+            )
+            or "0",
+        )
+
+        if valor_con_signo == 0:
+            return None, ""
+
+        tipo = "credito" if valor_con_signo > 0 else "debito"
+
+        return valor_con_signo, tipo
 
     @classmethod
     def conciliar_automatico(cls) -> dict[str, int]:
