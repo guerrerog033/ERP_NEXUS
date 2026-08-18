@@ -56,6 +56,9 @@ class ServicioNotaCreditoCompra(ServicioBase):
             "nota_credito_compra",
             prefijo,
             longitud=longitud,
+            consecutivo_minimo=(
+                cls.repositorio.siguiente_secuencia(prefijo) - 1
+            ),
         )
 
     @classmethod

@@ -90,6 +90,45 @@ class ServicioDespacho:
             db.close()
 
     @classmethod
+    def _siguiente_secuencia(cls, prefijo: str) -> int:
+        from aplicacion.modulos.logistica.despacho.modelos import (
+            DespachoPedido,
+        )
+
+        db = SessionLocal()
+
+        try:
+
+            numeros = (
+                db.query(DespachoPedido.numero)
+                .filter(
+                    DespachoPedido.numero.like(
+                        f"{prefijo}%",
+                    ),
+                )
+                .all()
+            )
+
+            maximo = 0
+
+            for (numero,) in numeros:
+
+                sufijo = numero[len(prefijo):]
+
+                if sufijo.isdigit():
+
+                    maximo = max(
+                        maximo,
+                        int(sufijo),
+                    )
+
+            return maximo + 1
+
+        finally:
+
+            db.close()
+
+    @classmethod
     def generar_numero(cls) -> str:
 
         from aplicacion.nucleo.numeracion.servicio import (
@@ -100,6 +139,9 @@ class ServicioDespacho:
             "despacho_logistica",
             cls.PREFIJO,
             longitud=cls.LONGITUD,
+            consecutivo_minimo=(
+                cls._siguiente_secuencia(cls.PREFIJO) - 1
+            ),
         )
 
     @classmethod
