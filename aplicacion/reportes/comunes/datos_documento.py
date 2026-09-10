@@ -8,6 +8,7 @@ from aplicacion.framework.reportes.numero_letras import (
 from aplicacion.modulos.ventas.cotizaciones.formatos_impresion import (
     _datos_cliente,
     _datos_empresa,
+    _etiqueta_impuesto_id,
     _porcentaje_impuesto_id,
     _unidad_producto,
 )
@@ -146,10 +147,15 @@ def cliente_a_dto(
     }
 
 
-def _impuesto_linea(
+def _impuesto_detalle_info(
     detalle,
     total_linea: float,
-) -> float:
+) -> tuple[str, float, float, float]:
+    """
+    Devuelve ``(etiqueta, porcentaje, base_gravable, valor)`` del
+    impuesto de la línea, para poder discriminarlo por tarifa en la
+    representación gráfica.
+    """
 
     impuesto_id = getattr(
         detalle,
@@ -161,12 +167,26 @@ def _impuesto_linea(
         impuesto_id,
     )
 
-    if (
-        porcentaje <= 0
-        or total_linea <= 0
-    ):
+    etiqueta = _etiqueta_impuesto_id(
+        impuesto_id,
+    ) or (
+        "IVA"
+        if porcentaje
+        else ""
+    )
 
-        return 0.0
+    total_linea = float(
+        total_linea or 0,
+    )
+
+    if porcentaje <= 0 or total_linea <= 0:
+
+        return (
+            etiqueta,
+            porcentaje,
+            max(0.0, total_linea),
+            0.0,
+        )
 
     incluye_iva = bool(
         getattr(
@@ -183,9 +203,11 @@ def _impuesto_linea(
             + porcentaje / 100
         )
 
-        return max(
-            0.0,
-            total_linea - base,
+        return (
+            etiqueta,
+            porcentaje,
+            base,
+            max(0.0, total_linea - base),
         )
 
     cantidad = float(
@@ -206,8 +228,72 @@ def _impuesto_linea(
         or 0,
     )
 
-    return cantidad * precio * (
-        porcentaje / 100
+    base = cantidad * precio
+
+    return (
+        etiqueta,
+        porcentaje,
+        base,
+        base * porcentaje / 100,
+    )
+
+
+def _impuesto_linea(
+    detalle,
+    total_linea: float,
+) -> float:
+
+    return _impuesto_detalle_info(
+        detalle,
+        total_linea,
+    )[3]
+
+
+def resumen_impuestos(
+    items: list[dict],
+) -> list[dict]:
+    """
+    Agrupa los impuestos de las líneas por etiqueta/tarifa para la
+    tabla de discriminación exigida en la representación gráfica.
+    """
+
+    grupos: dict[str, dict] = {}
+
+    for item in items:
+
+        valor = float(
+            item.get("impuestos", 0) or 0,
+        )
+
+        if valor <= 0:
+
+            continue
+
+        etiqueta = item.get(
+            "impuesto_etiqueta",
+        ) or "IVA"
+
+        grupo = grupos.setdefault(
+            etiqueta,
+            {
+                "etiqueta": etiqueta,
+                "porcentaje": float(
+                    item.get("impuesto_pct", 0) or 0,
+                ),
+                "base": 0.0,
+                "valor": 0.0,
+            },
+        )
+
+        grupo["base"] += float(
+            item.get("impuesto_base", 0) or 0,
+        )
+
+        grupo["valor"] += valor
+
+    return sorted(
+        grupos.values(),
+        key=lambda grupo: -grupo["valor"],
     )
 
 
@@ -263,6 +349,16 @@ def items_desde_detalles(
             or 0,
         )
 
+        (
+            impuesto_etiqueta,
+            impuesto_pct,
+            impuesto_base,
+            impuesto_valor,
+        ) = _impuesto_detalle_info(
+            detalle,
+            total,
+        )
+
         filas.append(
             {
                 "numero": indice,
@@ -277,10 +373,10 @@ def items_desde_detalles(
                 "cantidad": cantidad,
                 "precio": precio,
                 "descuento": descuento,
-                "impuestos": _impuesto_linea(
-                    detalle,
-                    total,
-                ),
+                "impuestos": impuesto_valor,
+                "impuesto_etiqueta": impuesto_etiqueta,
+                "impuesto_pct": impuesto_pct,
+                "impuesto_base": impuesto_base,
                 "total": total,
                 "unidad": _unidad_producto(
                     getattr(
@@ -462,6 +558,10 @@ def factura_venta_a_dto(
         or "",
     ).strip()
 
+    items_factura = items_desde_detalles(
+        detalles,
+    )
+
     return {
         "numero": str(
             factura.numero or "",
@@ -513,8 +613,9 @@ def factura_venta_a_dto(
             factura,
             nombre_cliente,
         ),
-        "items": items_desde_detalles(
-            detalles,
+        "items": items_factura,
+        "resumen_impuestos": resumen_impuestos(
+            items_factura,
         ),
         "observaciones": str(
             getattr(

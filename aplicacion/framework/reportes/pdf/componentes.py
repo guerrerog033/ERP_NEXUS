@@ -256,6 +256,119 @@ def tabla_detalle(
     return tabla
 
 
+def tabla_impuestos(
+    resumen,
+    estilos,
+):
+    """
+    Discriminación de impuestos por tarifa (base gravable y valor),
+    exigida en la representación gráfica de la factura electrónica.
+    ``resumen`` es la lista que produce ``resumen_impuestos``.
+    """
+
+    if not resumen:
+
+        return Spacer(1, 1)
+
+    encabezado = [
+        Paragraph(
+            f"<b>{titulo}</b>",
+            estilos["normal"],
+        )
+        for titulo in (
+            "IMPUESTO",
+            "BASE GRAVABLE",
+            "TARIFA",
+            "VALOR",
+        )
+    ]
+
+    datos = [encabezado]
+
+    for grupo in resumen:
+
+        porcentaje = float(
+            grupo.get("porcentaje", 0) or 0,
+        )
+
+        datos.append(
+            [
+                Paragraph(
+                    texto(
+                        grupo.get("etiqueta", "IVA"),
+                    ),
+                    estilos["normal"],
+                ),
+                Paragraph(
+                    dinero(
+                        grupo.get("base", 0),
+                    ),
+                    estilos["derecha"],
+                ),
+                Paragraph(
+                    f"{porcentaje:g}%",
+                    estilos["centro"],
+                ),
+                Paragraph(
+                    dinero(
+                        grupo.get("valor", 0),
+                    ),
+                    estilos["derecha"],
+                ),
+            ]
+        )
+
+    tabla = Table(
+        datos,
+        colWidths=[
+            45 * mm,
+            45 * mm,
+            25 * mm,
+            45 * mm,
+        ],
+    )
+
+    tabla.setStyle(
+        TableStyle(
+            [
+                (
+                    "BACKGROUND",
+                    (0, 0),
+                    (-1, 0),
+                    AZUL_CLARO,
+                ),
+                (
+                    "GRID",
+                    (0, 0),
+                    (-1, -1),
+                    0.4,
+                    GRIS_BORDE,
+                ),
+                (
+                    "VALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "MIDDLE",
+                ),
+                (
+                    "TOPPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    4,
+                ),
+                (
+                    "BOTTOMPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    4,
+                ),
+            ]
+        )
+    )
+
+    return tabla
+
+
 def bloque_totales(
     subtotal,
     descuento,

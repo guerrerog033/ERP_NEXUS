@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from reportlab.lib.units import mm
 from reportlab.platypus import (
+    KeepTogether,
     Paragraph,
     Spacer,
     Table,
@@ -12,6 +13,7 @@ from aplicacion.framework.reportes.pdf.componentes import (
     bloque_totales,
     qr_imagen,
     tabla_detalle,
+    tabla_impuestos,
 )
 from aplicacion.framework.reportes.pdf.documento_base import (
     DocumentoReportLab,
@@ -259,6 +261,40 @@ class FacturaVentaPDF(
 
         factura = self.factura
 
+        resumen = factura.get(
+            "resumen_impuestos",
+        ) or []
+
+        if resumen:
+
+            self.story.append(
+                Paragraph(
+                    "<b>DISCRIMINACIÓN DE IMPUESTOS</b>",
+                    self.estilos["pequeno"],
+                ),
+            )
+
+            self.story.append(
+                Spacer(
+                    1,
+                    2 * mm,
+                ),
+            )
+
+            self.story.append(
+                tabla_impuestos(
+                    resumen,
+                    self.estilos,
+                ),
+            )
+
+            self.story.append(
+                Spacer(
+                    1,
+                    4 * mm,
+                ),
+            )
+
         self.story.append(
             bloque_totales(
                 factura[
@@ -319,19 +355,24 @@ class FacturaVentaPDF(
 
             return
 
-        self.story.extend(
-            [
-                Spacer(
-                    1,
-                    5 * mm,
-                ),
-                Paragraph(
-                    "<b>OBSERVACIONES</b>",
-                    self.estilos["subtitulo"],
-                ),
-                Paragraph(
-                    observaciones,
-                    self.estilos["normal"],
-                ),
-            ],
+        self.story.append(
+            Spacer(
+                1,
+                5 * mm,
+            ),
+        )
+
+        self.story.append(
+            KeepTogether(
+                [
+                    Paragraph(
+                        "<b>OBSERVACIONES</b>",
+                        self.estilos["subtitulo"],
+                    ),
+                    Paragraph(
+                        observaciones,
+                        self.estilos["normal"],
+                    ),
+                ],
+            ),
         )
