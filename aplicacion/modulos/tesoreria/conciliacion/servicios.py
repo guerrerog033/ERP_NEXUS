@@ -458,6 +458,10 @@ class ServicioConciliacionBancaria:
                         or factura.total
                         or 0,
                     ),
+                ) and cls._coincide_texto(
+                    referencia,
+                    descripcion,
+                    factura.numero,
                 ):
                     return (
                         "factura_compra",
@@ -521,6 +525,10 @@ class ServicioConciliacionBancaria:
                         or factura.total
                         or 0,
                     ),
+                ) and cls._coincide_texto(
+                    referencia,
+                    descripcion,
+                    factura.numero,
                 ):
                     return (
                         "factura_venta",
