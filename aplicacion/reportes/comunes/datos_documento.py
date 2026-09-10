@@ -337,6 +337,41 @@ def _descuento_documento(
     return 0.0
 
 
+def _forma_pago_documento(
+    documento,
+) -> str:
+    """
+    Forma de pago según la representación gráfica DIAN: Contado o
+    Crédito. Se deriva del vencimiento (si hay plazo respecto a la
+    fecha del documento es Crédito); ``estado_pago`` describe la
+    cobranza, no la forma de pago, y no debe usarse aquí.
+    """
+
+    fecha_doc = getattr(
+        documento,
+        "fecha",
+        None,
+    )
+
+    vencimiento = getattr(
+        documento,
+        "fecha_vencimiento",
+        None,
+    )
+
+    try:
+        if vencimiento and fecha_doc and vencimiento > fecha_doc:
+
+            dias = (vencimiento - fecha_doc).days
+
+            return f"Crédito ({dias} días)"
+
+    except TypeError:
+        pass
+
+    return "Contado"
+
+
 def _autorizacion_dian(
     documento,
 ) -> str:
@@ -439,17 +474,9 @@ def factura_venta_a_dto(
                 None,
             ),
         ),
-        "forma_pago": str(
-            getattr(
-                factura,
-                "estado_pago",
-                "",
-            )
-            or "",
-        ).replace(
-            "_",
-            " ",
-        ).title(),
+        "forma_pago": _forma_pago_documento(
+            factura,
+        ),
         "medio_pago": str(
             getattr(
                 factura,
