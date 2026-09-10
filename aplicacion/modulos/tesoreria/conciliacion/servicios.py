@@ -761,24 +761,77 @@ class ServicioConciliacionBancaria:
 
     @classmethod
     def _parsear_valor(cls, texto: str) -> float:
+        """
+        Normaliza importes de extractos bancarios con formatos
+        heterogéneos. Reconoce:
+
+        - Formato es-CO / europeo: ``1.234.567,89`` (punto de
+          miles, coma decimal), el más común en los bancos
+          colombianos a los que apunta este módulo.
+        - Formato en-US: ``1,234,567.89`` (coma de miles, punto
+          decimal).
+        - Enteros sin separador decimal: ``200000``.
+        - Negativos con signo (``-1.234,56``, ``1.234,56-``) o
+          entre paréntesis (``(1.234,56)``), habituales en
+          exportaciones contables.
+        - Prefijos de moneda y espacios: ``$ 1.234.567,89``.
+        """
+
         texto = str(
-            texto or "0",
+            texto if texto is not None else "0",
         ).strip()
 
-        texto = re.sub(
-            r"[^\d,.-]",
-            "",
-            texto,
-        ).replace(
-            ",",
-            "",
+        if not texto:
+            return 0.0
+
+        negativo = (
+            texto.startswith("-")
+            or texto.endswith("-")
+            or (texto.startswith("(") and texto.endswith(")"))
         )
 
+        limpio = re.sub(r"[^\d,.]", "", texto)
+
+        if not limpio:
+            return 0.0
+
+        tiene_coma = "," in limpio
+        tiene_punto = "." in limpio
+
+        if tiene_coma and tiene_punto:
+            # El separador más a la derecha es el decimal; el otro
+            # agrupa miles.
+            if limpio.rfind(",") > limpio.rfind("."):
+                decimal, miles = ",", "."
+            else:
+                decimal, miles = ".", ","
+
+            limpio = limpio.replace(miles, "").replace(decimal, ".")
+
+        elif tiene_coma or tiene_punto:
+            separador = "," if tiene_coma else "."
+            partes = limpio.split(separador)
+
+            if len(partes) > 2:
+                # p. ej. ``1.234.567`` -> todos son miles.
+                limpio = limpio.replace(separador, "")
+
+            elif len(partes[-1]) == 3 and partes[0]:
+                # Un único separador seguido de 3 dígitos es
+                # agrupador de miles (``1.500`` -> 1500); los
+                # importes bancarios usan 2 decimales.
+                limpio = limpio.replace(separador, "")
+
+            else:
+                limpio = limpio.replace(separador, ".")
+
         try:
-            return float(texto or 0)
+            valor = float(limpio or 0)
 
         except ValueError:
             return 0.0
+
+        return -valor if negativo else valor
 
     @classmethod
     def listar_extractos(cls) -> list[ExtractoBancario]:

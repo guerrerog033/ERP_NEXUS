@@ -112,3 +112,83 @@ class TestDetectarDelimitador:
             ServicioConciliacionBancaria._detectar_delimitador("")
             == ","
         )
+
+
+class TestParsearValor:
+
+    def test_formato_colombiano_punto_miles_coma_decimal(self):
+
+        assert (
+            ServicioConciliacionBancaria._parsear_valor("1.234.567,89")
+            == 1234567.89
+        )
+
+    def test_formato_colombiano_con_prefijo_moneda(self):
+
+        assert (
+            ServicioConciliacionBancaria._parsear_valor("$ 1.234.567,89")
+            == 1234567.89
+        )
+
+    def test_formato_estadounidense_coma_miles_punto_decimal(self):
+
+        assert (
+            ServicioConciliacionBancaria._parsear_valor("1,234,567.89")
+            == 1234567.89
+        )
+
+    def test_entero_sin_separador(self):
+
+        assert (
+            ServicioConciliacionBancaria._parsear_valor("200000")
+            == 200000.0
+        )
+
+    def test_separador_unico_de_tres_digitos_es_miles(self):
+
+        assert (
+            ServicioConciliacionBancaria._parsear_valor("1.500") == 1500.0
+        )
+        assert (
+            ServicioConciliacionBancaria._parsear_valor("100.000")
+            == 100000.0
+        )
+
+    def test_coma_decimal_sin_miles(self):
+
+        assert (
+            ServicioConciliacionBancaria._parsear_valor("150,75") == 150.75
+        )
+
+    def test_negativo_con_signo(self):
+
+        assert (
+            ServicioConciliacionBancaria._parsear_valor("-80.000,50")
+            == -80000.5
+        )
+
+    def test_negativo_entre_parentesis(self):
+
+        assert (
+            ServicioConciliacionBancaria._parsear_valor("(1.234,56)")
+            == -1234.56
+        )
+
+    def test_negativo_con_signo_al_final(self):
+
+        assert (
+            ServicioConciliacionBancaria._parsear_valor("1.234,56-")
+            == -1234.56
+        )
+
+    def test_texto_no_numerico_retorna_cero(self):
+
+        assert (
+            ServicioConciliacionBancaria._parsear_valor("sin valor")
+            == 0.0
+        )
+
+    def test_none_y_vacio_retornan_cero(self):
+
+        assert ServicioConciliacionBancaria._parsear_valor(None) == 0.0
+        assert ServicioConciliacionBancaria._parsear_valor("") == 0.0
