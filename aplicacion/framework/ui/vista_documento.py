@@ -4,6 +4,7 @@ from abc import abstractmethod
 from pathlib import Path
 
 from PySide6.QtCore import QEvent, Qt, QUrl, Signal
+from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
@@ -61,32 +62,38 @@ class VistaDocumento(Page):
 
         encabezado = QHBoxLayout()
 
+        encabezado.setSpacing(
+            10,
+        )
+
         self.lbl_titulo = QLabel()
 
-        fuente_titulo = self.lbl_titulo.font()
-
-        fuente_titulo.setPointSize(
-            fuente_titulo.pointSize()
-            + 2,
+        self.lbl_titulo.setObjectName(
+            "DocumentoTitulo",
         )
 
-        fuente_titulo.setBold(
-            True,
+        self.lbl_estado = QLabel()
+
+        self.lbl_estado.setObjectName(
+            "DocumentoBadge",
         )
 
-        self.lbl_titulo.setFont(
-            fuente_titulo,
+        self.lbl_estado.setVisible(
+            False,
         )
 
         self.lbl_formato = QLabel()
 
-        self.lbl_formato.setStyleSheet(
-            "color: #64748b; padding: 4px 10px; "
-            "background: #f1f5f9; border-radius: 12px;",
+        self.lbl_formato.setObjectName(
+            "DocumentoFormatoChip",
         )
 
         encabezado.addWidget(
             self.lbl_titulo,
+        )
+
+        encabezado.addWidget(
+            self.lbl_estado,
         )
 
         encabezado.addStretch()
@@ -104,17 +111,7 @@ class VistaDocumento(Page):
         marco = QFrame()
 
         marco.setObjectName(
-            "marcoPreview",
-        )
-
-        marco.setStyleSheet(
-            """
-            QFrame#marcoPreview {
-                background: #dbe3ec;
-                border: 1px solid #c5d0dc;
-                border-radius: 10px;
-            }
-            """,
+            "DocumentoPreviewMarco",
         )
 
         marco_layout = QVBoxLayout(
@@ -130,17 +127,16 @@ class VistaDocumento(Page):
 
         self.vista_html = QTextBrowser()
 
+        self.vista_html.setObjectName(
+            "DocumentoPreviewHtml",
+        )
+
         self.vista_html.setOpenExternalLinks(
             True,
         )
 
         self.vista_html.setFrameShape(
             QFrame.Shape.NoFrame,
-        )
-
-        self.vista_html.setStyleSheet(
-            "QTextBrowser { background: #ffffff; "
-            "border-radius: 6px; padding: 8px; }",
         )
 
         self.vista_html.setSizePolicy(
@@ -190,9 +186,77 @@ class VistaDocumento(Page):
 
         self._conectar_acciones()
 
+        self._activar_atajos_documento()
+
         self._scroll_preview.viewport().installEventFilter(
             self,
         )
+
+    def _activar_atajos_documento(
+        self,
+    ) -> None:
+
+        atajos = (
+            ("Ctrl+P", self._imprimir),
+            ("Ctrl+Shift+P", self._exportar_pdf),
+            ("Ctrl+E", self._editar_por_atajo),
+        )
+
+        for secuencia, accion in atajos:
+
+            QShortcut(
+                QKeySequence(secuencia),
+                self,
+                activated=accion,
+            )
+
+    def _editar_por_atajo(
+        self,
+    ) -> None:
+
+        boton = getattr(
+            self,
+            "btn_editar",
+            None,
+        )
+
+        if boton is not None and boton.isEnabled() and boton.isVisible():
+
+            self.editar_solicitado.emit()
+
+    def establecer_estado(
+        self,
+        texto: str,
+        tono: str = "neutral",
+    ) -> None:
+        """
+        Fija el badge de estado de la cabecera. ``tono`` admite
+        ``neutral``, ``info``, ``exito``, ``advertencia`` y
+        ``peligro`` (definidos en tema.qss).
+        """
+
+        self.lbl_estado.setText(
+            texto or "",
+        )
+
+        self.lbl_estado.setVisible(
+            bool(texto),
+        )
+
+        if self.lbl_estado.property("tono") != tono:
+
+            self.lbl_estado.setProperty(
+                "tono",
+                tono,
+            )
+
+            self.lbl_estado.style().unpolish(
+                self.lbl_estado,
+            )
+
+            self.lbl_estado.style().polish(
+                self.lbl_estado,
+            )
 
     def _agregar_barras_accion(
         self,
@@ -408,12 +472,12 @@ class VistaDocumento(Page):
             titulo,
         )
 
-        etiqueta.setMinimumWidth(
-            88,
+        etiqueta.setObjectName(
+            "BarraAccionEtiqueta",
         )
 
-        etiqueta.setStyleSheet(
-            "color: #475569; font-weight: 600;",
+        etiqueta.setMinimumWidth(
+            88,
         )
 
         contenedor.addWidget(

@@ -927,6 +927,79 @@ QPushButton:disabled{
     border:1px solid #999999;
 }
 
+/* ==========================================================
+   Vista de documento
+   Cabecera, chip de formato, badge de estado y marco de
+   previsualización compartidos por facturas, cotizaciones,
+   pedidos, remisiones y notas.
+   ========================================================== */
+
+QLabel#DocumentoTitulo{
+    color:#12324F;
+    font-size:13pt;
+    font-weight:bold;
+}
+
+QLabel#BarraAccionEtiqueta{
+    color:#475569;
+    font-weight:600;
+}
+
+QLabel#DocumentoFormatoChip{
+    color:#5A6B7D;
+    background:#EEF2F6;
+    border:1px solid #D6DEE8;
+    border-radius:11px;
+    padding:3px 12px;
+    font-size:9pt;
+}
+
+QLabel#DocumentoBadge{
+    background:#EEF2F6;
+    color:#475569;
+    border:1px solid #D6DEE8;
+    border-radius:11px;
+    padding:3px 12px;
+    font-size:9pt;
+    font-weight:600;
+}
+
+QLabel#DocumentoBadge[tono="info"]{
+    background:#E4EEF9;
+    color:#1B4F8A;
+    border:1px solid #B9D3EC;
+}
+
+QLabel#DocumentoBadge[tono="exito"]{
+    background:#E6F4EC;
+    color:#15803D;
+    border:1px solid #B7E0C6;
+}
+
+QLabel#DocumentoBadge[tono="advertencia"]{
+    background:#FBF0DC;
+    color:#B45309;
+    border:1px solid #F0D9A8;
+}
+
+QLabel#DocumentoBadge[tono="peligro"]{
+    background:#FBE9E9;
+    color:#B91C1C;
+    border:1px solid #F0C2C2;
+}
+
+QFrame#DocumentoPreviewMarco{
+    background:#DBE3EC;
+    border:1px solid #C5D0DC;
+    border-radius:10px;
+}
+
+QTextBrowser#DocumentoPreviewHtml{
+    background:#FFFFFF;
+    border-radius:6px;
+    padding:8px;
+}
+
 QTableWidget{
     background:white;
     alternate-background-color:#F0F6FC;

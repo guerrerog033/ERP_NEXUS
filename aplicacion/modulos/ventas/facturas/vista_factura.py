@@ -101,8 +101,8 @@ class VistaFacturaVenta(VistaDocumento):
             "Formato",
         )
 
-        self.lbl_formato_impresion.setStyleSheet(
-            "color: #475569; font-weight: 600;",
+        self.lbl_formato_impresion.setObjectName(
+            "BarraAccionEtiqueta",
         )
 
         self.cmb_formato = QComboBox()
@@ -238,6 +238,36 @@ class VistaFacturaVenta(VistaDocumento):
 
         return " · ".join(partes)
 
+    def _tono_estado(
+        self,
+    ) -> str:
+
+        if self._factura is None:
+
+            return "neutral"
+
+        estado = str(
+            self._factura.estado or "",
+        ).lower()
+
+        estado_dian = str(
+            self._factura.estado_dian or "",
+        ).lower()
+
+        if "anul" in estado or estado_dian.startswith("rechaz"):
+
+            return "peligro"
+
+        if self._factura.contabilizado or estado == "contabilizada":
+
+            return "exito"
+
+        if estado in ("emitida", "generada") or self._factura.cufe:
+
+            return "info"
+
+        return "neutral"
+
     def _actualizar_botones(
         self,
     ) -> None:
@@ -245,6 +275,11 @@ class VistaFacturaVenta(VistaDocumento):
         if self._factura is None:
 
             return
+
+        self.establecer_estado(
+            self._etiqueta_estado(),
+            self._tono_estado(),
+        )
 
         self.btn_confirmar.setEnabled(
             self._factura.estado
@@ -625,7 +660,6 @@ class VistaFacturaVenta(VistaDocumento):
         formato = self._formato_actual()
 
         self.mostrar_formato(
-            f"{self._etiqueta_estado()} · "
             f"Formato: {etiqueta_formato(formato)}",
         )
 
