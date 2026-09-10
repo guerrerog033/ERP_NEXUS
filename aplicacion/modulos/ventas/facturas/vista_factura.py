@@ -82,11 +82,19 @@ class VistaFacturaVenta(VistaDocumento):
 
         self.layout_principal.addLayout(
             self._barra_etiquetada(
-                "Documento",
+                "Emisión",
                 (
                     self.btn_confirmar,
                     self.btn_emitir,
                     self.btn_contabilizar,
+                ),
+            ),
+        )
+
+        self.layout_principal.addLayout(
+            self._barra_etiquetada(
+                "Cliente",
+                (
                     self.btn_cartera,
                     self.btn_estado_cuenta,
                     self.btn_nota_credito,
