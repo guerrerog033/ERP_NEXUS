@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import date
+
 from aplicacion.modulos.tesoreria.conciliacion.servicios import (
     ServicioConciliacionBancaria,
 )
@@ -192,3 +194,71 @@ class TestParsearValor:
 
         assert ServicioConciliacionBancaria._parsear_valor(None) == 0.0
         assert ServicioConciliacionBancaria._parsear_valor("") == 0.0
+
+
+class TestParsearFecha:
+
+    def test_formato_iso(self):
+
+        assert ServicioConciliacionBancaria._parsear_fecha(
+            "2026-03-01",
+        ) == date(2026, 3, 1)
+
+    def test_dia_mes_anio_con_barra_y_guion(self):
+
+        assert ServicioConciliacionBancaria._parsear_fecha(
+            "01/03/2026",
+        ) == date(2026, 3, 1)
+        assert ServicioConciliacionBancaria._parsear_fecha(
+            "01-03-2026",
+        ) == date(2026, 3, 1)
+
+    def test_anio_de_dos_digitos(self):
+
+        assert ServicioConciliacionBancaria._parsear_fecha(
+            "01/03/26",
+        ) == date(2026, 3, 1)
+
+    def test_compacto_aaaammdd(self):
+
+        assert ServicioConciliacionBancaria._parsear_fecha(
+            "20260301",
+        ) == date(2026, 3, 1)
+
+    def test_descarta_componente_de_hora(self):
+
+        assert ServicioConciliacionBancaria._parsear_fecha(
+            "01/03/2026 13:04:22",
+        ) == date(2026, 3, 1)
+        assert ServicioConciliacionBancaria._parsear_fecha(
+            "2026-03-01T09:15:00",
+        ) == date(2026, 3, 1)
+
+    def test_mes_textual_espanol_e_ingles(self):
+
+        assert ServicioConciliacionBancaria._parsear_fecha(
+            "15-ene-2026",
+        ) == date(2026, 1, 15)
+        assert ServicioConciliacionBancaria._parsear_fecha(
+            "15 DIC 25",
+        ) == date(2025, 12, 15)
+        assert ServicioConciliacionBancaria._parsear_fecha(
+            "3/septiembre/2026",
+        ) == date(2026, 9, 3)
+        assert ServicioConciliacionBancaria._parsear_fecha(
+            "07-Aug-2026",
+        ) == date(2026, 8, 7)
+
+    def test_valores_no_reconocibles_retornan_none(self):
+
+        assert (
+            ServicioConciliacionBancaria._parsear_fecha("") is None
+        )
+        assert (
+            ServicioConciliacionBancaria._parsear_fecha("no es fecha")
+            is None
+        )
+        assert (
+            ServicioConciliacionBancaria._parsear_fecha("31/02/2026")
+            is None
+        )

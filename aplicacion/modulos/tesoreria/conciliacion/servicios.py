@@ -4,7 +4,7 @@ import csv
 import io
 import re
 import unicodedata
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from itertools import combinations
 from pathlib import Path
 
@@ -20,6 +20,35 @@ DIAS_VENTANA_MATCH_AVANZADO = 60
 # emparejarse con otro movimiento. Las parciales quedan fuera porque
 # una misma factura admite varios abonos sucesivos.
 _ESTADOS_QUE_AGOTAN = ("conciliado", "combinado", "manual")
+
+# Formatos numéricos de fecha aceptados en los extractos, en orden de
+# preferencia (los de año de 4 dígitos primero).
+_FORMATOS_FECHA = (
+    "%Y-%m-%d",
+    "%d/%m/%Y",
+    "%d-%m-%Y",
+    "%d/%m/%y",
+    "%d-%m-%y",
+    "%Y%m%d",
+)
+
+# Mes escrito con abreviatura o nombre, en español o inglés. La
+# búsqueda usa las tres primeras letras normalizadas, así que
+# "septiembre", "september" y "sept" caen todas en "sep".
+_MESES = {
+    "ene": 1, "jan": 1,
+    "feb": 2,
+    "mar": 3,
+    "abr": 4, "apr": 4,
+    "may": 5,
+    "jun": 6,
+    "jul": 7,
+    "ago": 8, "aug": 8,
+    "sep": 9,
+    "oct": 10,
+    "nov": 11,
+    "dic": 12, "dec": 12,
+}
 
 
 class ServicioConciliacionBancaria:
@@ -854,23 +883,70 @@ class ServicioConciliacionBancaria:
 
     @classmethod
     def _parsear_fecha(cls, texto: str):
+        """
+        Acepta los formatos de fecha que aparecen en los extractos
+        de los bancos colombianos: ISO, día/mes/año con ``/`` o
+        ``-`` y año de 2 o 4 dígitos, ``aaaammdd`` compacto, un
+        posible componente de hora que se descarta, y el mes
+        escrito con abreviatura o nombre en español o inglés
+        (``15-ene-2026``, ``15 DIC 25``).
+        """
+
         texto = str(texto or "").strip()
 
-        for formato in (
-            "%Y-%m-%d",
-            "%d/%m/%Y",
-            "%d-%m-%Y",
-        ):
-            try:
-                return datetime.strptime(
-                    texto,
-                    formato,
-                ).date()
+        if not texto:
+            return None
 
-            except ValueError:
-                continue
+        # Descarta un componente de hora ("dd/mm/aaaa 13:04:22").
+        solo_fecha = texto.split(" ")[0].split("T")[0].strip()
 
-        return None
+        for candidato in (solo_fecha, texto):
+            for formato in _FORMATOS_FECHA:
+                try:
+                    return datetime.strptime(
+                        candidato,
+                        formato,
+                    ).date()
+
+                except ValueError:
+                    continue
+
+        return cls._parsear_fecha_mes_textual(texto)
+
+    @classmethod
+    def _parsear_fecha_mes_textual(cls, texto: str):
+        coincidencia = re.search(
+            r"(\d{1,2})\s*[-/ ]\s*"
+            r"([A-Za-zÀ-ɏ]+)\.?\s*[-/ ]\s*"
+            r"(\d{2,4})",
+            texto,
+        )
+
+        if coincidencia is None:
+            return None
+
+        dia_raw, mes_raw, anio_raw = coincidencia.groups()
+
+        mes_norm = cls._normalizar_encabezado(mes_raw).replace(".", "")
+        mes = _MESES.get(mes_norm[:3])
+
+        if mes is None:
+            return None
+
+        anio = int(anio_raw)
+
+        if anio < 100:
+            anio += 2000
+
+        try:
+            return date(
+                anio,
+                mes,
+                int(dia_raw),
+            )
+
+        except ValueError:
+            return None
 
     @classmethod
     def _parsear_valor(cls, texto: str) -> float:
