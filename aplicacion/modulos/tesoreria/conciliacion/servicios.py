@@ -4,15 +4,51 @@ import csv
 import io
 import re
 import unicodedata
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from itertools import combinations
 from pathlib import Path
+
+from sqlalchemy import func
 
 from aplicacion.base_datos.conexion import SessionLocal
 
 from .modelos import ConciliacionBancaria, ExtractoBancario
 
 DIAS_VENTANA_MATCH_AVANZADO = 60
+
+# Estados de conciliación que agotan el documento: no puede volver a
+# emparejarse con otro movimiento. Las parciales quedan fuera porque
+# una misma factura admite varios abonos sucesivos.
+_ESTADOS_QUE_AGOTAN = ("conciliado", "combinado", "manual")
+
+# Formatos numéricos de fecha aceptados en los extractos, en orden de
+# preferencia (los de año de 4 dígitos primero).
+_FORMATOS_FECHA = (
+    "%Y-%m-%d",
+    "%d/%m/%Y",
+    "%d-%m-%Y",
+    "%d/%m/%y",
+    "%d-%m-%y",
+    "%Y%m%d",
+)
+
+# Mes escrito con abreviatura o nombre, en español o inglés. La
+# búsqueda usa las tres primeras letras normalizadas, así que
+# "septiembre", "september" y "sept" caen todas en "sep".
+_MESES = {
+    "ene": 1, "jan": 1,
+    "feb": 2,
+    "mar": 3,
+    "abr": 4, "apr": 4,
+    "may": 5,
+    "jun": 6,
+    "jul": 7,
+    "ago": 8, "aug": 8,
+    "sep": 9,
+    "oct": 10,
+    "nov": 11,
+    "dic": 12, "dec": 12,
+}
 
 
 class ServicioConciliacionBancaria:
@@ -284,10 +320,18 @@ class ServicioConciliacionBancaria:
                 .all()
             )
 
+            # Un documento ya conciliado no puede volver a
+            # emparejarse. Se calcula una sola vez y se actualiza en
+            # memoria a medida que el propio lote asigna documentos,
+            # para que dos movimientos del mismo valor no reclamen el
+            # mismo documento.
+            consumidos = cls._documentos_consumidos(db)
+
             for extracto in extractos:
                 matches = cls._buscar_documentos(
                     db,
                     extracto,
+                    consumidos,
                 )
 
                 if not matches:
@@ -305,6 +349,9 @@ class ServicioConciliacionBancaria:
                             estado=estado,
                         )
                     )
+
+                    if estado in _ESTADOS_QUE_AGOTAN:
+                        consumidos.add((tipo_doc, doc_id))
 
                 extracto.conciliado = True
                 conciliados += 1
@@ -324,10 +371,41 @@ class ServicioConciliacionBancaria:
         }
 
     @classmethod
+    def _documentos_consumidos(cls, db) -> set[tuple[str, int]]:
+        """
+        Conjunto ``(tipo_documento, documento_id)`` de documentos
+        que ya agotó una conciliación previa (exacta, combinada o
+        manual). No incluye las parciales: una misma factura puede
+        recibir varios abonos.
+        """
+
+        filas = (
+            db.query(
+                ConciliacionBancaria.tipo_documento,
+                ConciliacionBancaria.documento_id,
+            )
+            .filter(
+                ConciliacionBancaria.estado.in_(
+                    _ESTADOS_QUE_AGOTAN,
+                ),
+            )
+            .all()
+        )
+
+        return {(tipo, doc_id) for tipo, doc_id in filas}
+
+    @classmethod
+    def _rango_valor(cls, extracto: ExtractoBancario) -> tuple[float, float]:
+        objetivo = float(extracto.valor or 0)
+
+        return (objetivo - 1.0, objetivo + 1.0)
+
+    @classmethod
     def _buscar_documento(
         cls,
         db,
         extracto: ExtractoBancario,
+        consumidos: set[tuple[str, int]],
     ) -> tuple[str, int] | None:
         from aplicacion.modulos.tesoreria.comprobantes_egreso.modelos import (
             ComprobanteEgreso,
@@ -350,16 +428,23 @@ class ServicioConciliacionBancaria:
             extracto.descripcion or "",
         ).upper()
 
+        valor_min, valor_max = cls._rango_valor(extracto)
+
         if extracto.tipo == "debito":
             egresos = (
                 db.query(ComprobanteEgreso)
                 .filter(
                     ComprobanteEgreso.activo.is_(True),
+                    ComprobanteEgreso.valor_total >= valor_min,
+                    ComprobanteEgreso.valor_total <= valor_max,
                 )
                 .all()
             )
 
             for egreso in egresos:
+                if ("comprobante_egreso", egreso.id) in consumidos:
+                    continue
+
                 if cls._coincide_valor(
                     extracto.valor,
                     float(
@@ -375,16 +460,26 @@ class ServicioConciliacionBancaria:
                         egreso.id,
                     )
 
+            saldo_compra = func.coalesce(
+                FacturaCompra.saldo_pendiente,
+                FacturaCompra.total,
+                0,
+            )
+
             facturas = (
                 db.query(FacturaCompra)
                 .filter(
-                    FacturaCompra.estado_pago
-                    == "pendiente",
+                    FacturaCompra.estado_pago == "pendiente",
+                    saldo_compra >= valor_min,
+                    saldo_compra <= valor_max,
                 )
                 .all()
             )
 
             for factura in facturas:
+                if ("factura_compra", factura.id) in consumidos:
+                    continue
+
                 if cls._coincide_valor(
                     extracto.valor,
                     float(
@@ -392,6 +487,10 @@ class ServicioConciliacionBancaria:
                         or factura.total
                         or 0,
                     ),
+                ) and cls._coincide_texto(
+                    referencia,
+                    descripcion,
+                    factura.numero,
                 ):
                     return (
                         "factura_compra",
@@ -403,11 +502,16 @@ class ServicioConciliacionBancaria:
                 db.query(ReciboCaja)
                 .filter(
                     ReciboCaja.activo.is_(True),
+                    ReciboCaja.valor_total >= valor_min,
+                    ReciboCaja.valor_total <= valor_max,
                 )
                 .all()
             )
 
             for recibo in recibos:
+                if ("recibo_caja", recibo.id) in consumidos:
+                    continue
+
                 if cls._coincide_valor(
                     extracto.valor,
                     float(
@@ -423,16 +527,26 @@ class ServicioConciliacionBancaria:
                         recibo.id,
                     )
 
+            saldo_venta = func.coalesce(
+                FacturaVenta.saldo_pendiente,
+                FacturaVenta.total,
+                0,
+            )
+
             facturas = (
                 db.query(FacturaVenta)
                 .filter(
-                    FacturaVenta.estado_pago
-                    == "pendiente",
+                    FacturaVenta.estado_pago == "pendiente",
+                    saldo_venta >= valor_min,
+                    saldo_venta <= valor_max,
                 )
                 .all()
             )
 
             for factura in facturas:
+                if ("factura_venta", factura.id) in consumidos:
+                    continue
+
                 if cls._coincide_valor(
                     extracto.valor,
                     float(
@@ -440,6 +554,10 @@ class ServicioConciliacionBancaria:
                         or factura.total
                         or 0,
                     ),
+                ) and cls._coincide_texto(
+                    referencia,
+                    descripcion,
+                    factura.numero,
                 ):
                     return (
                         "factura_venta",
@@ -453,6 +571,7 @@ class ServicioConciliacionBancaria:
         cls,
         db,
         extracto: ExtractoBancario,
+        consumidos: set[tuple[str, int]] | None = None,
     ) -> list[tuple[str, int, float, str]] | None:
         """
         Intenta, en orden: (1) el match exacto de un solo documento
@@ -461,11 +580,18 @@ class ServicioConciliacionBancaria:
         movimiento (pago único que cubre varias facturas), y (3) un
         pago parcial de una sola factura identificada por su número
         en la referencia/descripción del movimiento.
+
+        ``consumidos`` es el conjunto de documentos ya conciliados
+        que no deben reutilizarse; si no se pasa, se calcula.
         """
+
+        if consumidos is None:
+            consumidos = cls._documentos_consumidos(db)
 
         match_simple = cls._buscar_documento(
             db,
             extracto,
+            consumidos,
         )
 
         if match_simple is not None:
@@ -484,6 +610,7 @@ class ServicioConciliacionBancaria:
         combinacion = cls._buscar_combinacion_facturas(
             db,
             extracto,
+            consumidos,
         )
 
         if combinacion is not None:
@@ -493,6 +620,7 @@ class ServicioConciliacionBancaria:
         parcial = cls._buscar_pago_parcial(
             db,
             extracto,
+            consumidos,
         )
 
         if parcial is not None:
@@ -572,6 +700,7 @@ class ServicioConciliacionBancaria:
         cls,
         db,
         extracto: ExtractoBancario,
+        consumidos: set[tuple[str, int]] | None = None,
         *,
         maximo_candidatos: int = 15,
         maximo_facturas: int = 4,
@@ -589,6 +718,9 @@ class ServicioConciliacionBancaria:
 
         if objetivo <= 0:
             return None
+
+        if consumidos is None:
+            consumidos = cls._documentos_consumidos(db)
 
         tipo_doc, facturas = cls._facturas_pendientes_por_tipo(
             db,
@@ -609,6 +741,9 @@ class ServicioConciliacionBancaria:
         por_tercero: dict[int, list[tuple[int, float]]] = {}
 
         for factura in facturas:
+
+            if (tipo_doc, factura.id) in consumidos:
+                continue
 
             tercero_id = getattr(
                 factura,
@@ -661,11 +796,15 @@ class ServicioConciliacionBancaria:
         cls,
         db,
         extracto: ExtractoBancario,
+        consumidos: set[tuple[str, int]] | None = None,
     ) -> tuple[str, int, float, str] | None:
         objetivo = float(extracto.valor or 0)
 
         if objetivo <= 0:
             return None
+
+        if consumidos is None:
+            consumidos = cls._documentos_consumidos(db)
 
         referencia = str(
             extracto.referencia or "",
@@ -686,6 +825,9 @@ class ServicioConciliacionBancaria:
         )
 
         for factura in facturas:
+
+            if (tipo_doc, factura.id) in consumidos:
+                continue
 
             saldo = float(
                 factura.saldo_pendiente or factura.total or 0,
@@ -741,44 +883,144 @@ class ServicioConciliacionBancaria:
 
     @classmethod
     def _parsear_fecha(cls, texto: str):
+        """
+        Acepta los formatos de fecha que aparecen en los extractos
+        de los bancos colombianos: ISO, día/mes/año con ``/`` o
+        ``-`` y año de 2 o 4 dígitos, ``aaaammdd`` compacto, un
+        posible componente de hora que se descarta, y el mes
+        escrito con abreviatura o nombre en español o inglés
+        (``15-ene-2026``, ``15 DIC 25``).
+        """
+
         texto = str(texto or "").strip()
 
-        for formato in (
-            "%Y-%m-%d",
-            "%d/%m/%Y",
-            "%d-%m-%Y",
-        ):
-            try:
-                return datetime.strptime(
-                    texto,
-                    formato,
-                ).date()
+        if not texto:
+            return None
 
-            except ValueError:
-                continue
+        # Descarta un componente de hora ("dd/mm/aaaa 13:04:22").
+        solo_fecha = texto.split(" ")[0].split("T")[0].strip()
 
-        return None
+        for candidato in (solo_fecha, texto):
+            for formato in _FORMATOS_FECHA:
+                try:
+                    return datetime.strptime(
+                        candidato,
+                        formato,
+                    ).date()
+
+                except ValueError:
+                    continue
+
+        return cls._parsear_fecha_mes_textual(texto)
+
+    @classmethod
+    def _parsear_fecha_mes_textual(cls, texto: str):
+        coincidencia = re.search(
+            r"(\d{1,2})\s*[-/ ]\s*"
+            r"([A-Za-zÀ-ɏ]+)\.?\s*[-/ ]\s*"
+            r"(\d{2,4})",
+            texto,
+        )
+
+        if coincidencia is None:
+            return None
+
+        dia_raw, mes_raw, anio_raw = coincidencia.groups()
+
+        mes_norm = cls._normalizar_encabezado(mes_raw).replace(".", "")
+        mes = _MESES.get(mes_norm[:3])
+
+        if mes is None:
+            return None
+
+        anio = int(anio_raw)
+
+        if anio < 100:
+            anio += 2000
+
+        try:
+            return date(
+                anio,
+                mes,
+                int(dia_raw),
+            )
+
+        except ValueError:
+            return None
 
     @classmethod
     def _parsear_valor(cls, texto: str) -> float:
+        """
+        Normaliza importes de extractos bancarios con formatos
+        heterogéneos. Reconoce:
+
+        - Formato es-CO / europeo: ``1.234.567,89`` (punto de
+          miles, coma decimal), el más común en los bancos
+          colombianos a los que apunta este módulo.
+        - Formato en-US: ``1,234,567.89`` (coma de miles, punto
+          decimal).
+        - Enteros sin separador decimal: ``200000``.
+        - Negativos con signo (``-1.234,56``, ``1.234,56-``) o
+          entre paréntesis (``(1.234,56)``), habituales en
+          exportaciones contables.
+        - Prefijos de moneda y espacios: ``$ 1.234.567,89``.
+        """
+
         texto = str(
-            texto or "0",
+            texto if texto is not None else "0",
         ).strip()
 
-        texto = re.sub(
-            r"[^\d,.-]",
-            "",
-            texto,
-        ).replace(
-            ",",
-            "",
+        if not texto:
+            return 0.0
+
+        negativo = (
+            texto.startswith("-")
+            or texto.endswith("-")
+            or (texto.startswith("(") and texto.endswith(")"))
         )
 
+        limpio = re.sub(r"[^\d,.]", "", texto)
+
+        if not limpio:
+            return 0.0
+
+        tiene_coma = "," in limpio
+        tiene_punto = "." in limpio
+
+        if tiene_coma and tiene_punto:
+            # El separador más a la derecha es el decimal; el otro
+            # agrupa miles.
+            if limpio.rfind(",") > limpio.rfind("."):
+                decimal, miles = ",", "."
+            else:
+                decimal, miles = ".", ","
+
+            limpio = limpio.replace(miles, "").replace(decimal, ".")
+
+        elif tiene_coma or tiene_punto:
+            separador = "," if tiene_coma else "."
+            partes = limpio.split(separador)
+
+            if len(partes) > 2:
+                # p. ej. ``1.234.567`` -> todos son miles.
+                limpio = limpio.replace(separador, "")
+
+            elif len(partes[-1]) == 3 and partes[0]:
+                # Un único separador seguido de 3 dígitos es
+                # agrupador de miles (``1.500`` -> 1500); los
+                # importes bancarios usan 2 decimales.
+                limpio = limpio.replace(separador, "")
+
+            else:
+                limpio = limpio.replace(separador, ".")
+
         try:
-            return float(texto or 0)
+            valor = float(limpio or 0)
 
         except ValueError:
             return 0.0
+
+        return -valor if negativo else valor
 
     @classmethod
     def listar_extractos(cls) -> list[ExtractoBancario]:
@@ -838,6 +1080,18 @@ class ServicioConciliacionBancaria:
                 if extracto.tipo == "debito"
                 else cls._candidatos_credito(db)
             )
+
+            consumidos = cls._documentos_consumidos(db)
+
+            candidatos = [
+                fila
+                for fila in candidatos
+                if (
+                    fila["tipo_documento"],
+                    fila["documento_id"],
+                )
+                not in consumidos
+            ]
 
             candidatos.sort(
                 key=lambda fila: abs(
@@ -1011,6 +1265,13 @@ class ServicioConciliacionBancaria:
             if extracto.conciliado:
                 raise ValueError("El movimiento ya está conciliado.")
 
+            if (tipo_documento, documento_id) in cls._documentos_consumidos(
+                db,
+            ):
+                raise ValueError(
+                    "El documento ya está conciliado con otro movimiento.",
+                )
+
             registro = ConciliacionBancaria(
                 extracto_id=extracto.id,
                 tipo_documento=tipo_documento,
@@ -1047,15 +1308,31 @@ class ServicioConciliacionBancaria:
             if registro is None:
                 raise ValueError("Conciliación no encontrada.")
 
+            extracto_id = registro.extracto_id
+
+            # Un match combinado genera varias filas para el mismo
+            # movimiento: hay que borrarlas todas, no solo la
+            # seleccionada, o quedan huérfanas apuntando a un
+            # extracto que vuelve a estar pendiente.
+            hermanas = (
+                db.query(ConciliacionBancaria)
+                .filter(
+                    ConciliacionBancaria.extracto_id == extracto_id,
+                )
+                .all()
+            )
+
+            for fila in hermanas:
+                db.delete(fila)
+
             extracto = db.get(
                 ExtractoBancario,
-                registro.extracto_id,
+                extracto_id,
             )
 
             if extracto is not None:
                 extracto.conciliado = False
 
-            db.delete(registro)
             db.commit()
 
         except Exception:
