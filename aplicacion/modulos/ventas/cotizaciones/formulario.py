@@ -2677,9 +2677,19 @@ class FormularioCotizacion(Page):
 
         if not cabecera.get("cliente_id"):
 
+            foco_cliente = getattr(
+                self.cliente,
+                "btn",
+                None,
+            ) or getattr(
+                self.cliente,
+                "txt",
+                None,
+            )
+
             return (
                 "Seleccione el cliente antes de guardar.",
-                getattr(self.cliente, "txt", None),
+                foco_cliente,
             )
 
         if not lineas:

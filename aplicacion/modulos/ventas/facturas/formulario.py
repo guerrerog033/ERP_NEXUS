@@ -498,6 +498,48 @@ class FormularioFacturaVenta(
             self._actualizar_altura_tabla,
         )
 
+        if not getattr(self, "_foco_inicial_aplicado", False):
+
+            self._foco_inicial_aplicado = True
+
+            QTimer.singleShot(
+                0,
+                self._aplicar_foco_inicial,
+            )
+
+    def _aplicar_foco_inicial(
+        self,
+    ) -> None:
+        """
+        Al abrir: si falta el cliente, foco en su selector; si ya
+        está, foco en el botón de producto de la primera fila para
+        empezar a cargar ítems de una.
+        """
+
+        selector_cliente = getattr(
+            self.cliente,
+            "btn",
+            None,
+        )
+
+        if not self.cliente.valor():
+
+            if selector_cliente is not None:
+
+                selector_cliente.setFocus()
+
+            return
+
+        boton = self._boton_producto_fila(0)
+
+        if boton is not None:
+
+            boton.setFocus()
+
+        elif selector_cliente is not None:
+
+            selector_cliente.setFocus()
+
     def _adaptar_cabecera_factura(
         self,
     ):
