@@ -42,12 +42,18 @@ def construir_pie_electronico(
 
         return []
 
-    qr = qr_imagen(
-        documento.get(
-            "qr_url",
-            cufe,
+    qr = [
+        qr_imagen(
+            documento.get(
+                "qr_url",
+                cufe,
+            ),
         ),
-    )
+        Paragraph(
+            "Validación DIAN",
+            estilos["pequeno"],
+        ),
+    ]
 
     texto = [
         Paragraph(

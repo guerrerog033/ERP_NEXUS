@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from reportlab.lib.enums import TA_RIGHT
+from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import mm
 from reportlab.platypus import (
     Image,
@@ -12,6 +14,8 @@ from reportlab.platypus import (
 )
 
 from aplicacion.framework.reportes.pdf.estilos import (
+    AZUL_NEXUS,
+    AZUL_OSCURO,
     estilos_reportlab,
 )
 
@@ -62,6 +66,30 @@ def construir_encabezado_empresa(
 
         estilos = estilos_reportlab()
 
+    titulo_emisor = ParagraphStyle(
+        "titulo_emisor",
+        parent=estilos["normal"],
+        fontName="Helvetica-Bold",
+        fontSize=13,
+        leading=15,
+        textColor=AZUL_OSCURO,
+    )
+
+    titulo_doc = ParagraphStyle(
+        "titulo_doc",
+        parent=titulo_emisor,
+        fontSize=15,
+        leading=17,
+        alignment=TA_RIGHT,
+    )
+
+    subtitulo_doc = ParagraphStyle(
+        "subtitulo_doc",
+        parent=estilos["subtitulo"],
+        alignment=TA_RIGHT,
+        textColor=AZUL_NEXUS,
+    )
+
     razon = (
         empresa.get(
             "razon_social",
@@ -95,10 +123,23 @@ def construir_encabezado_empresa(
 
         nit_texto = f"{nit}-{dv}"
 
+    fiscal = " · ".join(
+        parte
+        for parte in (
+            str(empresa.get("regimen", "") or "").strip(),
+            str(empresa.get("responsable_iva", "") or "").strip(),
+        )
+        if parte
+    )
+
+    actividad = str(
+        empresa.get("actividad_economica", "") or "",
+    ).strip()
+
     bloque_empresa = [
         Paragraph(
             f"<b>{razon}</b>",
-            estilos["titulo"],
+            titulo_emisor,
         ),
         Paragraph(
             f"NIT: {nit_texto}",
@@ -136,10 +177,28 @@ def construir_encabezado_empresa(
         ),
     ]
 
+    if fiscal:
+
+        bloque_empresa.append(
+            Paragraph(
+                fiscal,
+                estilos["pequeno"],
+            ),
+        )
+
+    if actividad:
+
+        bloque_empresa.append(
+            Paragraph(
+                f"Actividad económica: {actividad}",
+                estilos["pequeno"],
+            ),
+        )
+
     bloque_documento = [
         Paragraph(
             f"<b>{titulo_documento}</b>",
-            estilos["titulo"],
+            titulo_doc,
         ),
     ]
 
@@ -148,7 +207,7 @@ def construir_encabezado_empresa(
         bloque_documento.append(
             Paragraph(
                 f"<b>No. {numero}</b>",
-                estilos["subtitulo"],
+                subtitulo_doc,
             ),
         )
 
@@ -180,8 +239,8 @@ def construir_encabezado_empresa(
             ],
         ],
         colWidths=[
-            320,
-            190,
+            300,
+            210,
         ],
     )
 
@@ -193,6 +252,12 @@ def construir_encabezado_empresa(
                     (0, 0),
                     (-1, -1),
                     "TOP",
+                ),
+                (
+                    "ALIGN",
+                    (1, 0),
+                    (1, 0),
+                    "RIGHT",
                 ),
             ],
         ),

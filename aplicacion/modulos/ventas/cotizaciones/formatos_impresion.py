@@ -299,6 +299,19 @@ def _empresa_desde_maestro() -> dict | None:
             empresa.pais
             or "Colombia"
         ),
+        "regimen": (
+            empresa.regimen_tributario
+            or ""
+        ).strip(),
+        "responsable_iva": (
+            "Responsable de IVA"
+            if getattr(empresa, "responsable_iva", True)
+            else "No responsable de IVA"
+        ),
+        "actividad_economica": (
+            empresa.actividad_economica
+            or ""
+        ).strip(),
         "notas_pie": "",
         "vendedor_nombre": "",
         "vendedor_correo": "",
@@ -372,15 +385,43 @@ def _datos_empresa() -> dict:
             "vendedor_telefono",
         )
         or "",
+        "regimen": Configuracion.obtener(
+            "empresa",
+            "regimen_tributario",
+        )
+        or "",
+        "responsable_iva": Configuracion.obtener(
+            "empresa",
+            "responsable_iva",
+        )
+        or "",
+        "actividad_economica": Configuracion.obtener(
+            "empresa",
+            "actividad_economica",
+        )
+        or "",
     }
+
+    maestro = _empresa_desde_maestro()
 
     if datos[
         "nombre"
     ].strip():
 
-        return datos
+        # Completa desde el maestro solo lo que la config no define
+        # (p. ej. régimen / responsabilidad fiscal para la
+        # representación gráfica).
+        if maestro is not None:
 
-    maestro = _empresa_desde_maestro()
+            for clave, valor in maestro.items():
+
+                if not str(
+                    datos.get(clave, "") or "",
+                ).strip():
+
+                    datos[clave] = valor
+
+        return datos
 
     if maestro is None:
 
