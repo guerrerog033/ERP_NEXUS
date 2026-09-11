@@ -134,6 +134,11 @@ def cliente_a_dto(
             "",
         )
         or "",
+        "departamento": datos.get(
+            "departamento",
+            "",
+        )
+        or "",
         "telefono": datos.get(
             "telefono",
             "",
@@ -141,6 +146,16 @@ def cliente_a_dto(
         or "",
         "correo": datos.get(
             "correo",
+            "",
+        )
+        or "",
+        "regimen": datos.get(
+            "regimen",
+            "",
+        )
+        or "",
+        "responsabilidad_fiscal": datos.get(
+            "responsabilidad_fiscal",
             "",
         )
         or "",

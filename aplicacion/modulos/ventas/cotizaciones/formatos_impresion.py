@@ -508,6 +508,9 @@ def _datos_cliente(
     nombre_cliente: str,
 ) -> dict:
 
+    from aplicacion.maestros.terceros.constantes import (
+        RESPONSABILIDAD_FISCAL,
+    )
     from aplicacion.maestros.terceros.servicio import (
         TerceroServicio,
     )
@@ -534,8 +537,11 @@ def _datos_cliente(
             "contacto": nombre_cliente,
             "direccion": "No aplica",
             "ciudad": "",
+            "departamento": "",
             "telefono": "",
             "correo": "",
+            "regimen": "",
+            "responsabilidad_fiscal": "",
         }
 
     nit = str(
@@ -577,6 +583,12 @@ def _datos_cliente(
         or "",
     ).strip()
 
+    responsabilidad = "; ".join(
+        etiqueta.split(":")[0].strip()
+        for campo, etiqueta in RESPONSABILIDAD_FISCAL
+        if getattr(cliente, campo, False)
+    )
+
     return {
         "nombre": nombre,
         "nit": nit,
@@ -586,11 +598,20 @@ def _datos_cliente(
             or "No aplica",
         ).strip(),
         "ciudad": ciudad,
+        "departamento": str(
+            getattr(cliente, "departamento", "")
+            or "",
+        ).strip(),
         "telefono": telefono,
         "correo": str(
             cliente.correo
             or "",
         ).strip(),
+        "regimen": str(
+            getattr(cliente, "tipo_regimen_iva", "")
+            or "",
+        ).strip(),
+        "responsabilidad_fiscal": responsabilidad,
     }
 
 
@@ -895,11 +916,11 @@ def _crear_contexto(
         )
 
     try:
-        from aplicacion.modulos.ventas.cotizaciones.servicios import (
-            ServicioCotizacion,
-        )
         from aplicacion.comunes.qr_util import (
             generar_qr_data_uri,
+        )
+        from aplicacion.modulos.ventas.cotizaciones.servicios import (
+            ServicioCotizacion,
         )
 
         datos_aceptacion = (
