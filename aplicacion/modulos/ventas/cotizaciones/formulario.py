@@ -1385,6 +1385,10 @@ class FormularioCotizacion(Page):
         envolver: bool = False,
     ) -> None:
 
+        self._conectar_enter_avanza(
+            widget,
+        )
+
         if envolver:
 
             widget = self._envolver_widget_celda(
@@ -1400,6 +1404,30 @@ class FormularioCotizacion(Page):
         self.tabla.takeItem(
             fila,
             columna,
+        )
+
+    @staticmethod
+    def _conectar_enter_avanza(
+        widget: QWidget,
+    ) -> None:
+        """
+        Enter en un spin/combo editable de la tabla de ítems avanza
+        al siguiente campo del tab order, como en una planilla, en
+        vez de no hacer nada o pitar.
+        """
+
+        editor = getattr(
+            widget,
+            "lineEdit",
+            lambda: None,
+        )()
+
+        if editor is None:
+
+            return
+
+        editor.returnPressed.connect(
+            widget.focusNextChild,
         )
 
     def _impuesto_iva_predeterminado_id(
@@ -2485,6 +2513,27 @@ class FormularioCotizacion(Page):
         )
 
     def _recalcular_totales(self):
+        """
+        Punto de entrada de todas las señales de edición. Coalescea
+        los recálculos en una sola pasada tras una pausa corta para
+        no recorrer toda la tabla en cada tecla / rueda del mouse.
+        """
+
+        timer = getattr(self, "_timer_totales", None)
+
+        if timer is None:
+
+            from PySide6.QtCore import QTimer
+
+            timer = QTimer(self)
+            timer.setSingleShot(True)
+            timer.setInterval(120)
+            timer.timeout.connect(self._recalcular_totales_ahora)
+            self._timer_totales = timer
+
+        timer.start()
+
+    def _recalcular_totales_ahora(self):
 
         lineas = self._obtener_lineas()
 
@@ -2643,31 +2692,135 @@ class FormularioCotizacion(Page):
             "reteiva_id": self.celda_reteiva.valor(),
         }
 
-    def guardar(self):
+    @staticmethod
+    def _linea_vacia(linea: dict) -> bool:
+
+        return not (
+            linea.get("producto_id")
+            or str(linea.get("descripcion") or "").strip()
+            or float(linea.get("cantidad") or 0)
+            or float(linea.get("precio_unitario") or 0)
+        )
+
+    def _lineas_no_vacias(
+        self,
+        lineas: list[dict],
+    ) -> list[dict]:
+
+        return [
+            linea
+            for linea in lineas
+            if not FormularioCotizacion._linea_vacia(linea)
+        ]
+
+    def _validar_documento_basico(
+        self,
+        cabecera: dict,
+        lineas: list[dict],
+    ):
+        """
+        Validación de cliente en pantalla antes de golpear el
+        datasource. Devuelve ``(mensaje, widget_a_enfocar)`` o
+        ``(None, None)`` si está todo bien.
+        """
+
+        if not cabecera.get("cliente_id"):
+
+            foco_cliente = getattr(
+                self.cliente,
+                "btn",
+                None,
+            ) or getattr(
+                self.cliente,
+                "txt",
+                None,
+            )
+
+            return (
+                "Seleccione el cliente antes de guardar.",
+                foco_cliente,
+            )
+
+        if not lineas:
+
+            return (
+                "Agregue al menos un ítem con producto y cantidad.",
+                self.tabla,
+            )
+
+        for indice, linea in enumerate(lineas, start=1):
+
+            tiene_producto = bool(
+                linea.get("producto_id")
+                or str(linea.get("descripcion") or "").strip(),
+            )
+
+            if not tiene_producto:
+
+                return (
+                    f"El ítem {indice} no tiene producto ni descripción.",
+                    self.tabla,
+                )
+
+            if float(linea.get("cantidad") or 0) <= 0:
+
+                return (
+                    f"El ítem {indice} debe tener cantidad mayor que cero.",
+                    self.tabla,
+                )
+
+            if float(linea.get("precio_unitario") or 0) < 0:
+
+                return (
+                    f"El ítem {indice} tiene un precio negativo.",
+                    self.tabla,
+                )
+
+        return (None, None)
+
+    def _guardar_documento(
+        self,
+        *,
+        etiqueta: str,
+    ):
+        """
+        Flujo común de guardado con validación en pantalla y foco en
+        el campo con el problema. Devuelve el registro guardado o
+        ``None`` si no se guardó.
+        """
+
+        cabecera = self._obtener_cabecera()
+
+        lineas = self._lineas_no_vacias(
+            self._obtener_lineas(),
+        )
+
+        mensaje, foco = self._validar_documento_basico(
+            cabecera,
+            lineas,
+        )
+
+        if mensaje:
+
+            QMessageBox.warning(
+                self,
+                "Datos incompletos",
+                mensaje,
+            )
+
+            if foco is not None:
+
+                foco.setFocus()
+
+            return None
 
         try:
 
-            cotizacion = self.datasource.guardar_completa(
-                self._obtener_cabecera(),
-                self._obtener_lineas(),
+            registro = self.datasource.guardar_completa(
+                cabecera,
+                lineas,
                 self.id_registro,
             )
-
-            self.id_registro = cotizacion.id
-
-            self.es_edicion = True
-
-            self.txt_numero.setText(
-                cotizacion.numero,
-            )
-
-            QMessageBox.information(
-                self,
-                "Información",
-                "Cotización guardada correctamente.",
-            )
-
-            self.guardado.emit()
 
         except Exception as error:
 
@@ -2676,6 +2829,32 @@ class FormularioCotizacion(Page):
                 "Error",
                 str(error),
             )
+
+            return None
+
+        self.id_registro = registro.id
+
+        self.es_edicion = True
+
+        self.txt_numero.setText(
+            registro.numero,
+        )
+
+        QMessageBox.information(
+            self,
+            "Información",
+            f"{etiqueta} guardada correctamente.",
+        )
+
+        self.guardado.emit()
+
+        return registro
+
+    def guardar(self):
+
+        self._guardar_documento(
+            etiqueta="Cotización",
+        )
 
     def _datos_cotizacion_guardada(
         self,
