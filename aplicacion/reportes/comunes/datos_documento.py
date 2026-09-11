@@ -718,6 +718,10 @@ def cotizacion_a_dto(
         total - subtotal,
     )
 
+    items_cotizacion = items_desde_detalles(
+        detalles,
+    )
+
     return {
         "numero": str(
             cotizacion.numero or "",
@@ -759,8 +763,9 @@ def cotizacion_a_dto(
             cotizacion,
             nombre_cliente,
         ),
-        "items": items_desde_detalles(
-            detalles,
+        "items": items_cotizacion,
+        "resumen_impuestos": resumen_impuestos(
+            items_cotizacion,
         ),
         "observaciones": str(
             getattr(
@@ -790,6 +795,10 @@ def pedido_a_dto(
     impuestos = max(
         0.0,
         total - subtotal,
+    )
+
+    items_pedido = items_desde_detalles(
+        detalles,
     )
 
     return {
@@ -834,8 +843,9 @@ def pedido_a_dto(
             pedido,
             nombre_cliente,
         ),
-        "items": items_desde_detalles(
-            detalles,
+        "items": items_pedido,
+        "resumen_impuestos": resumen_impuestos(
+            items_pedido,
         ),
         "observaciones": str(
             getattr(

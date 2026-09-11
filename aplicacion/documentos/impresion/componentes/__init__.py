@@ -1,6 +1,7 @@
 from aplicacion.documentos.impresion.componentes.detalle import (
     construir_aplicacion_cartera,
     construir_bloque_totales,
+    construir_discriminacion_impuestos,
     construir_tabla_detalle,
     construir_tabla_impuestos,
     construir_tabla_logistica,
@@ -28,6 +29,7 @@ __all__ = [
     "construir_bloque_firmas",
     "construir_bloque_tercero",
     "construir_bloque_totales",
+    "construir_discriminacion_impuestos",
     "construir_encabezado_empresa",
     "construir_meta_documento",
     "construir_observaciones",

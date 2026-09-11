@@ -158,9 +158,19 @@ class PedidoVentaPDF(
 
         from aplicacion.documentos.impresion.componentes import (
             construir_bloque_totales,
+            construir_discriminacion_impuestos,
         )
 
         pedido = self.pedido
+
+        self.story.extend(
+            construir_discriminacion_impuestos(
+                pedido.get(
+                    "resumen_impuestos",
+                ),
+                estilos=self.estilos,
+            ),
+        )
 
         self.story.extend(
             construir_bloque_totales(
