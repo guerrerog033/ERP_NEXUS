@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import date
 
-from PySide6.QtCore import QDate, Signal
+from PySide6.QtCore import QDate, QTimer, Signal
 from PySide6.QtWidgets import (
     QDateEdit,
     QDoubleSpinBox,
@@ -235,6 +235,58 @@ class FormularioDocumentoSoporte(Page):
 
             self._cargar()
 
+        if not getattr(
+            self,
+            "_foco_inicial_aplicado",
+            False,
+        ):
+
+            self._foco_inicial_aplicado = True
+
+            QTimer.singleShot(
+                0,
+                self._aplicar_foco_inicial,
+            )
+
+    def _aplicar_foco_inicial(
+        self,
+    ) -> None:
+        """
+        Al abrir: si falta el proveedor, foco en su selector; si ya
+        está, foco en la descripción de la primera línea (celda de
+        tabla, no widget) para empezar a cargar ítems de una.
+        """
+
+        if not self.proveedor.valor():
+
+            self.proveedor.btn.setFocus()
+
+            return
+
+        if self.tabla.rowCount() == 0:
+
+            self.proveedor.btn.setFocus()
+
+            return
+
+        item = self.tabla.item(
+            0,
+            COL_DESCRIPCION,
+        )
+
+        if item is None:
+
+            self.proveedor.btn.setFocus()
+
+            return
+
+        self.tabla.setCurrentItem(
+            item,
+        )
+        self.tabla.editItem(
+            item,
+        )
+
     def _agregar_linea(self):
 
         fila = self.tabla.rowCount()
@@ -305,7 +357,137 @@ class FormularioDocumentoSoporte(Page):
             btn,
         )
 
+        for columna, widget in (
+            (COL_CANTIDAD, cantidad),
+            (COL_PRECIO, precio),
+            (COL_IMPUESTO, impuesto),
+        ):
+
+            self._conectar_enter_avanza(
+                widget,
+                columna,
+            )
+
         self._recalcular()
+
+    _ORDEN_COLUMNAS_FILA = (
+        COL_CANTIDAD,
+        COL_PRECIO,
+        COL_IMPUESTO,
+    )
+
+    @staticmethod
+    def _enfocar_widget(
+        widget,
+    ) -> None:
+
+        combo_interno = getattr(
+            widget,
+            "combo",
+            widget,
+        )
+
+        editor = getattr(
+            combo_interno,
+            "lineEdit",
+            lambda: None,
+        )()
+
+        (editor or widget).setFocus()
+
+    def _avanzar_desde(
+        self,
+        widget,
+        columna: int,
+    ) -> None:
+        """
+        Busca en qué fila está ``widget`` en este momento (no se
+        guarda el índice al conectar la señal, porque agregar o
+        borrar filas lo correría) y le pone foco al siguiente campo
+        de la planilla: la próxima columna de la misma fila, o la
+        cantidad de la fila de abajo si ya era la última columna
+        (la descripción es una celda de tabla, no un widget, así
+        que no participa de esta cadena).
+        """
+
+        for fila in range(
+            self.tabla.rowCount(),
+        ):
+
+            if (
+                self.tabla.cellWidget(
+                    fila,
+                    columna,
+                )
+                is not widget
+            ):
+
+                continue
+
+            indice = self._ORDEN_COLUMNAS_FILA.index(
+                columna,
+            )
+
+            if indice + 1 < len(
+                self._ORDEN_COLUMNAS_FILA,
+            ):
+
+                siguiente = self.tabla.cellWidget(
+                    fila,
+                    self._ORDEN_COLUMNAS_FILA[
+                        indice + 1
+                    ],
+                )
+
+            else:
+
+                siguiente = self.tabla.cellWidget(
+                    fila + 1,
+                    COL_CANTIDAD,
+                )
+
+            if siguiente is not None:
+
+                self._enfocar_widget(
+                    siguiente,
+                )
+
+            return
+
+    def _conectar_enter_avanza(
+        self,
+        widget,
+        columna: int,
+    ) -> None:
+        """
+        Enter en cantidad/precio/IVA avanza al siguiente como en
+        una planilla, en vez de no hacer nada.
+        """
+
+        manejador = (
+            lambda w=widget, c=columna: self._avanzar_desde(
+                w,
+                c,
+            )
+        )
+
+        combo_interno = getattr(
+            widget,
+            "combo",
+            widget,
+        )
+
+        editor = getattr(
+            combo_interno,
+            "lineEdit",
+            lambda: None,
+        )()
+
+        if editor is not None:
+
+            editor.returnPressed.connect(
+                manejador,
+            )
 
     def _borrar_linea(
         self,
@@ -331,7 +513,34 @@ class FormularioDocumentoSoporte(Page):
 
         self._recalcular()
 
-    def _recalcular(self):
+    def _recalcular(
+        self,
+    ):
+        """
+        Punto de entrada de todas las señales de edición. Coalescea
+        los recálculos en una sola pasada tras una pausa corta para
+        no recorrer toda la tabla en cada tecla / rueda del mouse.
+        """
+
+        timer = getattr(
+            self,
+            "_timer_totales",
+            None,
+        )
+
+        if timer is None:
+
+            timer = QTimer(self)
+            timer.setSingleShot(True)
+            timer.setInterval(120)
+            timer.timeout.connect(
+                self._recalcular_ahora,
+            )
+            self._timer_totales = timer
+
+        timer.start()
+
+    def _recalcular_ahora(self):
 
         lineas = self._lineas_formulario()
         cabecera = {}
@@ -486,13 +695,154 @@ class FormularioDocumentoSoporte(Page):
 
         self._recalcular()
 
+    @staticmethod
+    def _linea_vacia(
+        linea: dict,
+    ) -> bool:
+
+        return not (
+            str(
+                linea.get(
+                    "descripcion",
+                )
+                or "",
+            ).strip()
+            or float(
+                linea.get(
+                    "cantidad",
+                )
+                or 0,
+            )
+            or float(
+                linea.get(
+                    "precio_unitario",
+                )
+                or 0,
+            )
+        )
+
+    def _lineas_no_vacias(
+        self,
+        lineas: list[dict],
+    ) -> list[dict]:
+
+        return [
+            linea
+            for linea in lineas
+            if not FormularioDocumentoSoporte._linea_vacia(
+                linea,
+            )
+        ]
+
+    def _validar_documento_basico(
+        self,
+        cabecera: dict,
+        lineas: list[dict],
+    ):
+        """
+        Validación en pantalla antes de golpear el datasource.
+        Devuelve ``(mensaje, widget_a_enfocar)`` o ``(None, None)``
+        si está todo bien.
+        """
+
+        if not cabecera.get(
+            "proveedor_id",
+        ):
+
+            return (
+                "Seleccione el proveedor antes de guardar.",
+                self.proveedor.btn,
+            )
+
+        if not lineas:
+
+            return (
+                "Agregue al menos un ítem con descripción y "
+                "cantidad.",
+                self.tabla,
+            )
+
+        for indice, linea in enumerate(
+            lineas,
+            start=1,
+        ):
+
+            if not str(
+                linea.get(
+                    "descripcion",
+                )
+                or "",
+            ).strip():
+
+                return (
+                    f"El ítem {indice} no tiene descripción.",
+                    self.tabla,
+                )
+
+            if (
+                float(
+                    linea.get(
+                        "cantidad",
+                    )
+                    or 0,
+                )
+                <= 0
+            ):
+
+                return (
+                    f"El ítem {indice} debe tener cantidad "
+                    "mayor que cero.",
+                    self.tabla,
+                )
+
+            if (
+                float(
+                    linea.get(
+                        "precio_unitario",
+                    )
+                    or 0,
+                )
+                < 0
+            ):
+
+                return (
+                    f"El ítem {indice} tiene un precio negativo.",
+                    self.tabla,
+                )
+
+        return (None, None)
+
     def _guardar(self):
+
+        cabecera = self._cabecera_formulario()
+        lineas = self._lineas_no_vacias(
+            self._lineas_formulario(),
+        )
+
+        mensaje, foco = self._validar_documento_basico(
+            cabecera,
+            lineas,
+        )
+
+        if mensaje:
+
+            QMessageBox.warning(
+                self,
+                "Datos incompletos",
+                mensaje,
+            )
+
+            if foco is not None:
+
+                foco.setFocus()
+
+            return
 
         try:
 
             self.datasource.guardar_completa(
-                self._cabecera_formulario(),
-                self._lineas_formulario(),
+                cabecera,
+                lineas,
                 self.id_registro,
             )
 
