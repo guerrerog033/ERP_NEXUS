@@ -493,6 +493,61 @@ def _autorizacion_dian(
     )
 
 
+def _resolucion_dian_texto() -> str:
+    """
+    Frase de autorización de numeración para la representación
+    gráfica: número y fecha de la resolución, rango de numeración
+    habilitado y vigencia, tomados de la configuración DIAN.
+    """
+
+    def cfg(clave):
+        return str(
+            Configuracion.obtener("dian", clave) or "",
+        ).strip()
+
+    numero = cfg("resolucion_numero")
+
+    if not numero:
+        return ""
+
+    def fecha_cfg(clave):
+        crudo = cfg(clave)
+
+        if not crudo:
+            return ""
+
+        try:
+            return date.fromisoformat(crudo[:10]).strftime(
+                "%d/%m/%Y",
+            )
+
+        except ValueError:
+            return _formatear_fecha(crudo)
+
+    prefijo = cfg("prefijo_factura")
+    desde = cfg("resolucion_desde")
+    hasta = cfg("resolucion_hasta")
+    inicio = fecha_cfg("resolucion_fecha_inicio")
+    fin = fecha_cfg("resolucion_fecha_fin")
+
+    partes = [
+        f"Autorización de numeración DIAN No. {numero}",
+    ]
+
+    if inicio:
+        partes.append(f"del {inicio}")
+
+    if desde and hasta:
+        partes.append(
+            f"rango habilitado {prefijo}{desde} - {prefijo}{hasta}".strip(),
+        )
+
+    if fin:
+        partes.append(f"vigencia hasta {fin}")
+
+    return ", ".join(partes) + "."
+
+
 def factura_venta_a_dto(
     factura,
     detalles,
@@ -596,6 +651,7 @@ def factura_venta_a_dto(
         "autorizacion": _autorizacion_dian(
             factura,
         ),
+        "resolucion_dian": _resolucion_dian_texto(),
         "qr_url": url_qr_dian(
             cufe,
         )

@@ -85,14 +85,18 @@ def construir_pie_electronico(
             ),
         )
 
-    if documento.get(
+    resolucion = documento.get(
+        "resolucion_dian",
+    ) or documento.get(
         "autorizacion",
-    ):
+    )
+
+    if resolucion:
 
         texto.append(
             Paragraph(
-                f"<b>Resolución:</b> {documento['autorizacion']}",
-                estilos["normal"],
+                f"<b>Resolución:</b> {resolucion}",
+                estilos["pequeno"],
             ),
         )
 
