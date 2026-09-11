@@ -1692,37 +1692,9 @@ class FormularioFacturaVenta(
         self,
     ):
 
-        try:
-
-            factura = self.datasource.guardar_completa(
-                self._obtener_cabecera(),
-                self._obtener_lineas(),
-                self.id_registro,
-            )
-
-            self.id_registro = factura.id
-
-            self.es_edicion = True
-
-            self.txt_numero.setText(
-                factura.numero,
-            )
-
-            QMessageBox.information(
-                self,
-                "Información",
-                "Factura guardada correctamente.",
-            )
-
-            self.guardado.emit()
-
-        except Exception as error:
-
-            QMessageBox.critical(
-                self,
-                "Error",
-                str(error),
-            )
+        self._guardar_documento(
+            etiqueta="Factura",
+        )
 
     def _enviar_factura(
         self,
