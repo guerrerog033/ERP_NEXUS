@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import date
 
-from PySide6.QtCore import QDate, Qt, Signal
+from PySide6.QtCore import QDate, Qt, QTimer, Signal
 from PySide6.QtWidgets import (
     QComboBox,
     QDateEdit,
@@ -528,6 +528,47 @@ class FormularioFacturaCompra(Page):
 
             self._agregar_fila()
 
+        if not getattr(
+            self,
+            "_foco_inicial_aplicado",
+            False,
+        ):
+
+            self._foco_inicial_aplicado = True
+
+            QTimer.singleShot(
+                0,
+                self._aplicar_foco_inicial,
+            )
+
+    def _aplicar_foco_inicial(
+        self,
+    ) -> None:
+        """
+        Al abrir: si falta el proveedor, foco en su selector; si ya
+        está, foco en la descripción de la primera línea para
+        empezar a cargar ítems de una.
+        """
+
+        if not self.proveedor.valor():
+
+            self.proveedor.btn.setFocus()
+
+            return
+
+        descripcion = self._widget_fila(
+            0,
+            COL_DESCRIPCION,
+        )
+
+        if descripcion is not None:
+
+            descripcion.setFocus()
+
+        else:
+
+            self.proveedor.btn.setFocus()
+
     def _on_proveedor_seleccionado(
         self,
         resultado,
@@ -728,6 +769,18 @@ class FormularioFacturaCompra(Page):
             btn_borrar,
         )
 
+        for columna, widget in (
+            (COL_DESCRIPCION, descripcion),
+            (COL_CANTIDAD, cantidad),
+            (COL_PRECIO, precio),
+            (COL_IMPUESTO, impuesto),
+        ):
+
+            self._conectar_enter_avanza(
+                widget,
+                columna,
+            )
+
         self._recalcular_fila(
             fila,
         )
@@ -760,6 +813,137 @@ class FormularioFacturaCompra(Page):
             fila,
             columna,
         )
+
+    _ORDEN_COLUMNAS_FILA = (
+        COL_DESCRIPCION,
+        COL_CANTIDAD,
+        COL_PRECIO,
+        COL_IMPUESTO,
+    )
+
+    @staticmethod
+    def _enfocar_widget(
+        widget: QWidget,
+    ) -> None:
+
+        combo_interno = getattr(
+            widget,
+            "combo",
+            widget,
+        )
+
+        editor = getattr(
+            combo_interno,
+            "lineEdit",
+            lambda: None,
+        )()
+
+        (editor or widget).setFocus()
+
+    def _avanzar_desde(
+        self,
+        widget: QWidget,
+        columna: int,
+    ) -> None:
+        """
+        Busca en qué fila está ``widget`` en este momento (no se
+        guarda el índice al conectar la señal, porque agregar o
+        borrar filas lo correría) y le pone foco al siguiente campo
+        de la planilla: la próxima columna de la misma fila, o la
+        descripción de la fila de abajo si ya era la última
+        columna.
+        """
+
+        for fila in range(
+            self.tabla.rowCount(),
+        ):
+
+            if (
+                self._widget_fila(
+                    fila,
+                    columna,
+                )
+                is not widget
+            ):
+
+                continue
+
+            indice = self._ORDEN_COLUMNAS_FILA.index(
+                columna,
+            )
+
+            if indice + 1 < len(
+                self._ORDEN_COLUMNAS_FILA,
+            ):
+
+                siguiente = self._widget_fila(
+                    fila,
+                    self._ORDEN_COLUMNAS_FILA[
+                        indice + 1
+                    ],
+                )
+
+            else:
+
+                siguiente = self._widget_fila(
+                    fila + 1,
+                    COL_DESCRIPCION,
+                )
+
+            if siguiente is not None:
+
+                self._enfocar_widget(
+                    siguiente,
+                )
+
+            return
+
+    def _conectar_enter_avanza(
+        self,
+        widget: QWidget,
+        columna: int,
+    ) -> None:
+        """
+        Enter en un campo de la tabla de ítems avanza al siguiente
+        como en una planilla, en vez de no hacer nada. No usa el
+        tab order de Qt (``focusNextChild``) porque ese orden es
+        global al formulario y mezclarlo con el de la cabecera
+        movía el foco a otro lado del que se esperaba.
+        """
+
+        manejador = (
+            lambda w=widget, c=columna: self._avanzar_desde(
+                w,
+                c,
+            )
+        )
+
+        combo_interno = getattr(
+            widget,
+            "combo",
+            widget,
+        )
+
+        editor = getattr(
+            combo_interno,
+            "lineEdit",
+            lambda: None,
+        )()
+
+        if editor is not None:
+
+            editor.returnPressed.connect(
+                manejador,
+            )
+
+        elif isinstance(
+            widget,
+            QLineEdit,
+        ):
+
+            widget.returnPressed.connect(
+                manejador,
+            )
 
     def _recalcular_fila(
         self,
@@ -807,6 +991,33 @@ class FormularioFacturaCompra(Page):
         self._recalcular_totales()
 
     def _recalcular_totales(
+        self,
+    ):
+        """
+        Punto de entrada de todas las señales de edición. Coalescea
+        los recálculos en una sola pasada tras una pausa corta para
+        no recorrer toda la tabla en cada tecla / rueda del mouse.
+        """
+
+        timer = getattr(
+            self,
+            "_timer_totales",
+            None,
+        )
+
+        if timer is None:
+
+            timer = QTimer(self)
+            timer.setSingleShot(True)
+            timer.setInterval(120)
+            timer.timeout.connect(
+                self._recalcular_totales_ahora,
+            )
+            self._timer_totales = timer
+
+        timer.start()
+
+    def _recalcular_totales_ahora(
         self,
     ):
 
@@ -1213,13 +1424,152 @@ class FormularioFacturaCompra(Page):
 
         self._recalcular_totales()
 
+    @staticmethod
+    def _linea_vacia(
+        linea: dict,
+    ) -> bool:
+
+        return not (
+            str(
+                linea.get(
+                    "descripcion",
+                )
+                or "",
+            ).strip()
+            or float(
+                linea.get(
+                    "cantidad",
+                )
+                or 0,
+            )
+            or float(
+                linea.get(
+                    "precio_unitario",
+                )
+                or 0,
+            )
+        )
+
+    def _lineas_no_vacias(
+        self,
+        lineas: list[dict],
+    ) -> list[dict]:
+
+        return [
+            linea
+            for linea in lineas
+            if not FormularioFacturaCompra._linea_vacia(
+                linea,
+            )
+        ]
+
+    def _validar_documento_basico(
+        self,
+        cabecera: dict,
+        lineas: list[dict],
+    ):
+        """
+        Validación en pantalla antes de golpear el datasource.
+        Devuelve ``(mensaje, widget_a_enfocar)`` o ``(None, None)``
+        si está todo bien.
+        """
+
+        if not cabecera.get(
+            "proveedor_id",
+        ):
+
+            return (
+                "Seleccione el proveedor antes de guardar.",
+                self.proveedor.btn,
+            )
+
+        if not lineas:
+
+            return (
+                "Agregue al menos un ítem con descripción y "
+                "cantidad.",
+                self.tabla,
+            )
+
+        for indice, linea in enumerate(
+            lineas,
+            start=1,
+        ):
+
+            if not str(
+                linea.get(
+                    "descripcion",
+                )
+                or "",
+            ).strip():
+
+                return (
+                    f"El ítem {indice} no tiene descripción.",
+                    self.tabla,
+                )
+
+            if (
+                float(
+                    linea.get(
+                        "cantidad",
+                    )
+                    or 0,
+                )
+                <= 0
+            ):
+
+                return (
+                    f"El ítem {indice} debe tener cantidad "
+                    "mayor que cero.",
+                    self.tabla,
+                )
+
+            if (
+                float(
+                    linea.get(
+                        "precio_unitario",
+                    )
+                    or 0,
+                )
+                < 0
+            ):
+
+                return (
+                    f"El ítem {indice} tiene un precio negativo.",
+                    self.tabla,
+                )
+
+        return (None, None)
+
     def guardar(
         self,
     ):
 
-        try:
+        cabecera = self._obtener_cabecera()
+        lineas = self._lineas_no_vacias(
+            self._obtener_lineas(),
+        )
 
-            cabecera = self._obtener_cabecera()
+        mensaje, foco = self._validar_documento_basico(
+            cabecera,
+            lineas,
+        )
+
+        if mensaje:
+
+            QMessageBox.warning(
+                self,
+                "Datos incompletos",
+                mensaje,
+            )
+
+            if foco is not None:
+
+                foco.setFocus()
+
+            return
+
+        try:
 
             if (
                 self._ruta_xml_pendiente
@@ -1243,25 +1593,9 @@ class FormularioFacturaCompra(Page):
 
             factura = self.datasource.guardar_completa(
                 cabecera,
-                self._obtener_lineas(),
+                lineas,
                 self.id_registro,
             )
-
-            self.id_registro = factura.id
-            self.es_edicion = True
-            self._ruta_xml_pendiente = ""
-
-            self.txt_numero.setText(
-                factura.numero,
-            )
-
-            QMessageBox.information(
-                self,
-                "Información",
-                "Factura de compra guardada correctamente.",
-            )
-
-            self.guardado.emit()
 
         except Exception as error:
 
@@ -1270,3 +1604,21 @@ class FormularioFacturaCompra(Page):
                 "Error",
                 str(error),
             )
+
+            return
+
+        self.id_registro = factura.id
+        self.es_edicion = True
+        self._ruta_xml_pendiente = ""
+
+        self.txt_numero.setText(
+            factura.numero,
+        )
+
+        QMessageBox.information(
+            self,
+            "Información",
+            "Factura de compra guardada correctamente.",
+        )
+
+        self.guardado.emit()
