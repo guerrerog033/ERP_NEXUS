@@ -158,9 +158,19 @@ class CotizacionPDF(
 
         from aplicacion.documentos.impresion.componentes import (
             construir_bloque_totales,
+            construir_discriminacion_impuestos,
         )
 
         cotizacion = self.cotizacion
+
+        self.story.extend(
+            construir_discriminacion_impuestos(
+                cotizacion.get(
+                    "resumen_impuestos",
+                ),
+                estilos=self.estilos,
+            ),
+        )
 
         self.story.extend(
             construir_bloque_totales(

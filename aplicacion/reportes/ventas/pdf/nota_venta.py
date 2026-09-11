@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from reportlab.lib.units import mm
-from reportlab.platypus import Spacer
+from reportlab.platypus import Paragraph, Spacer
 
 from aplicacion.framework.reportes.pdf.documento_base import (
     DocumentoReportLab,
@@ -178,9 +178,44 @@ class NotaVentaPDF(
 
         from aplicacion.documentos.impresion.componentes import (
             construir_bloque_totales,
+            construir_tabla_impuestos,
         )
 
         nota = self.nota
+
+        resumen = nota.get(
+            "resumen_impuestos",
+        ) or []
+
+        if resumen:
+
+            self.story.append(
+                Paragraph(
+                    "<b>DISCRIMINACIÓN DE IMPUESTOS</b>",
+                    self.estilos["pequeno"],
+                ),
+            )
+
+            self.story.append(
+                Spacer(
+                    1,
+                    2 * mm,
+                ),
+            )
+
+            self.story.append(
+                construir_tabla_impuestos(
+                    resumen,
+                    estilos=self.estilos,
+                ),
+            )
+
+            self.story.append(
+                Spacer(
+                    1,
+                    4 * mm,
+                ),
+            )
 
         self.story.extend(
             construir_bloque_totales(

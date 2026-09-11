@@ -11,6 +11,7 @@ from aplicacion.framework.reportes.pdf.componentes import (
     bloque_totales,
     dinero,
     tabla_detalle,
+    tabla_impuestos,
 )
 from aplicacion.framework.reportes.pdf.estilos import (
     estilos_reportlab,
@@ -32,6 +33,62 @@ def construir_tabla_detalle(
         items,
         estilos,
     )
+
+
+def construir_tabla_impuestos(
+    resumen,
+    *,
+    estilos=None,
+):
+
+    if estilos is None:
+
+        estilos = estilos_reportlab()
+
+    return tabla_impuestos(
+        resumen or [],
+        estilos,
+    )
+
+
+def construir_discriminacion_impuestos(
+    resumen,
+    *,
+    estilos=None,
+):
+    """
+    Bloque "DISCRIMINACIÓN DE IMPUESTOS" (título + tabla) listo para
+    ``story.extend``. Devuelve ``[]`` si no hay impuestos.
+    """
+
+    if not resumen:
+
+        return []
+
+    if estilos is None:
+
+        estilos = estilos_reportlab()
+
+    from reportlab.lib.units import mm
+
+    return [
+        Paragraph(
+            "<b>DISCRIMINACIÓN DE IMPUESTOS</b>",
+            estilos["pequeno"],
+        ),
+        Spacer(
+            1,
+            2 * mm,
+        ),
+        tabla_impuestos(
+            resumen,
+            estilos,
+        ),
+        Spacer(
+            1,
+            4 * mm,
+        ),
+    ]
 
 
 def construir_bloque_totales(

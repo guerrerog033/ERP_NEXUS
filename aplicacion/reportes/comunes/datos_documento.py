@@ -8,6 +8,7 @@ from aplicacion.framework.reportes.numero_letras import (
 from aplicacion.modulos.ventas.cotizaciones.formatos_impresion import (
     _datos_cliente,
     _datos_empresa,
+    _etiqueta_impuesto_id,
     _porcentaje_impuesto_id,
     _unidad_producto,
 )
@@ -133,6 +134,11 @@ def cliente_a_dto(
             "",
         )
         or "",
+        "departamento": datos.get(
+            "departamento",
+            "",
+        )
+        or "",
         "telefono": datos.get(
             "telefono",
             "",
@@ -143,13 +149,28 @@ def cliente_a_dto(
             "",
         )
         or "",
+        "regimen": datos.get(
+            "regimen",
+            "",
+        )
+        or "",
+        "responsabilidad_fiscal": datos.get(
+            "responsabilidad_fiscal",
+            "",
+        )
+        or "",
     }
 
 
-def _impuesto_linea(
+def _impuesto_detalle_info(
     detalle,
     total_linea: float,
-) -> float:
+) -> tuple[str, float, float, float]:
+    """
+    Devuelve ``(etiqueta, porcentaje, base_gravable, valor)`` del
+    impuesto de la línea, para poder discriminarlo por tarifa en la
+    representación gráfica.
+    """
 
     impuesto_id = getattr(
         detalle,
@@ -161,12 +182,26 @@ def _impuesto_linea(
         impuesto_id,
     )
 
-    if (
-        porcentaje <= 0
-        or total_linea <= 0
-    ):
+    etiqueta = _etiqueta_impuesto_id(
+        impuesto_id,
+    ) or (
+        "IVA"
+        if porcentaje
+        else ""
+    )
 
-        return 0.0
+    total_linea = float(
+        total_linea or 0,
+    )
+
+    if porcentaje <= 0 or total_linea <= 0:
+
+        return (
+            etiqueta,
+            porcentaje,
+            max(0.0, total_linea),
+            0.0,
+        )
 
     incluye_iva = bool(
         getattr(
@@ -183,9 +218,11 @@ def _impuesto_linea(
             + porcentaje / 100
         )
 
-        return max(
-            0.0,
-            total_linea - base,
+        return (
+            etiqueta,
+            porcentaje,
+            base,
+            max(0.0, total_linea - base),
         )
 
     cantidad = float(
@@ -206,8 +243,72 @@ def _impuesto_linea(
         or 0,
     )
 
-    return cantidad * precio * (
-        porcentaje / 100
+    base = cantidad * precio
+
+    return (
+        etiqueta,
+        porcentaje,
+        base,
+        base * porcentaje / 100,
+    )
+
+
+def _impuesto_linea(
+    detalle,
+    total_linea: float,
+) -> float:
+
+    return _impuesto_detalle_info(
+        detalle,
+        total_linea,
+    )[3]
+
+
+def resumen_impuestos(
+    items: list[dict],
+) -> list[dict]:
+    """
+    Agrupa los impuestos de las líneas por etiqueta/tarifa para la
+    tabla de discriminación exigida en la representación gráfica.
+    """
+
+    grupos: dict[str, dict] = {}
+
+    for item in items:
+
+        valor = float(
+            item.get("impuestos", 0) or 0,
+        )
+
+        if valor <= 0:
+
+            continue
+
+        etiqueta = item.get(
+            "impuesto_etiqueta",
+        ) or "IVA"
+
+        grupo = grupos.setdefault(
+            etiqueta,
+            {
+                "etiqueta": etiqueta,
+                "porcentaje": float(
+                    item.get("impuesto_pct", 0) or 0,
+                ),
+                "base": 0.0,
+                "valor": 0.0,
+            },
+        )
+
+        grupo["base"] += float(
+            item.get("impuesto_base", 0) or 0,
+        )
+
+        grupo["valor"] += valor
+
+    return sorted(
+        grupos.values(),
+        key=lambda grupo: -grupo["valor"],
     )
 
 
@@ -263,6 +364,16 @@ def items_desde_detalles(
             or 0,
         )
 
+        (
+            impuesto_etiqueta,
+            impuesto_pct,
+            impuesto_base,
+            impuesto_valor,
+        ) = _impuesto_detalle_info(
+            detalle,
+            total,
+        )
+
         filas.append(
             {
                 "numero": indice,
@@ -277,10 +388,10 @@ def items_desde_detalles(
                 "cantidad": cantidad,
                 "precio": precio,
                 "descuento": descuento,
-                "impuestos": _impuesto_linea(
-                    detalle,
-                    total,
-                ),
+                "impuestos": impuesto_valor,
+                "impuesto_etiqueta": impuesto_etiqueta,
+                "impuesto_pct": impuesto_pct,
+                "impuesto_base": impuesto_base,
                 "total": total,
                 "unidad": _unidad_producto(
                     getattr(
@@ -337,6 +448,41 @@ def _descuento_documento(
     return 0.0
 
 
+def _forma_pago_documento(
+    documento,
+) -> str:
+    """
+    Forma de pago según la representación gráfica DIAN: Contado o
+    Crédito. Se deriva del vencimiento (si hay plazo respecto a la
+    fecha del documento es Crédito); ``estado_pago`` describe la
+    cobranza, no la forma de pago, y no debe usarse aquí.
+    """
+
+    fecha_doc = getattr(
+        documento,
+        "fecha",
+        None,
+    )
+
+    vencimiento = getattr(
+        documento,
+        "fecha_vencimiento",
+        None,
+    )
+
+    try:
+        if vencimiento and fecha_doc and vencimiento > fecha_doc:
+
+            dias = (vencimiento - fecha_doc).days
+
+            return f"Crédito ({dias} días)"
+
+    except TypeError:
+        pass
+
+    return "Contado"
+
+
 def _autorizacion_dian(
     documento,
 ) -> str:
@@ -360,6 +506,61 @@ def _autorizacion_dian(
         )
         or "",
     )
+
+
+def _resolucion_dian_texto() -> str:
+    """
+    Frase de autorización de numeración para la representación
+    gráfica: número y fecha de la resolución, rango de numeración
+    habilitado y vigencia, tomados de la configuración DIAN.
+    """
+
+    def cfg(clave):
+        return str(
+            Configuracion.obtener("dian", clave) or "",
+        ).strip()
+
+    numero = cfg("resolucion_numero")
+
+    if not numero:
+        return ""
+
+    def fecha_cfg(clave):
+        crudo = cfg(clave)
+
+        if not crudo:
+            return ""
+
+        try:
+            return date.fromisoformat(crudo[:10]).strftime(
+                "%d/%m/%Y",
+            )
+
+        except ValueError:
+            return _formatear_fecha(crudo)
+
+    prefijo = cfg("prefijo_factura")
+    desde = cfg("resolucion_desde")
+    hasta = cfg("resolucion_hasta")
+    inicio = fecha_cfg("resolucion_fecha_inicio")
+    fin = fecha_cfg("resolucion_fecha_fin")
+
+    partes = [
+        f"Autorización de numeración DIAN No. {numero}",
+    ]
+
+    if inicio:
+        partes.append(f"del {inicio}")
+
+    if desde and hasta:
+        partes.append(
+            f"rango habilitado {prefijo}{desde} - {prefijo}{hasta}".strip(),
+        )
+
+    if fin:
+        partes.append(f"vigencia hasta {fin}")
+
+    return ", ".join(partes) + "."
 
 
 def factura_venta_a_dto(
@@ -427,6 +628,10 @@ def factura_venta_a_dto(
         or "",
     ).strip()
 
+    items_factura = items_desde_detalles(
+        detalles,
+    )
+
     return {
         "numero": str(
             factura.numero or "",
@@ -439,17 +644,9 @@ def factura_venta_a_dto(
                 None,
             ),
         ),
-        "forma_pago": str(
-            getattr(
-                factura,
-                "estado_pago",
-                "",
-            )
-            or "",
-        ).replace(
-            "_",
-            " ",
-        ).title(),
+        "forma_pago": _forma_pago_documento(
+            factura,
+        ),
         "medio_pago": str(
             getattr(
                 factura,
@@ -469,6 +666,7 @@ def factura_venta_a_dto(
         "autorizacion": _autorizacion_dian(
             factura,
         ),
+        "resolucion_dian": _resolucion_dian_texto(),
         "qr_url": url_qr_dian(
             cufe,
         )
@@ -486,8 +684,9 @@ def factura_venta_a_dto(
             factura,
             nombre_cliente,
         ),
-        "items": items_desde_detalles(
-            detalles,
+        "items": items_factura,
+        "resumen_impuestos": resumen_impuestos(
+            items_factura,
         ),
         "observaciones": str(
             getattr(
@@ -517,6 +716,10 @@ def cotizacion_a_dto(
     impuestos = max(
         0.0,
         total - subtotal,
+    )
+
+    items_cotizacion = items_desde_detalles(
+        detalles,
     )
 
     return {
@@ -560,8 +763,9 @@ def cotizacion_a_dto(
             cotizacion,
             nombre_cliente,
         ),
-        "items": items_desde_detalles(
-            detalles,
+        "items": items_cotizacion,
+        "resumen_impuestos": resumen_impuestos(
+            items_cotizacion,
         ),
         "observaciones": str(
             getattr(
@@ -591,6 +795,10 @@ def pedido_a_dto(
     impuestos = max(
         0.0,
         total - subtotal,
+    )
+
+    items_pedido = items_desde_detalles(
+        detalles,
     )
 
     return {
@@ -635,8 +843,9 @@ def pedido_a_dto(
             pedido,
             nombre_cliente,
         ),
-        "items": items_desde_detalles(
-            detalles,
+        "items": items_pedido,
+        "resumen_impuestos": resumen_impuestos(
+            items_pedido,
         ),
         "observaciones": str(
             getattr(
@@ -2033,6 +2242,10 @@ def _nota_venta_a_dto(
         or "",
     ).strip()
 
+    items_nota = items_desde_detalles(
+        detalles,
+    )
+
     return {
         "numero": str(
             nota.numero or "",
@@ -2052,6 +2265,7 @@ def _nota_venta_a_dto(
         "autorizacion": _autorizacion_dian(
             nota,
         ),
+        "resolucion_dian": _resolucion_dian_texto(),
         "qr_url": url_qr_dian(
             cufe,
         )
@@ -2089,8 +2303,9 @@ def _nota_venta_a_dto(
             nota,
             nombre_cliente,
         ),
-        "items": items_desde_detalles(
-            detalles,
+        "items": items_nota,
+        "resumen_impuestos": resumen_impuestos(
+            items_nota,
         ),
         "observaciones": str(
             getattr(

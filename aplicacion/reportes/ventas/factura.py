@@ -93,17 +93,34 @@ class ReporteFacturaVenta(
             FacturaVentaPDF,
         )
 
+        electronica = bool(
+            str(
+                getattr(
+                    self.factura,
+                    "cufe",
+                    "",
+                )
+                or "",
+            ).strip(),
+        )
+
         dto = factura_venta_a_dto(
             self.factura,
             self.detalles,
             self.nombre_cliente,
-            electronica=False,
+            electronica=electronica,
+        )
+
+        titulo = (
+            "FACTURA ELECTRÓNICA DE VENTA"
+            if electronica
+            else "FACTURA DE VENTA"
         )
 
         return FacturaVentaPDF(
             ruta,
             empresa_reporte(),
             dto,
-            titulo="FACTURA DE VENTA",
-            electronica=False,
+            titulo=titulo,
+            electronica=electronica,
         ).construir()

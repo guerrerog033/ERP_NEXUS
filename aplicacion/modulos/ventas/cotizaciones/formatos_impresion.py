@@ -299,6 +299,19 @@ def _empresa_desde_maestro() -> dict | None:
             empresa.pais
             or "Colombia"
         ),
+        "regimen": (
+            empresa.regimen_tributario
+            or ""
+        ).strip(),
+        "responsable_iva": (
+            "Responsable de IVA"
+            if getattr(empresa, "responsable_iva", True)
+            else "No responsable de IVA"
+        ),
+        "actividad_economica": (
+            empresa.actividad_economica
+            or ""
+        ).strip(),
         "notas_pie": "",
         "vendedor_nombre": "",
         "vendedor_correo": "",
@@ -372,15 +385,43 @@ def _datos_empresa() -> dict:
             "vendedor_telefono",
         )
         or "",
+        "regimen": Configuracion.obtener(
+            "empresa",
+            "regimen_tributario",
+        )
+        or "",
+        "responsable_iva": Configuracion.obtener(
+            "empresa",
+            "responsable_iva",
+        )
+        or "",
+        "actividad_economica": Configuracion.obtener(
+            "empresa",
+            "actividad_economica",
+        )
+        or "",
     }
+
+    maestro = _empresa_desde_maestro()
 
     if datos[
         "nombre"
     ].strip():
 
-        return datos
+        # Completa desde el maestro solo lo que la config no define
+        # (p. ej. régimen / responsabilidad fiscal para la
+        # representación gráfica).
+        if maestro is not None:
 
-    maestro = _empresa_desde_maestro()
+            for clave, valor in maestro.items():
+
+                if not str(
+                    datos.get(clave, "") or "",
+                ).strip():
+
+                    datos[clave] = valor
+
+        return datos
 
     if maestro is None:
 
@@ -508,6 +549,9 @@ def _datos_cliente(
     nombre_cliente: str,
 ) -> dict:
 
+    from aplicacion.maestros.terceros.constantes import (
+        RESPONSABILIDAD_FISCAL,
+    )
     from aplicacion.maestros.terceros.servicio import (
         TerceroServicio,
     )
@@ -534,8 +578,11 @@ def _datos_cliente(
             "contacto": nombre_cliente,
             "direccion": "No aplica",
             "ciudad": "",
+            "departamento": "",
             "telefono": "",
             "correo": "",
+            "regimen": "",
+            "responsabilidad_fiscal": "",
         }
 
     nit = str(
@@ -577,6 +624,12 @@ def _datos_cliente(
         or "",
     ).strip()
 
+    responsabilidad = "; ".join(
+        etiqueta.split(":")[0].strip()
+        for campo, etiqueta in RESPONSABILIDAD_FISCAL
+        if getattr(cliente, campo, False)
+    )
+
     return {
         "nombre": nombre,
         "nit": nit,
@@ -586,11 +639,20 @@ def _datos_cliente(
             or "No aplica",
         ).strip(),
         "ciudad": ciudad,
+        "departamento": str(
+            getattr(cliente, "departamento", "")
+            or "",
+        ).strip(),
         "telefono": telefono,
         "correo": str(
             cliente.correo
             or "",
         ).strip(),
+        "regimen": str(
+            getattr(cliente, "tipo_regimen_iva", "")
+            or "",
+        ).strip(),
+        "responsabilidad_fiscal": responsabilidad,
     }
 
 
@@ -895,11 +957,11 @@ def _crear_contexto(
         )
 
     try:
-        from aplicacion.modulos.ventas.cotizaciones.servicios import (
-            ServicioCotizacion,
-        )
         from aplicacion.comunes.qr_util import (
             generar_qr_data_uri,
+        )
+        from aplicacion.modulos.ventas.cotizaciones.servicios import (
+            ServicioCotizacion,
         )
 
         datos_aceptacion = (
@@ -1824,9 +1886,26 @@ def _html_estandar(
         empresa,
     )
 
-    fecha_texto = ctx.cotizacion.fecha.strftime(
-        "%d/%m/%Y",
+    # El resto de formatos usa ``ctx.fecha`` (string ya formateado);
+    # ``_html_estandar`` era el único que reformateaba desde el
+    # documento y fallaba si no era una fecha (p. ej. notas).
+    fecha_texto = str(
+        getattr(ctx, "fecha", "") or "",
     )
+
+    if not fecha_texto:
+
+        fecha_doc = getattr(
+            ctx.cotizacion,
+            "fecha",
+            None,
+        )
+
+        fecha_texto = (
+            fecha_doc.strftime("%d/%m/%Y")
+            if hasattr(fecha_doc, "strftime")
+            else str(fecha_doc or "")
+        )
 
     ciudad_tel_cliente = (
         cliente[
@@ -2114,6 +2193,10 @@ def _html_estandar(
                 {_celda_valor_estandar(vendedor)}
             </tr>
         </table>
+
+        <div style="font-size:9pt;color:#333;margin-bottom:8px;">
+            {ctx.info_adicional}
+        </div>
 
         <table width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom:10px;">
             <tr bgcolor="#ececec" align="center" style="font-size:9pt;font-weight:bold;">
