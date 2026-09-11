@@ -11,6 +11,7 @@ from aplicacion.framework.reportes.pdf.componentes import (
     bloque_totales,
     dinero,
     tabla_detalle,
+    tabla_impuestos,
 )
 from aplicacion.framework.reportes.pdf.estilos import (
     estilos_reportlab,
@@ -30,6 +31,22 @@ def construir_tabla_detalle(
 
     return tabla_detalle(
         items,
+        estilos,
+    )
+
+
+def construir_tabla_impuestos(
+    resumen,
+    *,
+    estilos=None,
+):
+
+    if estilos is None:
+
+        estilos = estilos_reportlab()
+
+    return tabla_impuestos(
+        resumen or [],
         estilos,
     )
 

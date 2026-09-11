@@ -2232,6 +2232,10 @@ def _nota_venta_a_dto(
         or "",
     ).strip()
 
+    items_nota = items_desde_detalles(
+        detalles,
+    )
+
     return {
         "numero": str(
             nota.numero or "",
@@ -2251,6 +2255,7 @@ def _nota_venta_a_dto(
         "autorizacion": _autorizacion_dian(
             nota,
         ),
+        "resolucion_dian": _resolucion_dian_texto(),
         "qr_url": url_qr_dian(
             cufe,
         )
@@ -2288,8 +2293,9 @@ def _nota_venta_a_dto(
             nota,
             nombre_cliente,
         ),
-        "items": items_desde_detalles(
-            detalles,
+        "items": items_nota,
+        "resumen_impuestos": resumen_impuestos(
+            items_nota,
         ),
         "observaciones": str(
             getattr(
