@@ -1385,6 +1385,10 @@ class FormularioCotizacion(Page):
         envolver: bool = False,
     ) -> None:
 
+        self._conectar_enter_avanza(
+            widget,
+        )
+
         if envolver:
 
             widget = self._envolver_widget_celda(
@@ -1400,6 +1404,30 @@ class FormularioCotizacion(Page):
         self.tabla.takeItem(
             fila,
             columna,
+        )
+
+    @staticmethod
+    def _conectar_enter_avanza(
+        widget: QWidget,
+    ) -> None:
+        """
+        Enter en un spin/combo editable de la tabla de ítems avanza
+        al siguiente campo del tab order, como en una planilla, en
+        vez de no hacer nada o pitar.
+        """
+
+        editor = getattr(
+            widget,
+            "lineEdit",
+            lambda: None,
+        )()
+
+        if editor is None:
+
+            return
+
+        editor.returnPressed.connect(
+            widget.focusNextChild,
         )
 
     def _impuesto_iva_predeterminado_id(
