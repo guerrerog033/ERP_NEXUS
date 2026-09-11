@@ -439,37 +439,16 @@ class VistaNotaCreditoVenta(VistaDocumento):
             " · ".join(estado),
         )
 
-        filas = ""
-
-        for detalle in nota.detalles:
-
-            filas += (
-                "<tr>"
-                f"<td>{detalle.descripcion}</td>"
-                f"<td align='right'>{detalle.cantidad:.2f}</td>"
-                f"<td align='right'>${detalle.total_linea:,.2f}</td>"
-                "</tr>"
-            )
-
-        html = (
-            "<h2>Nota crédito de venta</h2>"
-            f"<p><b>Factura referencia:</b> "
-            f"{nota.factura_id}</p>"
-            f"<p><b>CUFE factura:</b> "
-            f"{nota.factura_cufe or '-'}</p>"
-            f"<p><b>Subtotal:</b> ${nota.subtotal:,.2f}<br>"
-            f"<b>IVA:</b> ${nota.iva:,.2f}<br>"
-            f"<b>Total:</b> ${nota.total:,.2f}</p>"
-            "<table border='1' cellspacing='0' "
-            "cellpadding='6' width='100%'>"
-            "<tr><th>Descripción</th>"
-            "<th>Cant.</th><th>Total</th></tr>"
-            f"{filas}"
-            "</table>"
+        from aplicacion.reportes.ventas.nota_credito import (
+            generar_html_nota_credito_venta,
         )
 
         self.establecer_html(
-            html,
+            generar_html_nota_credito_venta(
+                nota,
+                list(nota.detalles),
+                nombre_cliente,
+            ),
         )
 
         self._actualizar_botones()

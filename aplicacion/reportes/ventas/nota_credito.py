@@ -52,13 +52,64 @@ def _numero_factura_referencia(
         db.close()
 
 
-def _html_nota_credito_venta(
+def _es_electronica(nota) -> bool:
+
+    return bool(
+        str(
+            getattr(nota, "cufe", "") or "",
+        ).strip(),
+    )
+
+
+def _codigo_formato_nota() -> str:
+
+    from aplicacion.modulos.ventas.cotizaciones.formatos_impresion import (
+        normalizar_formato_codigo,
+    )
+    from aplicacion.modulos.ventas.cotizaciones.servicios import (
+        ServicioCotizacion,
+    )
+
+    predeterminado = normalizar_formato_codigo(
+        ServicioCotizacion.formato_predeterminado(),
+    )
+
+    if predeterminado in ServicioCotizacion.formatos_disponibles():
+
+        return predeterminado
+
+    return "estandar"
+
+
+def generar_html_nota_venta(
     nota,
     detalles,
     nombre_cliente: str,
     *,
+    tipo: str = "credito",
     factura_numero: str = "",
 ) -> str:
+    """
+    HTML de la nota (crédito o débito) usando el motor de formatos
+    compartido — mismo aspecto que la factura — en vez del bloque
+    suelto que se usaba en la vista previa.
+    """
+
+    from aplicacion.modulos.ventas.cotizaciones.formatos_impresion import (
+        generar_html_desde_contexto,
+    )
+    from aplicacion.reportes.comunes.datos_documento import (
+        nota_credito_venta_a_dto,
+        nota_debito_venta_a_dto,
+    )
+    from aplicacion.reportes.comunes.html_documento import (
+        contexto_formato_desde_dto,
+        dto_a_resumen_html,
+    )
+
+    es_debito = tipo == "debito"
+
+    palabra = "débito" if es_debito else "crédito"
 
     referencia = (
         factura_numero
@@ -71,33 +122,103 @@ def _html_nota_credito_venta(
         )
     )
 
-    filas = ""
+    electronica = _es_electronica(nota)
 
-    for detalle in detalles:
+    a_dto = (
+        nota_debito_venta_a_dto
+        if es_debito
+        else nota_credito_venta_a_dto
+    )
 
-        filas += (
-            "<tr>"
-            f"<td>{detalle.descripcion}</td>"
-            f"<td align='right'>{float(detalle.cantidad or 0):,.2f}</td>"
-            f"<td align='right'>${float(detalle.total_linea or 0):,.2f}</td>"
-            "</tr>"
+    dto = a_dto(
+        nota,
+        detalles,
+        nombre_cliente,
+        electronica=electronica,
+        factura_numero=referencia,
+    )
+
+    info: list[str] = []
+
+    if referencia:
+
+        info.append(
+            f"<p><b>Factura referencia:</b> {referencia}</p>",
         )
 
-    return (
-        "<h2>Nota crédito de venta</h2>"
-        f"<p><b>Cliente:</b> {nombre_cliente}</p>"
-        f"<p><b>Factura referencia:</b> {referencia}</p>"
-        f"<p><b>CUFE factura:</b> "
-        f"{getattr(nota, 'factura_cufe', '') or '-'}</p>"
-        f"<p><b>Subtotal:</b> ${float(nota.subtotal or 0):,.2f}<br>"
-        f"<b>IVA:</b> ${float(nota.iva or 0):,.2f}<br>"
-        f"<b>Total:</b> ${float(nota.total or 0):,.2f}</p>"
-        "<table border='1' cellspacing='0' "
-        "cellpadding='6' width='100%'>"
-        "<tr><th>Descripción</th>"
-        "<th>Cant.</th><th>Total</th></tr>"
-        f"{filas}"
-        "</table>"
+    if getattr(nota, "motivo", ""):
+
+        info.append(
+            f"<p><b>Motivo:</b> {nota.motivo}</p>",
+        )
+
+    if getattr(nota, "factura_cufe", ""):
+
+        info.append(
+            "<p><b>CUFE factura:</b> "
+            f"<span style='font-size:9pt;'>{nota.factura_cufe}</span></p>",
+        )
+
+    if electronica:
+
+        info.append(
+            "<p><b>CUFE:</b> "
+            f"<span style='font-size:9pt;'>{nota.cufe}</span></p>",
+        )
+
+    ctx = contexto_formato_desde_dto(
+        dto,
+        documento=nota,
+        detalles=detalles,
+        nombre_cliente=nombre_cliente,
+        resumen=dto_a_resumen_html(dto),
+        fecha=dto.get("fecha_generacion", ""),
+        etiqueta_documento=f"NOTA {palabra.upper()}",
+        titulo_documento=(
+            f"Nota {palabra} electrónica"
+            if electronica
+            else f"Nota {palabra} de venta"
+        ),
+        info_adicional="".join(info),
+        mostrar_imagenes=False,
+    )
+
+    return generar_html_desde_contexto(
+        ctx,
+        _codigo_formato_nota(),
+    )
+
+
+def generar_html_nota_credito_venta(
+    nota,
+    detalles,
+    nombre_cliente: str,
+    *,
+    factura_numero: str = "",
+) -> str:
+
+    return generar_html_nota_venta(
+        nota,
+        detalles,
+        nombre_cliente,
+        tipo="credito",
+        factura_numero=factura_numero,
+    )
+
+
+def _html_nota_credito_venta(
+    nota,
+    detalles,
+    nombre_cliente: str,
+    *,
+    factura_numero: str = "",
+) -> str:
+
+    return generar_html_nota_credito_venta(
+        nota,
+        detalles,
+        nombre_cliente,
+        factura_numero=factura_numero,
     )
 
 

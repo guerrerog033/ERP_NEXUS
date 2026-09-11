@@ -1886,9 +1886,26 @@ def _html_estandar(
         empresa,
     )
 
-    fecha_texto = ctx.cotizacion.fecha.strftime(
-        "%d/%m/%Y",
+    # El resto de formatos usa ``ctx.fecha`` (string ya formateado);
+    # ``_html_estandar`` era el único que reformateaba desde el
+    # documento y fallaba si no era una fecha (p. ej. notas).
+    fecha_texto = str(
+        getattr(ctx, "fecha", "") or "",
     )
+
+    if not fecha_texto:
+
+        fecha_doc = getattr(
+            ctx.cotizacion,
+            "fecha",
+            None,
+        )
+
+        fecha_texto = (
+            fecha_doc.strftime("%d/%m/%Y")
+            if hasattr(fecha_doc, "strftime")
+            else str(fecha_doc or "")
+        )
 
     ciudad_tel_cliente = (
         cliente[
@@ -2176,6 +2193,10 @@ def _html_estandar(
                 {_celda_valor_estandar(vendedor)}
             </tr>
         </table>
+
+        <div style="font-size:9pt;color:#333;margin-bottom:8px;">
+            {ctx.info_adicional}
+        </div>
 
         <table width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom:10px;">
             <tr bgcolor="#ececec" align="center" style="font-size:9pt;font-weight:bold;">

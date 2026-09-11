@@ -55,6 +55,10 @@ def _nota_credito_ui(
     detalle = SimpleNamespace(
         descripcion="Producto demo",
         cantidad=1.0,
+        precio_unitario=25000.0,
+        impuesto_id=None,
+        precio_incluye_iva=False,
+        producto_id=None,
         total_linea=29750.0,
     )
 
@@ -64,9 +68,11 @@ def _nota_credito_ui(
         estado=estado,
         estado_dian="",
         motivo="Devolución",
+        fecha=date.today(),
         cliente_id=1,
         factura_id=2,
         factura_cufe="CUFE-DEMO",
+        cufe="",
         subtotal=25000.0,
         iva=4750.0,
         total=29750.0,
@@ -83,6 +89,10 @@ def _nota_debito_ui(
     detalle = SimpleNamespace(
         descripcion="Intereses",
         cantidad=1.0,
+        precio_unitario=5000.0,
+        impuesto_id=None,
+        precio_incluye_iva=False,
+        producto_id=None,
         total_linea=5950.0,
     )
 
@@ -92,9 +102,11 @@ def _nota_debito_ui(
         estado=estado,
         estado_dian="",
         motivo="Intereses mora",
+        fecha=date.today(),
         cliente_id=1,
         factura_id=2,
         factura_cufe="CUFE-DEMO",
+        cufe="",
         subtotal=5000.0,
         iva=950.0,
         total=5950.0,
