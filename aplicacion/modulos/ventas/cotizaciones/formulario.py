@@ -2485,6 +2485,27 @@ class FormularioCotizacion(Page):
         )
 
     def _recalcular_totales(self):
+        """
+        Punto de entrada de todas las señales de edición. Coalescea
+        los recálculos en una sola pasada tras una pausa corta para
+        no recorrer toda la tabla en cada tecla / rueda del mouse.
+        """
+
+        timer = getattr(self, "_timer_totales", None)
+
+        if timer is None:
+
+            from PySide6.QtCore import QTimer
+
+            timer = QTimer(self)
+            timer.setSingleShot(True)
+            timer.setInterval(120)
+            timer.timeout.connect(self._recalcular_totales_ahora)
+            self._timer_totales = timer
+
+        timer.start()
+
+    def _recalcular_totales_ahora(self):
 
         lineas = self._obtener_lineas()
 
