@@ -2,9 +2,13 @@ from __future__ import annotations
 
 
 
-from PySide6.QtCore import QDate
+from PySide6.QtCore import QDate, Qt, QTimer
+
+from PySide6.QtGui import QKeySequence, QShortcut
 
 from PySide6.QtWidgets import (
+
+    QAbstractItemView,
 
     QComboBox,
 
@@ -288,6 +292,8 @@ class _DialogoOrdenCompra(QDialog):
 
         )
 
+        self.btn_agregar = btn_agregar
+
 
 
         btn_agregar.clicked.connect(
@@ -386,11 +392,60 @@ class _DialogoOrdenCompra(QDialog):
 
 
 
+        # Las celdas son solo lectura: _lineas es la fuente de verdad
+        # y editar la tabla no la actualizaba.
+        self.tabla.setEditTriggers(
+            QAbstractItemView.EditTrigger.NoEditTriggers,
+        )
+        self.tabla.setSelectionBehavior(
+            QAbstractItemView.SelectionBehavior.SelectRows,
+        )
+        self.tabla.setSelectionMode(
+            QAbstractItemView.SelectionMode.SingleSelection,
+        )
+
+
+
         layout.addWidget(
 
             self.tabla,
 
         )
+
+
+
+        pie = QHBoxLayout()
+
+        self.btn_quitar = QPushButton(
+            "Quitar línea",
+        )
+        self.btn_quitar.setToolTip(
+            "Quitar la línea seleccionada (Supr)",
+        )
+        self.btn_quitar.clicked.connect(
+            self._quitar_linea,
+        )
+
+        QShortcut(
+            QKeySequence(Qt.Key.Key_Delete),
+            self.tabla,
+            self._quitar_linea,
+            context=Qt.ShortcutContext.WidgetShortcut,
+        )
+
+        self.lbl_total = QLabel()
+        self.lbl_total.setAlignment(
+            Qt.AlignmentFlag.AlignRight
+            | Qt.AlignmentFlag.AlignVCenter,
+        )
+
+        pie.addWidget(self.btn_quitar)
+        pie.addStretch(1)
+        pie.addWidget(self.lbl_total)
+
+        layout.addLayout(pie)
+
+        self._actualizar_total()
 
 
 
@@ -424,6 +479,133 @@ class _DialogoOrdenCompra(QDialog):
 
 
 
+        # Enter en cant/costo avanza como una planilla (producto →
+        # cant → costo → agregar); ver keyPressEvent.
+        self.cantidad.lineEdit().returnPressed.connect(
+            lambda: self._enfocar_spin(self.costo),
+        )
+        self.costo.lineEdit().returnPressed.connect(
+            self._agregar_linea,
+        )
+
+        self._foco_inicial_aplicado = False
+
+
+
+    def keyPressEvent(
+        self,
+        event,
+    ):
+        """
+        QDialog convierte un Enter no consumido en un clic al botón
+        por defecto, y QDialogButtonBox marca Guardar como tal al
+        mostrarse: Enter en "Cant." guardaba la orden a medio
+        capturar. Enter sobre un botón enfocado lo maneja el propio
+        botón y no llega acá.
+        """
+
+        if event.key() in (
+            Qt.Key.Key_Return,
+            Qt.Key.Key_Enter,
+        ):
+
+            event.accept()
+
+            return
+
+        super().keyPressEvent(event)
+
+
+
+    def showEvent(
+        self,
+        event,
+    ):
+
+        super().showEvent(event)
+
+        if not self._foco_inicial_aplicado:
+
+            self._foco_inicial_aplicado = True
+
+            QTimer.singleShot(
+                0,
+                self._aplicar_foco_inicial,
+            )
+
+
+
+    def _aplicar_foco_inicial(self) -> None:
+        """
+        Al abrir: si falta el proveedor, foco en su selector; si ya
+        está, foco en el buscador de producto para empezar a cargar
+        líneas.
+        """
+
+        if self.proveedor.valor() is None:
+
+            self.proveedor.btn.setFocus()
+
+            return
+
+        self.producto.btn_buscar.setFocus()
+
+
+
+    @staticmethod
+    def _enfocar_spin(
+        spin,
+    ) -> None:
+
+        spin.setFocus()
+        spin.selectAll()
+
+
+
+    def _actualizar_total(self) -> None:
+
+        total = sum(
+            linea["cantidad"] * linea["costo_unitario"]
+            for linea in self._lineas
+        )
+
+        self.lbl_total.setText(
+            f"{len(self._lineas)} línea(s) · "
+            f"Total: <b>{total:,.2f}</b>",
+        )
+
+        self.btn_quitar.setEnabled(
+            bool(self._lineas),
+        )
+
+
+
+    def _quitar_linea(self) -> None:
+
+        fila = self.tabla.currentRow()
+
+        if fila < 0 or fila >= len(self._lineas):
+
+            return
+
+        del self._lineas[fila]
+
+        self.tabla.removeRow(fila)
+
+        self._actualizar_total()
+
+        if self._lineas:
+
+            self.tabla.selectRow(
+                min(fila, len(self._lineas) - 1),
+            )
+
+        else:
+
+            self.producto.btn_buscar.setFocus()
+
+
+
     def _producto_seleccionado(
 
         self,
@@ -448,6 +630,10 @@ class _DialogoOrdenCompra(QDialog):
 
             )
 
+        if self.producto.producto_id is not None:
+
+            self._enfocar_spin(self.cantidad)
+
 
 
     def _agregar_linea(self):
@@ -467,6 +653,8 @@ class _DialogoOrdenCompra(QDialog):
                 "Seleccione un producto.",
 
             )
+
+            self.producto.btn_buscar.setFocus()
 
 
 
@@ -596,6 +784,12 @@ class _DialogoOrdenCompra(QDialog):
 
         self.costo.setValue(0)
 
+        self._actualizar_total()
+
+        self.tabla.scrollToBottom()
+
+        self.producto.btn_buscar.setFocus()
+
 
 
     def _guardar(self):
@@ -620,7 +814,40 @@ class _DialogoOrdenCompra(QDialog):
 
             )
 
+            self.proveedor.btn.setFocus()
 
+
+
+            return
+
+
+
+        if self.producto.producto_id is not None:
+
+            # Producto elegido en la captura pero nunca agregado:
+            # guardar sin él lo perdería en silencio.
+            QMessageBox.warning(
+                self,
+                "Orden de compra",
+                "Hay un producto seleccionado que no se agregó. "
+                "Use «Agregar línea» o límpielo antes de guardar.",
+            )
+
+            self.btn_agregar.setFocus()
+
+            return
+
+
+
+        if not self._lineas:
+
+            QMessageBox.warning(
+                self,
+                "Orden de compra",
+                "Agregue al menos una línea.",
+            )
+
+            self.producto.btn_buscar.setFocus()
 
             return
 
