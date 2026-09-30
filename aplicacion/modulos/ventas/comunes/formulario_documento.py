@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QLabel,
-    QMessageBox,
 )
 
 from aplicacion.framework.base.page import Page
@@ -229,34 +227,6 @@ class FormularioDocumentoVenta(
         self,
     ):
 
-        try:
-
-            registro = self.datasource.guardar_completa(
-                self._obtener_cabecera(),
-                self._obtener_lineas(),
-                self.id_registro,
-            )
-
-            self.id_registro = registro.id
-
-            self.es_edicion = True
-
-            self.txt_numero.setText(
-                registro.numero,
-            )
-
-            QMessageBox.information(
-                self,
-                "Información",
-                self.mensaje_guardado,
-            )
-
-            self.guardado.emit()
-
-        except Exception as error:
-
-            QMessageBox.critical(
-                self,
-                "Error",
-                str(error),
-            )
+        self._guardar_documento(
+            mensaje=self.mensaje_guardado,
+        )

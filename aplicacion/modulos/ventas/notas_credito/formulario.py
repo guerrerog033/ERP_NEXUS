@@ -17,7 +17,6 @@ from aplicacion.modulos.ventas.notas_credito.nota_definition import (
 )
 from aplicacion.modulos.ventas.notas_credito.servicios import (
     MOTIVOS_NOTA_CREDITO,
-    ServicioNotaCreditoVenta,
 )
 
 
@@ -167,38 +166,6 @@ class FormularioNotaCreditoVenta(
         self,
     ):
 
-        from PySide6.QtWidgets import (
-            QMessageBox,
+        self._guardar_documento(
+            mensaje="Nota crédito guardada correctamente.",
         )
-
-        try:
-
-            nota = self.datasource.guardar_completa(
-                self._obtener_cabecera(),
-                self._obtener_lineas(),
-                self.id_registro,
-            )
-
-            self.id_registro = nota.id
-
-            self.es_edicion = True
-
-            self.txt_numero.setText(
-                nota.numero,
-            )
-
-            QMessageBox.information(
-                self,
-                "Información",
-                "Nota crédito guardada correctamente.",
-            )
-
-            self.guardado.emit()
-
-        except Exception as error:
-
-            QMessageBox.critical(
-                self,
-                "Error",
-                str(error),
-            )

@@ -8,6 +8,7 @@ from PySide6.QtCore import (
     QEvent,
     QObject,
     Qt,
+    QTimer,
     Signal,
 )
 from PySide6.QtWidgets import (
@@ -2781,12 +2782,15 @@ class FormularioCotizacion(Page):
     def _guardar_documento(
         self,
         *,
-        etiqueta: str,
+        etiqueta: str = "Documento",
+        mensaje: str | None = None,
     ):
         """
         Flujo común de guardado con validación en pantalla y foco en
         el campo con el problema. Devuelve el registro guardado o
-        ``None`` si no se guardó.
+        ``None`` si no se guardó. ``mensaje`` reemplaza el texto por
+        defecto "{etiqueta} guardada correctamente." cuando el
+        documento tiene uno propio (p. ej. ``self.mensaje_guardado``).
         """
 
         cabecera = self._obtener_cabecera()
@@ -2843,7 +2847,7 @@ class FormularioCotizacion(Page):
         QMessageBox.information(
             self,
             "Información",
-            f"{etiqueta} guardada correctamente.",
+            mensaje or f"{etiqueta} guardada correctamente.",
         )
 
         self.guardado.emit()
@@ -2855,6 +2859,97 @@ class FormularioCotizacion(Page):
         self._guardar_documento(
             etiqueta="Cotización",
         )
+
+    def _boton_producto_fila(
+        self,
+        fila: int,
+    ) -> QPushButton | None:
+
+        celda = self.tabla.cellWidget(
+            fila,
+            COL_PRODUCTO,
+        )
+
+        if celda is None:
+
+            return None
+
+        layout = celda.layout()
+
+        if (
+            layout is None
+            or layout.count() < 2
+        ):
+
+            return None
+
+        boton = layout.itemAt(
+            1,
+        ).widget()
+
+        if isinstance(
+            boton,
+            QPushButton,
+        ):
+
+            return boton
+
+        return None
+
+    def showEvent(
+        self,
+        event,
+    ):
+
+        super().showEvent(
+            event,
+        )
+
+        if not getattr(
+            self,
+            "_foco_inicial_aplicado",
+            False,
+        ):
+
+            self._foco_inicial_aplicado = True
+
+            QTimer.singleShot(
+                0,
+                self._aplicar_foco_inicial,
+            )
+
+    def _aplicar_foco_inicial(
+        self,
+    ) -> None:
+        """
+        Al abrir: si falta el cliente, foco en su selector; si ya
+        está, foco en el botón de producto de la primera fila para
+        empezar a cargar ítems de una.
+        """
+
+        selector_cliente = getattr(
+            self.cliente,
+            "btn",
+            None,
+        )
+
+        if not self.cliente.valor():
+
+            if selector_cliente is not None:
+
+                selector_cliente.setFocus()
+
+            return
+
+        boton = self._boton_producto_fila(0)
+
+        if boton is not None:
+
+            boton.setFocus()
+
+        elif selector_cliente is not None:
+
+            selector_cliente.setFocus()
 
     def _datos_cotizacion_guardada(
         self,
