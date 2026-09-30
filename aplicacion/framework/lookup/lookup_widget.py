@@ -58,6 +58,16 @@ class LookupWidget(QWidget):
 
         self.btn = Botones.buscar()
 
+        # Sin esto, Qt puede elegirlo como botón "default" implícito
+        # del diálogo que lo contenga (suele ser el primer botón
+        # autoDefault agregado, antes que Guardar): Enter en
+        # cualquier otro campo del formulario terminaba abriendo el
+        # buscador en vez de no hacer nada. Enter con foco real en
+        # este botón lo sigue activando igual.
+        self.btn.setAutoDefault(
+            False,
+        )
+
         layout.addWidget(
             self.txt
         )
