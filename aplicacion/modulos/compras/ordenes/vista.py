@@ -638,11 +638,21 @@ class _DialogoOrdenCompra(QDialog):
 
     def _agregar_linea(self):
 
-
-
         if self.producto.producto_id is None:
 
+            # Enter en "Costo" dispara returnPressed dos veces para
+            # una sola tecla (lo hace QAbstractSpinBox al validar su
+            # texto): la primera agrega la línea y limpia el
+            # producto, la segunda llega con el campo ya vacío. Sin
+            # esta guarda, cada línea agregada con Enter mostraba
+            # además "Seleccione un producto" de la nada.
+            if getattr(
+                self,
+                "_linea_agregada_recientemente",
+                False,
+            ):
 
+                return
 
             QMessageBox.warning(
 
@@ -783,6 +793,17 @@ class _DialogoOrdenCompra(QDialog):
         self.cantidad.setValue(1)
 
         self.costo.setValue(0)
+
+        self._linea_agregada_recientemente = True
+
+        QTimer.singleShot(
+            0,
+            lambda: setattr(
+                self,
+                "_linea_agregada_recientemente",
+                False,
+            ),
+        )
 
         self._actualizar_total()
 
