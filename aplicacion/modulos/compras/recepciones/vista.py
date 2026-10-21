@@ -112,6 +112,16 @@ class RecepcionesCompraPage(Page):
             ],
         )
 
+        # Solo la columna "Recibir" (spinbox) se edita; antes se podía
+        # escribir sobre producto/cantidades sin ningún efecto.
+        self.tabla.setEditTriggers(
+            QTableWidget.EditTrigger.NoEditTriggers,
+        )
+
+        self.tabla.horizontalHeader().setStretchLastSection(
+            True,
+        )
+
         layout.addWidget(self.tabla)
 
         barra = QHBoxLayout()
@@ -156,6 +166,10 @@ class RecepcionesCompraPage(Page):
                 "Estado",
                 "Observaciones",
             ],
+        )
+
+        self.historial.setEditTriggers(
+            QTableWidget.EditTrigger.NoEditTriggers,
         )
 
         layout.addWidget(
@@ -533,6 +547,39 @@ class RecepcionesCompraPage(Page):
                     "cantidad": cantidad,
                 },
             )
+
+        if not lineas:
+
+            QMessageBox.warning(
+                self,
+                "Recepciones",
+                "Indique en la columna «Recibir» la cantidad "
+                "recibida de al menos un producto.",
+            )
+
+            self.tabla.setFocus()
+
+            return
+
+        confirmar = QMessageBox.question(
+            self,
+            "Recepciones",
+            (
+                f"¿Registrar la recepción de {len(lineas)} "
+                f"producto(s) de la orden {self.orden.currentText()} "
+                f"en la bodega {self.bodega.currentText()}?\n\n"
+                "Esto suma las cantidades al inventario."
+            ),
+            QMessageBox.StandardButton.Yes
+            | QMessageBox.StandardButton.No,
+        )
+
+        if (
+            confirmar
+            != QMessageBox.StandardButton.Yes
+        ):
+
+            return
 
         try:
 
