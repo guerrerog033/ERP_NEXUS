@@ -8,8 +8,10 @@ from PySide6.QtWidgets import (
     QDateEdit,
     QDialog,
     QDialogButtonBox,
+    QDoubleSpinBox,
     QFormLayout,
     QHBoxLayout,
+    QLabel,
     QLineEdit,
     QMessageBox,
     QPushButton,
@@ -44,6 +46,8 @@ class CampoRegistro:
         requerido: bool = False,
         datasource=None,
         resolver_texto=None,
+        decimales: int = 2,
+        maximo: float = 999_999_999_999.0,
     ):
 
         self.nombre = nombre
@@ -53,6 +57,13 @@ class CampoRegistro:
         self.requerido = requerido
         self.datasource = datasource
         self.resolver_texto = resolver_texto
+
+        # tipo="numero": cantidades y precios con QDoubleSpinBox. Con
+        # QLineEdit, "45.000" (miles con punto, como se escribe en
+        # Colombia) se guardaba como 45 y "2,5" se rechazaba.
+        self.decimales = decimales
+
+        self.maximo = maximo
 
 
 class DialogoRegistro(QDialog):
@@ -146,6 +157,51 @@ class DialogoRegistro(QDialog):
                             texto=texto,
                         ),
                     )
+
+            elif campo.tipo == "numero":
+
+                widget = QDoubleSpinBox()
+
+                widget.setDecimals(
+                    campo.decimales,
+                )
+
+                widget.setRange(
+                    0,
+                    campo.maximo,
+                )
+
+                widget.setGroupSeparatorShown(
+                    True,
+                )
+
+                widget.setButtonSymbols(
+                    QDoubleSpinBox.ButtonSymbols.NoButtons,
+                )
+
+                widget.setMinimumWidth(
+                    160,
+                )
+
+                if valor not in (
+                    None,
+                    "",
+                ):
+
+                    try:
+
+                        widget.setValue(
+                            float(
+                                valor,
+                            ),
+                        )
+
+                    except (
+                        TypeError,
+                        ValueError,
+                    ):
+
+                        pass
 
             elif campo.tipo == "fecha":
 
@@ -248,15 +304,27 @@ class DialogoRegistro(QDialog):
                     campo.tipo == "fecha"
                     and widget.date() == widget.minimumDate()
                 )
+                or (
+                    campo.tipo == "numero"
+                    and widget.value() <= 0
+                )
             )
 
             if vacio:
 
+                mensaje = (
+                    f"El campo '{campo.etiqueta}' debe ser mayor que cero."
+                    if campo.tipo == "numero"
+                    else f"El campo '{campo.etiqueta}' es obligatorio."
+                )
+
                 QMessageBox.warning(
                     self,
                     "Falta información",
-                    f"El campo '{campo.etiqueta}' es obligatorio.",
+                    mensaje,
                 )
+
+                widget.setFocus()
 
                 return
 
@@ -289,6 +357,10 @@ class DialogoRegistro(QDialog):
             elif campo.tipo == "lookup":
 
                 resultado[campo.nombre] = widget.valor()
+
+            elif campo.tipo == "numero":
+
+                resultado[campo.nombre] = widget.value()
 
             elif campo.tipo == "fecha":
 
@@ -381,8 +453,32 @@ class ListaRegistrosWidget(QWidget):
             QAbstractItemView.NoEditTriggers,
         )
 
+        # Doble clic sobre una fila abre la edición, como en las demás
+        # tablas del ERP.
+        self.tabla.doubleClicked.connect(
+            lambda *_args: self._editar(),
+        )
+
         layout.addWidget(
             self.tabla,
+        )
+
+        # Sin registro padre guardado (formulario nuevo) no hay a qué
+        # asociar las filas: antes "Agregar" no hacía nada sin avisar.
+        self.lbl_sin_padre = QLabel(
+            "Guarde primero el registro para poder agregar elementos aquí.",
+        )
+
+        self.lbl_sin_padre.setWordWrap(
+            True,
+        )
+
+        self.lbl_sin_padre.setStyleSheet(
+            "color: #8a6d3b; font-style: italic;",
+        )
+
+        layout.addWidget(
+            self.lbl_sin_padre,
         )
 
         barra = QHBoxLayout()
@@ -429,6 +525,30 @@ class ListaRegistrosWidget(QWidget):
             self._eliminar,
         )
 
+        self._actualizar_estado_padre()
+
+    def _actualizar_estado_padre(
+        self,
+    ) -> None:
+
+        hay_padre = bool(
+            self.padre_id,
+        )
+
+        for boton in (
+            self.btn_agregar,
+            self.btn_editar,
+            self.btn_eliminar,
+        ):
+
+            boton.setEnabled(
+                hay_padre,
+            )
+
+        self.lbl_sin_padre.setVisible(
+            not hay_padre,
+        )
+
     def cargar(
         self,
         padre_id,
@@ -445,6 +565,8 @@ class ListaRegistrosWidget(QWidget):
         )
 
         self._refrescar_tabla()
+
+        self._actualizar_estado_padre()
 
     def _refrescar_tabla(
         self,
@@ -515,6 +637,20 @@ class ListaRegistrosWidget(QWidget):
             Qt.ItemDataRole.UserRole,
         ) if item else None
 
+    def _avisar_sin_seleccion(
+        self,
+    ) -> None:
+
+        if not self._registros:
+
+            return
+
+        QMessageBox.information(
+            self,
+            self.titulo_dialogo,
+            "Seleccione primero una fila de la tabla.",
+        )
+
     def _agregar(
         self,
     ) -> None:
@@ -564,6 +700,8 @@ class ListaRegistrosWidget(QWidget):
         registro_id = self._fila_seleccionada_id()
 
         if registro_id is None:
+
+            self._avisar_sin_seleccion()
 
             return
 
@@ -632,6 +770,8 @@ class ListaRegistrosWidget(QWidget):
         registro_id = self._fila_seleccionada_id()
 
         if registro_id is None:
+
+            self._avisar_sin_seleccion()
 
             return
 

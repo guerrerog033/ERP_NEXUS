@@ -2,6 +2,7 @@ from PySide6.QtWidgets import (
     QDialog,
     QGroupBox,
     QHBoxLayout,
+    QMessageBox,
     QPushButton,
     QVBoxLayout,
 )
@@ -108,6 +109,11 @@ class TerceroFormulario(FormularioBase):
 
         self._consultando = False
 
+        # Último (tipo, número) ya consultado o cargado. Evita repetir la
+        # consulta (local + DIAN/RUES, que puede tardar) cada vez que el
+        # campo pierde el foco sin que el documento haya cambiado.
+        self._ultima_consulta = None
+
         self._tipo_tercero_inicial = tipo_tercero_inicial
 
         super().__init__(
@@ -119,6 +125,34 @@ class TerceroFormulario(FormularioBase):
         self._aplicar_tipo_tercero_inicial()
 
         self._agregar_registros_relacionados()
+
+        if self.es_edicion:
+
+            self._ultima_consulta = self._clave_documento()
+
+    def _clave_documento(
+        self,
+    ):
+
+        tipo = self.widget(
+            "tipo_documento",
+        )
+
+        numero = self.widget(
+            "numero_documento",
+        )
+
+        if (
+            tipo is None
+            or numero is None
+        ):
+
+            return None
+
+        return (
+            tipo.currentText(),
+            numero.text().strip(),
+        )
 
     def _agregar_registros_relacionados(
         self,
@@ -535,7 +569,22 @@ class TerceroFormulario(FormularioBase):
 
             dv.setText("")
 
-            self._limpiar_campos_externos()
+            # Editando, borrar el número no debe vaciar nombre,
+            # dirección y contacto del tercero ya guardado.
+            if not self.es_edicion:
+
+                self._limpiar_campos_externos()
+
+            self._ultima_consulta = None
+
+            return
+
+        clave = (
+            tipo.currentText(),
+            numero_texto,
+        )
+
+        if clave == self._ultima_consulta:
 
             return
 
@@ -560,6 +609,11 @@ class TerceroFormulario(FormularioBase):
                 )
 
                 return
+
+            self._ultima_consulta = (
+                tipo.currentText(),
+                resultado.numero or numero_texto,
+            )
 
             numero.blockSignals(
                 True
@@ -586,18 +640,17 @@ class TerceroFormulario(FormularioBase):
                 and resultado.tercero is not None
             ):
 
-                self.cargar(
-
-                    resultado.tercero
-
+                self._manejar_tercero_existente(
+                    resultado.tercero,
                 )
 
-                self.mostrar_info(
+                return
 
-                    "El tercero ya existe en el sistema."
+            if self.es_edicion:
 
-                )
-
+                # Corrigiendo el documento de un tercero existente solo
+                # se recalcula el DV: no se reemplazan sus datos por los
+                # de la consulta externa.
                 return
 
             self._limpiar_campos_externos()
@@ -647,6 +700,138 @@ class TerceroFormulario(FormularioBase):
         finally:
 
             self._consultando = False
+
+    def _manejar_tercero_existente(
+        self,
+        tercero,
+    ) -> None:
+        """
+        El documento digitado ya pertenece a un tercero guardado.
+
+        - Editando ese mismo tercero: no hace nada (antes recargaba el
+          registro y borraba lo que el usuario llevaba editado).
+        - Editando otro tercero: avisa que el documento está repetido.
+        - Creando uno nuevo: ofrece abrir el existente para editarlo,
+          en lugar de copiar sus datos en un registro nuevo que luego
+          falla al guardar con "Ya existe un tercero con ese documento".
+        """
+
+        tercero_id = getattr(
+            tercero,
+            "id",
+            None,
+        )
+
+        nombre = self._nombre_tercero(
+            tercero,
+        )
+
+        if self.es_edicion:
+
+            if tercero_id == self.id_registro:
+
+                return
+
+            self.mostrar_error(
+                "Ya existe otro tercero con este documento"
+                f"{nombre}. Corrija el número antes de guardar."
+            )
+
+            return
+
+        if not self._preguntar(
+            "Este documento ya está registrado"
+            f"{nombre}.\n\n¿Desea abrirlo para editarlo?"
+        ):
+
+            return
+
+        self._cambiar_a_edicion(
+            tercero,
+        )
+
+    @staticmethod
+    def _nombre_tercero(
+        tercero,
+    ) -> str:
+
+        nombre = str(
+            getattr(
+                tercero,
+                "nombre_completo",
+                "",
+            )
+            or getattr(
+                tercero,
+                "razon_social",
+                "",
+            )
+            or ""
+        ).strip()
+
+        return f": {nombre}" if nombre else ""
+
+    def _preguntar(
+        self,
+        mensaje: str,
+    ) -> bool:
+
+        return (
+            QMessageBox.question(
+                self,
+                "Tercero existente",
+                mensaje,
+                QMessageBox.StandardButton.Yes
+                | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.Yes,
+            )
+            == QMessageBox.StandardButton.Yes
+        )
+
+    def _cambiar_a_edicion(
+        self,
+        tercero,
+    ) -> None:
+
+        from aplicacion.framework.form.modo import (
+            ModoFormulario,
+        )
+
+        tercero_id = getattr(
+            tercero,
+            "id",
+            None,
+        )
+
+        if tercero_id is None:
+
+            self.cargar(
+                tercero,
+            )
+
+            return
+
+        completo = None
+
+        if self.datasource is not None:
+
+            completo = self.datasource.obtener_por_id(
+                tercero_id,
+            )
+
+        self.id_registro = tercero_id
+
+        self.modo = ModoFormulario.EDICION
+
+        self.es_edicion = True
+
+        self.cargar(
+            completo or tercero,
+        )
+
+        self._ultima_consulta = self._clave_documento()
+
+        self._agregar_registros_relacionados()
 
     def _limpiar_campos_externos(
         self,

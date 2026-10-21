@@ -225,3 +225,105 @@ def test_eliminar_cancelado_no_borra():
         widget._eliminar()
 
     assert widget.tabla.rowCount() == 1
+
+
+def test_sin_registro_padre_deshabilita_botones_y_muestra_aviso():
+    widget = _widget()
+
+    widget.cargar(None)
+
+    assert not widget.btn_agregar.isEnabled()
+    assert not widget.btn_editar.isEnabled()
+    assert not widget.btn_eliminar.isEnabled()
+    assert not widget.lbl_sin_padre.isHidden()
+
+
+def test_con_registro_padre_habilita_botones_y_oculta_aviso():
+    widget = _widget()
+
+    widget.cargar(4)
+
+    assert widget.btn_agregar.isEnabled()
+    assert widget.lbl_sin_padre.isHidden()
+
+
+def test_editar_sin_seleccion_avisa_si_hay_filas():
+    widget = _widget()
+
+    widget.servicio.guardar(
+        {
+            "tercero_id": 2,
+            "banco": "Bancolombia",
+            "numero_cuenta": "111",
+        },
+    )
+
+    widget.cargar(2)
+
+    widget.tabla.clearSelection()
+
+    with patch(
+        "aplicacion.framework.ui.lista_registros_widget.QMessageBox.information",
+    ) as mock_info:
+        widget._editar()
+
+    mock_info.assert_called_once()
+
+
+def test_campo_numero_usa_spinbox_y_devuelve_float():
+    from PySide6.QtWidgets import QDoubleSpinBox
+
+    from aplicacion.framework.ui.lista_registros_widget import (
+        DialogoRegistro,
+    )
+
+    _qapp()
+
+    dialogo = DialogoRegistro(
+        "Escalón",
+        [
+            CampoRegistro(
+                "precio",
+                "Precio",
+                tipo="numero",
+                requerido=True,
+            ),
+        ],
+        valores={
+            "precio": "45000.50",
+        },
+    )
+
+    widget = dialogo._widgets["precio"]
+
+    assert isinstance(widget, QDoubleSpinBox)
+    assert dialogo.valores() == {"precio": 45000.5}
+
+
+def test_campo_numero_requerido_rechaza_cero():
+    from aplicacion.framework.ui.lista_registros_widget import (
+        DialogoRegistro,
+    )
+
+    _qapp()
+
+    dialogo = DialogoRegistro(
+        "Componente",
+        [
+            CampoRegistro(
+                "cantidad",
+                "Cantidad",
+                tipo="numero",
+                requerido=True,
+            ),
+        ],
+    )
+
+    with patch(
+        "aplicacion.framework.ui.lista_registros_widget.QMessageBox.warning",
+    ) as mock_warning:
+        dialogo._validar_y_aceptar()
+
+    mock_warning.assert_called_once()
+    assert "mayor que cero" in mock_warning.call_args.args[2]
+    assert dialogo.result() != QDialog.DialogCode.Accepted

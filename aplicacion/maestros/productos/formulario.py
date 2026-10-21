@@ -272,6 +272,8 @@ class FormularioProducto(FormularioBase):
                 CampoRegistro(
                     "cantidad",
                     "Cantidad",
+                    tipo="numero",
+                    decimales=4,
                     requerido=True,
                 ),
             ],
@@ -355,11 +357,13 @@ class FormularioProducto(FormularioBase):
                 CampoRegistro(
                     "cantidad_minima",
                     "Cantidad mínima",
+                    tipo="numero",
                     requerido=True,
                 ),
                 CampoRegistro(
                     "precio",
                     "Precio",
+                    tipo="numero",
                     requerido=True,
                 ),
             ],
@@ -463,9 +467,6 @@ class FormularioProducto(FormularioBase):
                 widget_variantes.isChecked(),
             )
 
-        self.atributos_variante_widget.cambio.connect(
-            self._sincronizar_atributos_variantes,
-        )
 
         widget_es_kit = self.widget(
             "es_kit",
@@ -584,8 +585,11 @@ class FormularioProducto(FormularioBase):
         visible: bool,
     ) -> None:
 
+        # En un producto nuevo el grupo también se muestra: la lista
+        # indica que hay que guardar primero para agregar componentes
+        # (antes no aparecía nada y no quedaba claro qué hacer).
         self._grupo_kit.setVisible(
-            visible and self.es_edicion,
+            visible,
         )
 
     def _actualizar_lote_serie_visible(
@@ -613,7 +617,7 @@ class FormularioProducto(FormularioBase):
         )
 
         self._grupo_lote_serie.setVisible(
-            requiere and self.es_edicion,
+            requiere,
         )
 
     @staticmethod
@@ -772,6 +776,84 @@ class FormularioProducto(FormularioBase):
 
         self.precio_volumen_widget.cargar(
             self.id_registro,
+        )
+
+    def _requiere_registros_relacionados(
+        self,
+    ) -> bool:
+
+        for nombre_campo in (
+            "es_kit",
+            "maneja_lote",
+            "maneja_serie",
+        ):
+
+            widget = self.widget(
+                nombre_campo,
+            )
+
+            if (
+                widget is not None
+                and widget.isChecked()
+            ):
+
+                return True
+
+        return False
+
+    def guardar_exitoso(
+        self,
+        objeto=None,
+        mensaje="Registro guardado correctamente.",
+    ):
+        """
+        Un producto nuevo marcado como kit o con lote/serie no puede
+        tener componentes ni lotes hasta existir en la base de datos.
+        Antes el formulario se cerraba al guardar y había que volver a
+        abrirlo para agregarlos; ahora queda abierto en modo edición.
+        """
+
+        registro_id = getattr(
+            objeto,
+            "id",
+            None,
+        )
+
+        if (
+            self.es_edicion
+            or registro_id is None
+            or not self._requiere_registros_relacionados()
+        ):
+
+            super().guardar_exitoso(
+                objeto,
+                mensaje,
+            )
+
+            return
+
+        from aplicacion.framework.form.modo import (
+            ModoFormulario,
+        )
+
+        self.id_registro = registro_id
+
+        self.modo = ModoFormulario.EDICION
+
+        self.es_edicion = True
+
+        # Recarga desde la BD para que precios y variantes queden con
+        # sus ids y un segundo "Guardar" actualice en vez de duplicar.
+        self._cargar_registro()
+
+        self._cargar_datos_adicionales()
+
+        self.guardado.emit()
+
+        self.mostrar_info(
+            "Producto guardado. Ya puede agregar los componentes "
+            "del kit o los lotes / números de serie y volver a "
+            "guardar si cambia algo más."
         )
 
     def valores(self):
