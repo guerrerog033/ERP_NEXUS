@@ -544,7 +544,11 @@ def test_documento_changed_carga_tercero_existente(
         form.datasource,
         "documento_changed",
         return_value=resultado,
-    ):
+    ), patch.object(
+        TerceroFormulario,
+        "_preguntar",
+        return_value=True,
+    ) as mock_preguntar:
         form.formulario.set_valor(
             "tipo_documento",
             "CC",
@@ -558,10 +562,12 @@ def test_documento_changed_carga_tercero_existente(
 
     binding = form.formulario.binding
 
+    # Ahora pregunta si abrir el existente en vez de copiarlo en
+    # silencio a un registro nuevo (que luego fallaba al guardar).
+    mock_preguntar.assert_called_once()
     assert binding.valor(
         "primer_nombre",
     ) == "Existente"
     assert binding.valor(
         "correo",
     ) == "existente@demo.com"
-    _mock_info.assert_called_once()
