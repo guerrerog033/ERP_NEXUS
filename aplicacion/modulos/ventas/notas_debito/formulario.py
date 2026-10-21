@@ -166,38 +166,6 @@ class FormularioNotaDebitoVenta(
         self,
     ):
 
-        from PySide6.QtWidgets import (
-            QMessageBox,
+        self._guardar_documento(
+            mensaje="Nota débito guardada correctamente.",
         )
-
-        try:
-
-            nota = self.datasource.guardar_completa(
-                self._obtener_cabecera(),
-                self._obtener_lineas(),
-                self.id_registro,
-            )
-
-            self.id_registro = nota.id
-
-            self.es_edicion = True
-
-            self.txt_numero.setText(
-                nota.numero,
-            )
-
-            QMessageBox.information(
-                self,
-                "Información",
-                "Nota débito guardada correctamente.",
-            )
-
-            self.guardado.emit()
-
-        except Exception as error:
-
-            QMessageBox.critical(
-                self,
-                "Error",
-                str(error),
-            )
