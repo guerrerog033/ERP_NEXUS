@@ -267,7 +267,7 @@ class CrudFormularioDialog:
                 ),
                 720,
             )
-            + 40,
+            + 160,
         )
 
         return formulario
