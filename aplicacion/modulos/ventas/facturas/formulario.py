@@ -297,15 +297,12 @@ class FormularioFacturaVenta(
                 estilo
                 + """
             QHeaderView::section {
-                background: qlineargradient(
-                    x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #2B4C78,
-                    stop:1 #1E3A5F
-                );
-                color: white;
-                font-weight: bold;
-                padding: 6px;
+                background: #F8FAFC;
+                color: #475569;
+                font-weight: 600;
+                padding: 8px 6px;
                 border: none;
+                border-bottom: 1px solid #E2E8F0;
             }
             """
             )
@@ -1011,10 +1008,10 @@ class FormularioFacturaVenta(
             if layout_totales is not None:
 
                 layout_totales.setContentsMargins(
-                    0,
-                    4,
-                    0,
-                    4,
+                    14,
+                    10,
+                    14,
+                    10,
                 )
 
                 layout_totales.setSpacing(
@@ -1026,7 +1023,7 @@ class FormularioFacturaVenta(
             )
 
             panel_totales.setMaximumWidth(
-                300,
+                360,
             )
 
         indice_acciones = None

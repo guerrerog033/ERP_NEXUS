@@ -27,10 +27,43 @@
    ========================================================== */
 
 QWidget{
-    background-color:#F3F5F8;
+    background-color:transparent;
     color:#1E293B;
     font-family:"Segoe UI";
     font-size:10pt;
+}
+
+/*
+   Los contenedores son transparentes: así no aparecen parches
+   grises dentro de las tarjetas blancas. Solo pintan fondo las
+   ventanas de primer nivel y las superficies que lo declaran.
+*/
+QMainWindow,
+QWidget#Dashboard{
+    background-color:#F3F5F8;
+}
+
+QDialog,
+QMessageBox,
+QCalendarWidget,
+QCalendarWidget QWidget,
+QAbstractItemView,
+QListView,
+QTreeView,
+QListWidget{
+    background-color:#FFFFFF;
+}
+
+QCalendarWidget QToolButton{
+    color:#1E293B;
+    background:transparent;
+    border:none;
+    padding:4px 8px;
+}
+
+QCalendarWidget QAbstractItemView:enabled{
+    selection-background-color:#1E3A5F;
+    selection-color:#FFFFFF;
 }
 
 QLabel{
@@ -46,9 +79,7 @@ QToolTip{
     border-radius:4px;
 }
 
-QMainWindow{
-    background-color:#F3F5F8;
-}
+
 
 
 /* ==========================================================
@@ -1349,4 +1380,61 @@ QProgressBar#PanelGerencialEmbudoBarra::chunk{
 
 QWidget#Dashboard{
     background-color:#F3F5F8;
+}
+
+
+/* ==========================================================
+   Hoja de documento (cotización, pedido, remisión, factura...)
+   ========================================================== */
+
+QLabel#DocumentoTituloHoja{
+    color:#1E293B;
+    font-size:17pt;
+    font-weight:700;
+    padding:0 0 6px 0;
+    border:none;
+}
+
+QFrame#DocumentoSeparador{
+    color:#E2E8F0;
+    background:#E2E8F0;
+    max-height:1px;
+    border:none;
+}
+
+QLabel#DocumentoEtiquetaSeccion{
+    color:#1E293B;
+    font-weight:600;
+}
+
+QPushButton#BotonAgregarLinea{
+    background:transparent;
+    color:#1E3A5F;
+    border:1px dashed #C9D6E6;
+    border-radius:6px;
+    padding:7px 14px;
+    font-weight:600;
+}
+
+QPushButton#BotonAgregarLinea:hover{
+    background:#EAF0F7;
+    border-color:#1E3A5F;
+}
+
+QWidget#PanelTotalesDocumento{
+    background:#F8FAFC;
+    border:1px solid #E2E8F0;
+    border-radius:8px;
+}
+
+QWidget#PanelTotalesDocumento QLabel{
+    color:#475569;
+}
+
+QLabel#DocumentoTotal{
+    color:#1E293B;
+    font-size:13pt;
+    font-weight:700;
+    padding-top:6px;
+    border-top:1px solid #E2E8F0;
 }

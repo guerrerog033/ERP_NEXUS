@@ -299,6 +299,10 @@ class FormularioCotizacion(Page):
 
         super()._crear_ui()
 
+        self.setObjectName(
+            "DocumentoPagina",
+        )
+
         self.layout_principal.setContentsMargins(
             0,
             0,
@@ -308,6 +312,32 @@ class FormularioCotizacion(Page):
 
         self.card = Card(
             "",
+        )
+
+        self.card.setObjectName(
+            "card",
+        )
+
+        self.card.layout_principal.setContentsMargins(
+            28,
+            22,
+            28,
+            18,
+        )
+
+        # Título del documento a la izquierda, como una hoja:
+        # "Nueva cotización", "Nueva factura de venta"...
+        self.card.set_titulo(
+            self._titulo_documento(),
+        )
+
+        self.card.lbl_titulo.setObjectName(
+            "DocumentoTituloHoja",
+        )
+
+        self.card.lbl_titulo.setAlignment(
+            Qt.AlignmentFlag.AlignLeft
+            | Qt.AlignmentFlag.AlignVCenter,
         )
 
         self.layout_principal.addWidget(
@@ -582,6 +612,10 @@ class FormularioCotizacion(Page):
             "Observaciones",
         )
 
+        etiqueta_observaciones.setObjectName(
+            "DocumentoEtiquetaSeccion",
+        )
+
         self.observaciones.setMinimumHeight(
             120,
         )
@@ -603,6 +637,10 @@ class FormularioCotizacion(Page):
             "Agregar línea",
         )
 
+        self.btn_agregar_linea.setObjectName(
+            "BotonAgregarLinea",
+        )
+
         acciones_lineas.addWidget(
             self.btn_agregar_linea,
         )
@@ -614,6 +652,15 @@ class FormularioCotizacion(Page):
 
         panel_totales = QWidget()
 
+        panel_totales.setObjectName(
+            "PanelTotalesDocumento",
+        )
+
+        panel_totales.setAttribute(
+            Qt.WidgetAttribute.WA_StyledBackground,
+            True,
+        )
+
         panel_totales.setMinimumWidth(
             360,
         )
@@ -623,10 +670,10 @@ class FormularioCotizacion(Page):
         )
 
         layout_totales.setContentsMargins(
-            0,
-            0,
-            0,
-            0,
+            14,
+            12,
+            14,
+            12,
         )
 
         layout_totales.setSpacing(
@@ -824,6 +871,10 @@ class FormularioCotizacion(Page):
 
         fuente_total = self.lbl_total.font()
 
+        self.lbl_total.setObjectName(
+            "DocumentoTotal",
+        )
+
         fuente_total.setBold(
             True,
         )
@@ -848,7 +899,25 @@ class FormularioCotizacion(Page):
             acciones_lineas,
         )
 
+        separador_botones = QFrame()
+
+        separador_botones.setObjectName(
+            "DocumentoSeparador",
+        )
+
+        separador_botones.setFrameShape(
+            QFrame.Shape.HLine,
+        )
+
+        self.card.agregar_widget(
+            separador_botones,
+        )
+
         botones = QHBoxLayout()
+
+        botones.setSpacing(
+            8,
+        )
 
         botones.addStretch()
 
@@ -879,6 +948,20 @@ class FormularioCotizacion(Page):
         self.btn_guardar = Botones.guardar()
 
         self.btn_cancelar = Botones.cancelar()
+
+        # Solo "Guardar" es botón principal; imprimir, PDF, WhatsApp y
+        # correo son acciones secundarias.
+        for boton_secundario in (
+            self.btn_imprimir,
+            self.btn_pdf,
+            self.btn_whatsapp,
+            self.btn_correo,
+            self.btn_cancelar,
+        ):
+
+            boton_secundario.setObjectName(
+                "BotonSecundario",
+            )
 
         botones.addWidget(
             self.btn_imprimir,
@@ -943,6 +1026,39 @@ class FormularioCotizacion(Page):
         else:
 
             self._agregar_linea()
+
+    def _titulo_documento(
+        self,
+    ) -> str:
+
+        nombre = str(
+            getattr(
+                self,
+                "titulo",
+                "Documento",
+            )
+            or "Documento",
+        )
+
+        if getattr(
+            self,
+            "es_edicion",
+            False,
+        ):
+
+            return nombre
+
+        masculino = nombre.split()[0].lower() in (
+            "pedido",
+            "documento",
+            "comprobante",
+            "recibo",
+        )
+
+        return (
+            f"{'Nuevo' if masculino else 'Nueva'} "
+            f"{nombre[0].lower()}{nombre[1:]}"
+        )
 
     def _cargar_registro(self):
 
