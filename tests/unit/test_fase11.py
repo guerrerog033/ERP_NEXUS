@@ -122,7 +122,7 @@ def test_engine_emite_campo_al_cambiar():
 
 def test_design_tokens():
 
-    assert colores.PRIMARY == "#1B4F8A"
+    assert colores.PRIMARY == "#1E3A5F"
     assert Colores.PRIMARIO == colores.PRIMARY
     assert dimensiones.CONTROL_MD == 36
 

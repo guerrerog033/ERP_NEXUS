@@ -72,7 +72,7 @@ def test_status_badge_info():
 
     assert badge is not None
     assert badge["texto"] == "Borrador"
-    assert badge["fondo"] == "#FEF3C7"
+    assert badge["fondo"] == "#F1F5F9"
 
 
 def test_registros_model_badge_role():

@@ -165,7 +165,7 @@ class POSCajaPage(Page):
             "Desglose por método de pago",
         )
         self.lbl_metodos.setStyleSheet(
-            "font-weight:600;color:#1B4F8A;",
+            "font-weight:600;color:#1E3A5F;",
         )
 
         card.contenido.addWidget(
@@ -201,7 +201,7 @@ class POSCajaPage(Page):
             "$0",
         )
         self.lbl_efectivo_esperado.setStyleSheet(
-            "font-size:18px;font-weight:700;color:#111827;",
+            "font-size:18px;font-weight:700;color:#1E293B;",
         )
 
         arqueo.addWidget(
@@ -248,7 +248,7 @@ class POSCajaPage(Page):
             "$0",
         )
         self.lbl_diferencia.setStyleSheet(
-            "font-size:16px;font-weight:600;color:#92400E;",
+            "font-size:16px;font-weight:600;color:#B54708;",
         )
 
         arqueo.addWidget(
@@ -329,14 +329,14 @@ class POSCajaPage(Page):
             titulo,
         )
         etiqueta.setStyleSheet(
-            "color:#6B7280;font-size:12px;",
+            "color:#64748B;font-size:12px;",
         )
 
         monto = QLabel(
             valor,
         )
         monto.setStyleSheet(
-            "font-size:24px;font-weight:700;color:#111827;",
+            "font-size:24px;font-weight:700;color:#1E293B;",
         )
 
         layout.addWidget(
@@ -502,13 +502,13 @@ class POSCajaPage(Page):
 
         diferencia = contado - esperado
 
-        color = "#065F46"
+        color = "#067647"
 
         if abs(
             diferencia,
         ) > 0.01:
 
-            color = "#B91C1C"
+            color = "#B42318"
 
         self.lbl_diferencia.setText(
             f"${diferencia:,.0f}",

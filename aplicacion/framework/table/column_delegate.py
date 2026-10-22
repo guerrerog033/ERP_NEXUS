@@ -99,24 +99,65 @@ class ColumnStyledDelegate(
             QPainter.RenderHint.Antialiasing,
         )
 
+        # Etiqueta tipo "píldora" del ancho del texto, alineada a la
+        # izquierda. Antes ocupaba toda la celda y la columna de
+        # estado se veía como barras de color.
+        texto_badge = str(
+            badge.get(
+                "texto",
+                "",
+            ),
+        )
+
+        metricas = option.fontMetrics
+
+        ancho = min(
+            metricas.horizontalAdvance(
+                texto_badge,
+            )
+            + 20,
+            option.rect.width() - 12,
+        )
+
+        alto = min(
+            metricas.height() + 6,
+            option.rect.height() - 6,
+        )
+
         rect = option.rect.adjusted(
-            6,
-            6,
-            -6,
-            -6,
+            8,
+            0,
+            0,
+            0,
+        )
+
+        rect.setWidth(
+            max(
+                ancho,
+                0,
+            ),
+        )
+
+        rect.setTop(
+            option.rect.top()
+            + (option.rect.height() - alto) // 2,
+        )
+
+        rect.setHeight(
+            alto,
         )
 
         fondo = QColor(
             badge.get(
                 "fondo",
-                "#E5E7EB",
+                "#E2E8F0",
             ),
         )
 
         texto_color = QColor(
             badge.get(
                 "texto_color",
-                "#111827",
+                "#1E293B",
             ),
         )
 
@@ -130,8 +171,8 @@ class ColumnStyledDelegate(
 
         painter.drawRoundedRect(
             rect,
-            10,
-            10,
+            alto / 2,
+            alto / 2,
         )
 
         painter.setPen(

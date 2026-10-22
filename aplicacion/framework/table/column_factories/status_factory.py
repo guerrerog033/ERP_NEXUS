@@ -6,27 +6,27 @@ from .text_factory import TextColumnFactory
 
 
 COLORES_ESTADO = {
-    "borrador": ("#FEF3C7", "#92400E"),
-    "pendiente": ("#FEF3C7", "#92400E"),
-    "en_preparacion": ("#DBEAFE", "#1E40AF"),
-    "aprobada": ("#DBEAFE", "#1E40AF"),
-    "emitida": ("#D1FAE5", "#065F46"),
-    "conciliado": ("#D1FAE5", "#065F46"),
-    "pagada": ("#D1FAE5", "#065F46"),
-    "parcial": ("#DBEAFE", "#1E40AF"),
-    "anulada": ("#FEE2E2", "#991B1B"),
-    "rechazada": ("#FEE2E2", "#991B1B"),
-    "vencida": ("#FEE2E2", "#991B1B"),
-    "activo": ("#D1FAE5", "#065F46"),
-    "inactivo": ("#F3F4F6", "#374151"),
-    "true": ("#D1FAE5", "#065F46"),
-    "false": ("#F3F4F6", "#374151"),
-    "prospeccion": ("#FEF3C7", "#92400E"),
-    "calificacion": ("#DBEAFE", "#1E40AF"),
-    "propuesta": ("#E0E7FF", "#3730A3"),
-    "negociacion": ("#FDE68A", "#92400E"),
-    "ganada": ("#D1FAE5", "#065F46"),
-    "perdida": ("#FEE2E2", "#991B1B"),
+    "borrador": ("#F1F5F9", "#475569"),
+    "pendiente": ("#FFFAEB", "#B54708"),
+    "en_preparacion": ("#EAF0F7", "#1E3A5F"),
+    "aprobada": ("#EAF0F7", "#1E3A5F"),
+    "emitida": ("#ECFDF3", "#067647"),
+    "conciliado": ("#ECFDF3", "#067647"),
+    "pagada": ("#ECFDF3", "#067647"),
+    "parcial": ("#EAF0F7", "#1E3A5F"),
+    "anulada": ("#FEF3F2", "#B42318"),
+    "rechazada": ("#FEF3F2", "#B42318"),
+    "vencida": ("#FEF3F2", "#B42318"),
+    "activo": ("#ECFDF3", "#067647"),
+    "inactivo": ("#F8FAFC", "#475569"),
+    "true": ("#ECFDF3", "#067647"),
+    "false": ("#F8FAFC", "#475569"),
+    "prospeccion": ("#FFFAEB", "#B54708"),
+    "calificacion": ("#EAF0F7", "#1E3A5F"),
+    "propuesta": ("#EAF0F7", "#1E3A5F"),
+    "negociacion": ("#FFFAEB", "#B54708"),
+    "ganada": ("#ECFDF3", "#067647"),
+    "perdida": ("#FEF3F2", "#B42318"),
 }
 
 
@@ -62,7 +62,7 @@ class StatusColumnFactory(
             clave,
             mapa.get(
                 texto.lower(),
-                ("#E5E7EB", "#111827"),
+                ("#E2E8F0", "#1E293B"),
             ),
         )
 

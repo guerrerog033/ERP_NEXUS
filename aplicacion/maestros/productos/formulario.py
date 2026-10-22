@@ -93,7 +93,7 @@ class FormularioProducto(FormularioBase):
             QGroupBox {
                 font-size: 14px;
                 font-weight: 600;
-                border: 1px solid #d8dee9;
+                border: 1px solid #e2e8f0;
                 border-radius: 8px;
                 margin-top: 8px;
                 padding-top: 12px;
@@ -423,11 +423,11 @@ class FormularioProducto(FormularioBase):
             }
             QScrollBar:vertical {
                 width: 8px;
-                background: #eef2f6;
+                background: #f8fafc;
                 margin: 2px 0;
             }
             QScrollBar::handle:vertical {
-                background: #90a4ae;
+                background: #64748b;
                 border-radius: 4px;
                 min-height: 28px;
             }

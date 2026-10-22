@@ -299,8 +299,8 @@ class FormularioFacturaVenta(
             QHeaderView::section {
                 background: qlineargradient(
                     x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #3A7BC5,
-                    stop:1 #1B4F8A
+                    stop:0 #2B4C78,
+                    stop:1 #1E3A5F
                 );
                 color: white;
                 font-weight: bold;
@@ -924,7 +924,7 @@ class FormularioFacturaVenta(
         )
 
         etiqueta_pagos.setStyleSheet(
-            "font-weight:600;color:#1B4F8A;",
+            "font-weight:600;color:#1E3A5F;",
         )
 
         fila_pago = QHBoxLayout()

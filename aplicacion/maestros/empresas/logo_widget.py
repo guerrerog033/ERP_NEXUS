@@ -63,10 +63,10 @@ class LogoEmpresaWidget(QWidget):
         self.preview.setStyleSheet(
             """
             QLabel {
-                border: 1px solid #cfd8dc;
+                border: 1px solid #e2e8f0;
                 border-radius: 8px;
-                background: #fafafa;
-                color: #78909c;
+                background: #f8fafc;
+                color: #64748b;
             }
             """
         )

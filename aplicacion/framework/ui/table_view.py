@@ -123,12 +123,12 @@ class TableView(QTableView):
             """
             QTableView{
                 background:#FFFFFF;
-                color:#1F2937;
-                border:1px solid #D7DCE3;
+                color:#1E293B;
+                border:1px solid #E2E8F0;
                 border-radius:8px;
                 alternate-background-color:#F8FAFC;
-                selection-background-color:#DCEEFF;
-                selection-color:#111827;
+                selection-background-color:#EAF0F7;
+                selection-color:#1E293B;
                 font-size:13px;
                 outline:none;
             }
@@ -137,17 +137,17 @@ class TableView(QTableView):
                 border:none;
             }
             QTableView::item:selected{
-                background:#DCEEFF;
-                color:#111827;
+                background:#EAF0F7;
+                color:#1E293B;
             }
             QTableView::item:hover{
-                background:#EEF6FF;
+                background:#EAF0F7;
             }
             QHeaderView::section{
-                background:#1247A5;
+                background:#1E3A5F;
                 color:white;
                 border:none;
-                border-right:1px solid #2D63C7;
+                border-right:1px solid #1E3A5F;
                 padding:10px;
                 font-size:13px;
                 font-weight:bold;

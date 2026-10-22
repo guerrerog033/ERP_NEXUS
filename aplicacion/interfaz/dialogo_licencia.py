@@ -59,7 +59,7 @@ class DialogoActivacionLicencia(QDialog):
             """
             font-size:18px;
             font-weight:bold;
-            color:#1B4F8A;
+            color:#1E3A5F;
             padding-bottom:8px;
             """
         )

@@ -78,7 +78,7 @@ class Dialog(QDialog):
 
             font-weight:bold;
 
-            color:#1F2937;
+            color:#1E293B;
 
         }
 

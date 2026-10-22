@@ -73,7 +73,7 @@ class _PanelTipoVariante(QWidget):
         )
 
         ayuda.setStyleSheet(
-            "color:#546e7a;",
+            "color:#64748b;",
         )
 
         layout.addWidget(

@@ -67,8 +67,8 @@ class ActividadDefinition(FormDefinition):
                         False: "Pendiente",
                     },
                     "colores": {
-                        "completada": ("#D1FAE5", "#065F46"),
-                        "pendiente": ("#FEF3C7", "#92400E"),
+                        "completada": ("#ECFDF3", "#067647"),
+                        "pendiente": ("#FFFAEB", "#B54708"),
                     },
                 },
             ),

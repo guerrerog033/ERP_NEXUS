@@ -80,8 +80,8 @@ class ContratoDefinition(FormDefinition):
                         False: "Cerrado",
                     },
                     "colores": {
-                        "vigente": ("#D1FAE5", "#065F46"),
-                        "cerrado": ("#F3F4F6", "#374151"),
+                        "vigente": ("#ECFDF3", "#067647"),
+                        "cerrado": ("#F8FAFC", "#475569"),
                     },
                 },
             ),

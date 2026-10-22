@@ -474,7 +474,7 @@ class ListaRegistrosWidget(QWidget):
         )
 
         self.lbl_sin_padre.setStyleSheet(
-            "color: #8a6d3b; font-style: italic;",
+            "color: #64748b; font-style: italic;",
         )
 
         layout.addWidget(

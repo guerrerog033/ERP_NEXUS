@@ -385,206 +385,151 @@ GRUPOS: list[
         list[dict],
     ]
 ] = [
-
+    # Orden pensado para el día a día de un negocio: lo comercial
+    # arriba, luego maestros, finanzas, informes y al final la
+    # administración del sistema. Un grupo con título vacío no
+    # muestra encabezado (Inicio).
     (
-        "Operaciones",
+        "",
         [
-
             {
                 "icono": "inicio",
                 "titulo": "Inicio",
                 "modulo": MODULO_INICIO,
             },
-
+        ],
+    ),
+    (
+        "Comercial",
+        [
             {
                 "icono": "ventas",
                 "titulo": "Ventas",
                 "submenu": [
-
                     ("Cotizaciones", "Cotizaciones"),
-
                     ("Pedidos", "Pedidos"),
-
+                    ("Remisiones", "Remisiones"),
                     ("Facturas de venta", "FacturasVenta"),
-
                     ("Notas crédito", "NotasCreditoVenta"),
-
                     ("Notas débito", "NotasDebitoVenta"),
-
-                    ("Punto de venta", "POSVenta"),
-
-                    ("Historial POS", "POSHistorial"),
-
-                    ("Caja POS", "POSCaja"),
-
-                    ("Remisiones internas", "Remisiones"),
-
-                    ("Guías remisión electrónica", "GuiasRemisionElectronica"),
-
-                    ("Recibos de caja", "RecibosCaja"),
-
                     ("Facturación recurrente", "FacturasRecurrentes"),
-
+                    ("Guías de remisión electrónica", "GuiasRemisionElectronica"),
                 ],
             },
-
             {
-                "icono": "logistica",
-                "titulo": "Logística",
+                "icono": "pos",
+                "titulo": "Punto de venta",
                 "submenu": [
-
-                    ("Despachos", "DespachosLogistica"),
-
+                    ("Vender", "POSVenta"),
+                    ("Historial", "POSHistorial"),
+                    ("Caja del día", "POSCaja"),
                 ],
             },
-
             {
                 "icono": "compras",
                 "titulo": "Compras y gastos",
                 "modulo": "Compras",
             },
-
+            {
+                "icono": "logistica",
+                "titulo": "Logística",
+                "submenu": [
+                    ("Despachos", "DespachosLogistica"),
+                ],
+            },
+            {
+                "icono": "crm",
+                "titulo": "CRM",
+                "modulo": "CRM",
+            },
         ],
     ),
-
     (
         "Maestros",
         [
-
             {
                 "icono": "terceros",
                 "titulo": "Terceros",
                 "submenu": [
-
                     ("Clientes", "Clientes"),
-
                     ("Proveedores", "Proveedores"),
-
                     ("Otros", "Otros"),
-
                 ],
             },
-
             {
                 "icono": "productos",
                 "titulo": "Productos y servicios",
                 "submenu": [
-
-                    ("Categorías", "Categorías"),
-
-                    ("Marcas", "Marcas"),
-
                     ("Productos", "Productos"),
-
                     ("Variantes", "Variantes"),
-
+                    ("Categorías", "Categorías"),
+                    ("Marcas", "Marcas"),
                     ("Listas de precio", "ListasPrecio"),
-
                     ("Impuestos", "Impuestos"),
-
                 ],
             },
-
         ],
     ),
-
     (
-        "Financiero",
+        "Finanzas",
         [
-
             {
                 "icono": "bancos",
-                "titulo": "Cajas y bancos",
+                "titulo": "Tesorería",
                 "submenu": [
-
                     ("Recibos de caja", "RecibosCaja"),
-
                     ("Comprobantes de egreso", "ComprobantesEgreso"),
-
                     ("Conciliación bancaria", "ConciliacionBancaria"),
-
                 ],
             },
-
+            {
+                "icono": "cartera",
+                "titulo": "Cartera",
+                "modulo": "Cartera",
+            },
             {
                 "icono": "contabilidad",
                 "titulo": "Contabilidad",
                 "modulo": "Contabilidad",
             },
-
             {
-                "icono": "productos",
+                "icono": "inventarios",
                 "titulo": "Inventarios",
                 "modulo": "Inventarios",
             },
-
-            {
-                "icono": "bancos",
-                "titulo": "Cartera",
-                "modulo": "Cartera",
-            },
-
-            {
-                "icono": "contabilidad",
-                "titulo": "Reportes",
-                "modulo": "Reportes",
-            },
-
             {
                 "icono": "nomina",
                 "titulo": "Nómina",
                 "modulo": "Nomina",
             },
-
-            {
-                "icono": "terceros",
-                "titulo": "CRM",
-                "modulo": "CRM",
-            },
-
         ],
     ),
-
     (
-        "Seguridad",
+        "Informes",
         [
-
             {
-                "icono": "terceros",
-                "titulo": "Accesos",
+                "icono": "reportes",
+                "titulo": "Reportes",
+                "modulo": "Reportes",
+            },
+        ],
+    ),
+    (
+        "Sistema",
+        [
+            {
+                "icono": "administracion",
+                "titulo": "Administración",
                 "submenu": [
-
                     ("Usuarios", "AdminUsuarios"),
-
                     ("Roles", "AdminRoles"),
-
                     ("Auditoría", "AdminAuditoria"),
-
+                    ("Configuración DIAN", "ConfiguracionDian"),
+                    ("Licencias", "AdminLicencias"),
                 ],
             },
-
         ],
     ),
-
-    (
-        "Administración",
-        [
-
-            {
-                "icono": "contabilidad",
-                "titulo": "Licencias",
-                "modulo": "AdminLicencias",
-            },
-
-            {
-                "icono": "contabilidad",
-                "titulo": "Configuración DIAN",
-                "modulo": "ConfiguracionDian",
-            },
-
-        ],
-    ),
-
 ]
 
 

@@ -120,7 +120,7 @@ class Field:
 
             return (
                 f'{self.titulo} '
-                f'<span style="color:#C62828">*</span>'
+                f'<span style="color:#B42318">*</span>'
             )
 
         return self.titulo

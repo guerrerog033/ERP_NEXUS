@@ -1269,7 +1269,7 @@ class FormularioCotizacion(Page):
             """
             QTableWidget {
                 background: white;
-                gridline-color: #C8D8E8;
+                gridline-color: #E2E8F0;
             }
             QTableWidget::item {
                 padding: 4px;
@@ -1281,20 +1281,20 @@ class FormularioCotizacion(Page):
             QLineEdit,
             QComboBox {
                 background: white;
-                color: #1F2937;
-                border: 1px solid #B0C4D8;
+                color: #1E293B;
+                border: 1px solid #CBD5E1;
                 border-radius: 4px;
                 padding: 4px;
                 min-height: 28px;
             }
             QDoubleSpinBox:focus {
-                border: 2px solid #4A7FB0;
+                border: 2px solid #2B4C78;
             }
             QLineEdit:focus {
-                border: 2px solid #4A7FB0;
+                border: 2px solid #2B4C78;
             }
             QComboBox:focus {
-                border: 2px solid #4A7FB0;
+                border: 2px solid #2B4C78;
             }
             QDoubleSpinBox::up-button,
             QDoubleSpinBox::down-button {
@@ -1633,7 +1633,7 @@ class FormularioCotizacion(Page):
         )
 
         etiqueta.setStyleSheet(
-            "color: #1F2937;",
+            "color: #1E293B;",
         )
 
         layout.addWidget(
@@ -1688,7 +1688,7 @@ class FormularioCotizacion(Page):
         )
 
         etiqueta.setStyleSheet(
-            "color: #546E7A;",
+            "color: #64748B;",
         )
 
         etiqueta.setCursor(
@@ -2381,7 +2381,7 @@ class FormularioCotizacion(Page):
                 )
 
                 etiqueta.setStyleSheet(
-                    "color: #1F2937;",
+                    "color: #1E293B;",
                 )
 
         spin_precio = self._widget_celda(

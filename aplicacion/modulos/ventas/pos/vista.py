@@ -177,7 +177,7 @@ class POSVentaPage(QWidget):
             True,
         )
         self.lbl_stock_alerta.setStyleSheet(
-            "color:#B45309;font-weight:600;",
+            "color:#B54708;font-weight:600;",
         )
 
         card.contenido.addWidget(
@@ -235,7 +235,7 @@ class POSVentaPage(QWidget):
             "Cambio: $0",
         )
         self.lbl_cambio.setStyleSheet(
-            "font-size:15px;font-weight:600;color:#065F46;",
+            "font-size:15px;font-weight:600;color:#067647;",
         )
 
         pago.addWidget(
@@ -274,7 +274,7 @@ class POSVentaPage(QWidget):
             "Total: $0",
         )
         self.lbl_total.setStyleSheet(
-            "font-size:18px;font-weight:700;color:#1B4F8A;",
+            "font-size:18px;font-weight:700;color:#1E3A5F;",
         )
 
         pie.addWidget(

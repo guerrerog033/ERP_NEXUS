@@ -82,7 +82,7 @@ class AtributosVarianteWidget(QWidget):
         )
 
         ayuda.setStyleSheet(
-            "color: #546e7a; padding-bottom: 4px;",
+            "color: #64748b; padding-bottom: 4px;",
         )
 
         layout.addWidget(

@@ -160,17 +160,17 @@ class Table(QTableWidget):
 
                 background:#FFFFFF;
 
-                color:#1F2937;
+                color:#1E293B;
 
-                border:1px solid #D7DCE3;
+                border:1px solid #E2E8F0;
 
                 border-radius:8px;
 
                 alternate-background-color:#F8FAFC;
 
-                selection-background-color:#DCEEFF;
+                selection-background-color:#EAF0F7;
 
-                selection-color:#111827;
+                selection-color:#1E293B;
 
                 font-size:13px;
 
@@ -188,27 +188,27 @@ class Table(QTableWidget):
 
             QTableWidget::item:selected{
 
-                background:#DCEEFF;
+                background:#EAF0F7;
 
-                color:#111827;
+                color:#1E293B;
 
             }
 
             QTableWidget::item:hover{
 
-                background:#EEF6FF;
+                background:#EAF0F7;
 
             }
 
             QHeaderView::section{
 
-                background:#1247A5;
+                background:#1E3A5F;
 
                 color:white;
 
                 border:none;
 
-                border-right:1px solid #2D63C7;
+                border-right:1px solid #1E3A5F;
 
                 padding:10px;
 
@@ -236,7 +236,7 @@ class Table(QTableWidget):
 
             QScrollBar::handle:vertical{
 
-                background:#C7CDD6;
+                background:#CBD5E1;
 
                 border-radius:6px;
 
@@ -246,7 +246,7 @@ class Table(QTableWidget):
 
             QScrollBar::handle:vertical:hover{
 
-                background:#9AA6B2;
+                background:#64748B;
 
             }
 
@@ -269,7 +269,7 @@ class Table(QTableWidget):
 
             QScrollBar::handle:horizontal{
 
-                background:#C7CDD6;
+                background:#CBD5E1;
 
                 border-radius:6px;
 
@@ -279,7 +279,7 @@ class Table(QTableWidget):
 
             QScrollBar::handle:horizontal:hover{
 
-                background:#9AA6B2;
+                background:#64748B;
 
             }
 

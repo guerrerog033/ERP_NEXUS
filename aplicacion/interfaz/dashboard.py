@@ -74,6 +74,16 @@ class Dashboard(QWidget):
             "Dashboard"
         )
 
+        # Pinta el fondo claro del tema; sin esto se veía el azul
+        # oscuro de la ventana del login alrededor del contenido.
+        from aplicacion.recursos.estilos.tema import (
+            habilitar_fondo_qss,
+        )
+
+        habilitar_fondo_qss(
+            self,
+        )
+
         self.setWindowTitle(
             self._titulo_ventana()
         )
@@ -237,6 +247,10 @@ class Dashboard(QWidget):
 
         self.barra_lateral.actualizar_accesos_rapidos()
 
+        self.barra_lateral.marcar_activo(
+            MODULO_INICIO,
+        )
+
         from aplicacion.integraciones.dian.programador_recepcion import (
             ProgramadorRecepcionCompras,
         )
@@ -393,6 +407,12 @@ class Dashboard(QWidget):
         self,
         nombre: str,
     ):
+
+        if nombre != MODULO_PENDIENTE:
+
+            self.barra_lateral.marcar_activo(
+                nombre,
+            )
 
         if nombre == MODULO_INICIO:
 

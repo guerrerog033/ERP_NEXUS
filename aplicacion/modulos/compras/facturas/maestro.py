@@ -225,7 +225,7 @@ class MaestroFacturasCompra(
         self.lbl_pendientes_revision = QLabel()
 
         self.lbl_pendientes_revision.setStyleSheet(
-            "color:#B45309;font-weight:600;padding:0 8px;",
+            "color:#B54708;font-weight:600;padding:0 8px;",
         )
 
         self.lbl_pendientes_revision.hide()

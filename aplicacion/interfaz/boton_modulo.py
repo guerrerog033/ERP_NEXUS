@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QFont
+from PySide6.QtGui import QColor, QFont, QPainter, QPixmap
 from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
@@ -11,11 +11,69 @@ from aplicacion.recursos.estilos.tema import habilitar_fondo_qss
 from aplicacion.recursos.ui.recursos import Recursos
 
 
+COLOR_ICONO = "#64748B"
+COLOR_ICONO_ACTIVO = "#1E3A5F"
+
+
+def _pixmap_tenido(
+    icono,
+    tamano: int,
+    color: str,
+) -> QPixmap:
+    """
+    Pinta el ícono SVG (de un solo trazo) con un color de la paleta,
+    para que todos los íconos del menú se vean iguales y el activo
+    tome el azul marino.
+    """
+
+    base = icono.pixmap(
+        tamano,
+        tamano,
+    )
+
+    resultado = QPixmap(
+        base.size(),
+    )
+
+    resultado.setDevicePixelRatio(
+        base.devicePixelRatio(),
+    )
+
+    resultado.fill(
+        Qt.transparent,
+    )
+
+    pintor = QPainter(
+        resultado,
+    )
+
+    pintor.drawPixmap(
+        0,
+        0,
+        base,
+    )
+
+    pintor.setCompositionMode(
+        QPainter.CompositionMode_SourceIn,
+    )
+
+    pintor.fillRect(
+        resultado.rect(),
+        QColor(
+            color,
+        ),
+    )
+
+    pintor.end()
+
+    return resultado
+
+
 class BotonModulo(QFrame):
 
     clicked = Signal()
 
-    ANCHO_ICONO = 24
+    ANCHO_ICONO = 20
 
     def __init__(
         self,
@@ -24,6 +82,7 @@ class BotonModulo(QFrame):
         modulo: str,
         *,
         pendiente: bool = False,
+        con_submenu: bool = False,
     ):
 
         super().__init__()
@@ -53,7 +112,7 @@ class BotonModulo(QFrame):
         )
 
         self.setMinimumHeight(
-            44,
+            38,
         )
 
         self._layout = QHBoxLayout(
@@ -61,10 +120,10 @@ class BotonModulo(QFrame):
         )
 
         self._layout.setContentsMargins(
-            16,
-            8,
             12,
-            8,
+            6,
+            10,
+            6,
         )
 
         self._layout.setSpacing(
@@ -86,13 +145,24 @@ class BotonModulo(QFrame):
             self.ANCHO_ICONO,
         )
 
+        icono_qt = Recursos.icono_modulo(
+            icono,
+        )
+
+        self._pixmap_normal = _pixmap_tenido(
+            icono_qt,
+            self.ANCHO_ICONO,
+            COLOR_ICONO,
+        )
+
+        self._pixmap_activo = _pixmap_tenido(
+            icono_qt,
+            self.ANCHO_ICONO,
+            COLOR_ICONO_ACTIVO,
+        )
+
         self.lbl_icono.setPixmap(
-            Recursos.icono_modulo(
-                icono,
-            ).pixmap(
-                self.ANCHO_ICONO,
-                self.ANCHO_ICONO,
-            ),
+            self._pixmap_normal,
         )
 
         self.lbl_titulo = QLabel(
@@ -131,6 +201,31 @@ class BotonModulo(QFrame):
         self._layout.addWidget(
             self.lbl_titulo,
             1,
+        )
+
+        # Flecha que indica que el módulo despliega opciones.
+        self.lbl_flecha = QLabel(
+            "›" if con_submenu else "",
+        )
+
+        self.lbl_flecha.setObjectName(
+            "BotonModuloFlecha",
+        )
+
+        self.lbl_flecha.setFixedWidth(
+            12,
+        )
+
+        self.lbl_flecha.setVisible(
+            con_submenu,
+        )
+
+        self._con_submenu = con_submenu
+
+        self._layout.addWidget(
+            self.lbl_flecha,
+            0,
+            Qt.AlignVCenter,
         )
 
         if pendiente:
@@ -174,13 +269,39 @@ class BotonModulo(QFrame):
             nombre,
         )
 
-        self.style().unpolish(
-            self,
+        activo = nombre == "BotonModuloActivo"
+
+        self.lbl_icono.setPixmap(
+            self._pixmap_activo
+            if activo
+            else self._pixmap_normal,
         )
 
-        self.style().polish(
+        if self._con_submenu:
+
+            self.lbl_flecha.setText(
+                "⌄" if abierto else "›",
+            )
+
+        self._repulir()
+
+    def _repulir(
+        self,
+    ) -> None:
+
+        for widget in (
             self,
-        )
+            self.lbl_titulo,
+            self.lbl_flecha,
+        ):
+
+            widget.style().unpolish(
+                widget,
+            )
+
+            widget.style().polish(
+                widget,
+            )
 
     def set_expandido(
         self,
@@ -191,13 +312,18 @@ class BotonModulo(QFrame):
             expandido,
         )
 
+        self.lbl_flecha.setVisible(
+            expandido
+            and self._con_submenu,
+        )
+
         if expandido:
 
             self._layout.setContentsMargins(
-                16,
-                8,
                 12,
-                8,
+                6,
+                10,
+                6,
             )
 
             if self._pendiente:
@@ -215,10 +341,10 @@ class BotonModulo(QFrame):
             return
 
         self._layout.setContentsMargins(
+            14,
+            6,
             10,
-            8,
-            10,
-            8,
+            6,
         )
 
         self.setToolTip(
@@ -249,7 +375,7 @@ class BotonSubmodulo(QFrame):
         titulo: str,
         modulo: str,
         *,
-        margen_izquierdo: int = 52,
+        margen_izquierdo: int = 44,
     ):
 
         super().__init__()
@@ -269,7 +395,7 @@ class BotonSubmodulo(QFrame):
         )
 
         self.setFixedHeight(
-            36,
+            32,
         )
 
         layout = QHBoxLayout(
@@ -302,54 +428,39 @@ class BotonSubmodulo(QFrame):
             etiqueta,
         )
 
-        self.setContextMenuPolicy(
-            Qt.ContextMenuPolicy.CustomContextMenu,
-        )
+        self._etiqueta = etiqueta
 
-        self.customContextMenuRequested.connect(
-            self._mostrar_menu_contexto,
-        )
-
-    def _mostrar_menu_contexto(
+    def set_activo(
         self,
-        pos,
+        activo: bool,
     ) -> None:
 
-        from PySide6.QtWidgets import QMenu
+        nombre = (
+            "BotonSubmoduloActivo"
+            if activo
+            else "BotonSubmodulo"
+        )
 
-        from aplicacion.framework.app_context import AppContext
+        if self.objectName() == nombre:
 
-        menu = QMenu(
+            return
+
+        self.setObjectName(
+            nombre,
+        )
+
+        for widget in (
             self,
-        )
-
-        navegacion = getattr(
-            AppContext,
-            "navegacion",
-            None,
-        )
-
-        if navegacion and navegacion.es_favorito(
-            self.modulo,
+            self._etiqueta,
         ):
 
-            menu.addAction(
-                "Quitar de favoritos",
-                lambda: self._alternar_favorito(),
+            widget.style().unpolish(
+                widget,
             )
 
-        else:
-
-            menu.addAction(
-                "Agregar a favoritos",
-                lambda: self._alternar_favorito(),
+            widget.style().polish(
+                widget,
             )
-
-        menu.exec(
-            self.mapToGlobal(
-                pos,
-            ),
-        )
 
     def _alternar_favorito(
         self,

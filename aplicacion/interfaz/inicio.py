@@ -202,6 +202,14 @@ class Inicio(QWidget):
             "Inicio",
         )
 
+        from aplicacion.recursos.estilos.tema import (
+            habilitar_fondo_qss,
+        )
+
+        habilitar_fondo_qss(
+            self,
+        )
+
         principal = QVBoxLayout(
             self,
         )

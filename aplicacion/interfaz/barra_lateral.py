@@ -156,6 +156,12 @@ class BarraLateral(QWidget):
 
         self._etiquetas_acceso: list[QLabel] = []
 
+        # (botón de submódulo o None, botón del módulo padre, id del
+        # módulo) para resaltar en el menú la pantalla abierta.
+        self._enlaces: list[tuple] = []
+
+        self._modulo_activo: str | None = None
+
 
 
         self.setFixedWidth(
@@ -350,37 +356,23 @@ class BarraLateral(QWidget):
 
         for titulo_grupo, entradas in grupos_visibles():
 
+            if titulo_grupo:
 
+                etiqueta = QLabel(
+                    titulo_grupo.upper(),
+                )
 
-            etiqueta = QLabel(
+                etiqueta.setObjectName(
+                    "BarraLateralEtiqueta",
+                )
 
-                titulo_grupo.upper(),
+                self._etiquetas_grupo.append(
+                    etiqueta,
+                )
 
-            )
-
-
-
-            etiqueta.setObjectName(
-
-                "BarraLateralEtiqueta",
-
-            )
-
-
-
-            self._etiquetas_grupo.append(
-
-                etiqueta,
-
-            )
-
-
-
-            botones_layout.addWidget(
-
-                etiqueta,
-
-            )
+                botones_layout.addWidget(
+                    etiqueta,
+                )
 
 
 
@@ -575,9 +567,7 @@ class BarraLateral(QWidget):
 
 
         self._contenedor_accesos.setVisible(
-
-            not colapsada,
-
+            False,
         )
 
 
@@ -643,156 +633,31 @@ class BarraLateral(QWidget):
 
 
     def actualizar_accesos_rapidos(
-
         self,
-
     ) -> None:
-
-
-
-        from aplicacion.framework.app_context import AppContext
-
-
+        """
+        La barra lateral ya no muestra Favoritos ni Recientes: solo
+        el menú de módulos, para que se vea ordenada. Se conserva el
+        método (lo llama el dashboard) y deja el bloque oculto.
+        """
 
         while self._layout_accesos.count():
 
-
-
             item = self._layout_accesos.takeAt(
-
                 0,
-
             )
-
-
 
             widget = item.widget()
 
-
-
             if widget is not None:
-
-
 
                 widget.deleteLater()
 
-
-
-        navegacion = getattr(
-
-            AppContext,
-
-            "navegacion",
-
-            None,
-
-        )
-
-
-
-        if navegacion is None:
-
-
-
-            self._contenedor_accesos.setVisible(
-
-                False,
-
-            )
-
-
-
-            return
-
-
-
-        favoritos = [
-            modulo_id
-            for modulo_id in navegacion.favoritos()
-            if modulo_accesible(
-                modulo_id,
-            )
-        ]
-
-
-
-        if not favoritos:
-
-
-
-            self._contenedor_accesos.setVisible(
-
-                False,
-
-            )
-
-
-
-            return
-
-
+        self._etiquetas_acceso.clear()
 
         self._contenedor_accesos.setVisible(
-
-            True,
-
+            False,
         )
-
-
-
-        self._agregar_etiqueta_acceso(
-
-            "Favoritos",
-
-        )
-
-
-
-        for modulo_id in favoritos:
-
-
-
-            self._agregar_boton_acceso(
-
-                navegacion.etiqueta(
-
-                    modulo_id,
-
-                ),
-
-                modulo_id,
-
-            )
-
-
-
-        separador = QFrame()
-
-
-
-        separador.setObjectName(
-
-            "BarraLateralSeparador",
-
-        )
-
-
-
-        separador.setFrameShape(
-
-            QFrame.HLine,
-
-        )
-
-
-
-        self._layout_accesos.addWidget(
-
-            separador,
-
-        )
-
-
 
     def _agregar_etiqueta_acceso(
 
@@ -946,34 +811,19 @@ class BarraLateral(QWidget):
 
 
 
-        boton = BotonModulo(
-
-
-
-            entrada["icono"],
-
-
-
-            entrada["titulo"],
-
-
-
-            modulo,
-
-
-
-            pendiente=pendiente,
-
-
-
+        submenu = entrada.get(
+            "submenu",
         )
 
-
-
-        submenu = entrada.get(
-
-            "submenu",
-
+        boton = BotonModulo(
+            entrada["icono"],
+            entrada["titulo"],
+            modulo,
+            pendiente=pendiente,
+            con_submenu=bool(
+                submenu
+                and len(submenu) > 1
+            ),
         )
 
 
@@ -996,6 +846,14 @@ class BarraLateral(QWidget):
 
 
 
+            )
+
+            self._enlaces.append(
+                (
+                    None,
+                    boton,
+                    submenu[0][1],
+                ),
             )
 
 
@@ -1156,10 +1014,12 @@ class BarraLateral(QWidget):
 
 
 
-                sub_boton.favorito_solicitado.connect(
-
-                    self._on_favorito_solicitado,
-
+                self._enlaces.append(
+                    (
+                        sub_boton,
+                        boton,
+                        modulo_sub,
+                    ),
                 )
 
 
@@ -1268,6 +1128,14 @@ class BarraLateral(QWidget):
 
 
 
+        )
+
+        self._enlaces.append(
+            (
+                None,
+                boton,
+                modulo,
+            ),
         )
 
 
@@ -1384,14 +1252,59 @@ class BarraLateral(QWidget):
 
         self._boton_submenu_abierto = None
 
+        self._aplicar_resaltado()
 
+
+
+    def marcar_activo(
+        self,
+        modulo: str | None,
+    ) -> None:
+        """
+        Resalta en el menú la pantalla abierta (y su módulo padre).
+        """
+
+        self._modulo_activo = modulo
+
+        self._aplicar_resaltado()
+
+    def _aplicar_resaltado(
+        self,
+    ) -> None:
+
+        padres_activos = set()
+
+        for sub_boton, padre, modulo in self._enlaces:
+
+            activo = (
+                modulo == self._modulo_activo
+            )
+
+            if sub_boton is not None:
+
+                sub_boton.set_activo(
+                    activo,
+                )
+
+            if activo and padre is not None:
+
+                padres_activos.add(
+                    id(padre),
+                )
+
+        for boton in self._botones:
+
+            if boton is self._boton_submenu_abierto:
+
+                continue
+
+            boton.set_submenu_abierto(
+                id(boton) in padres_activos,
+            )
 
     def _seleccionar(
-
         self,
-
         modulo: str,
-
     ) -> None:
 
 

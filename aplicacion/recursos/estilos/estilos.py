@@ -73,9 +73,9 @@ class Estilos:
     def boton_guardar(widget):
         Estilos._boton(
             widget,
-            "#16A34A",
-            "#15803D",
-            "#166534",
+            "#067647",
+            "#067647",
+            "#067647",
         )
 
     @staticmethod
@@ -83,17 +83,17 @@ class Estilos:
         Estilos._boton(
             widget,
             Colores.INFORMACION,
-            "#1D4ED8",
-            "#1E40AF",
+            "#1E3A5F",
+            "#1E3A5F",
         )
 
     @staticmethod
     def boton_editar(widget):
         Estilos._boton(
             widget,
-            "#F59E0B",
-            "#D97706",
-            "#B45309",
+            "#B54708",
+            "#B54708",
+            "#B54708",
         )
 
     @staticmethod
@@ -101,26 +101,26 @@ class Estilos:
         Estilos._boton(
             widget,
             Colores.PELIGRO,
-            "#B91C1C",
-            "#991B1B",
+            "#B42318",
+            "#B42318",
         )
 
     @staticmethod
     def boton_actualizar(widget):
         Estilos._boton(
             widget,
-            "#0891B2",
-            "#0E7490",
-            "#155E75",
+            "#1E3A5F",
+            "#1E3A5F",
+            "#1E3A5F",
         )
 
     @staticmethod
     def boton_buscar(widget):
         Estilos._boton(
             widget,
-            "#4F46E5",
-            "#4338CA",
-            "#3730A3",
+            "#1E3A5F",
+            "#1E3A5F",
+            "#1E3A5F",
         )
 
     @staticmethod
@@ -128,8 +128,8 @@ class Estilos:
         Estilos._boton(
             widget,
             Colores.TEXTO_SECUNDARIO,
-            "#4B5563",
-            "#374151",
+            "#475569",
+            "#475569",
         )
 
     @staticmethod

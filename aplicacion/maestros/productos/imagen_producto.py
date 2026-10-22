@@ -63,10 +63,10 @@ class ImagenProductoWidget(QWidget):
         self.preview.setStyleSheet(
             """
             QLabel {
-                border: 1px solid #cfd8dc;
+                border: 1px solid #e2e8f0;
                 border-radius: 8px;
-                background: #fafafa;
-                color: #78909c;
+                background: #f8fafc;
+                color: #64748b;
             }
             """
         )
@@ -258,7 +258,7 @@ class ImagenProductoLabel(
 
         self.setStyleSheet(
             "background: #F8FAFC; "
-            "border: 1px dashed #C8D8E8; "
+            "border: 1px dashed #E2E8F0; "
             "border-radius: 4px;",
         )
 

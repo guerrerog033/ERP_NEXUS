@@ -49,7 +49,7 @@ QFrame#card{
 
     background:#ffffff;
 
-    border:1px solid #d8dee9;
+    border:1px solid #e2e8f0;
 
     border-radius:12px;
 
@@ -61,7 +61,7 @@ QLabel#titulo{
 
     font-weight:700;
 
-    color:#1f2937;
+    color:#1e293b;
 
     padding-bottom:16px;
 

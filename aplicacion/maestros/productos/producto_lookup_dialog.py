@@ -43,7 +43,7 @@ class ProductoLookupDialog(LookupDialog):
         )
 
         self.lbl_sin_resultados.setStyleSheet(
-            "color: #546e7a; padding: 4px 0;",
+            "color: #64748b; padding: 4px 0;",
         )
 
         self.layout().insertWidget(

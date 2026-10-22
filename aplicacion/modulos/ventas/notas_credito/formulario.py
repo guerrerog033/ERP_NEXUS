@@ -56,7 +56,7 @@ class FormularioNotaCreditoVenta(
         )
 
         self.lbl_factura_ref.setStyleSheet(
-            "font-weight:600;color:#1B4F8A;",
+            "font-weight:600;color:#1E3A5F;",
         )
 
         self.txt_factura_ref = QLabel(

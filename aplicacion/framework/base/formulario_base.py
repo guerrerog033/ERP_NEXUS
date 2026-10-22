@@ -210,11 +210,11 @@ class FormularioBase(Page):
             }
             QScrollBar:vertical {
                 width: 8px;
-                background: #eef2f6;
+                background: #f8fafc;
                 margin: 2px 0;
             }
             QScrollBar::handle:vertical {
-                background: #90a4ae;
+                background: #64748b;
                 border-radius: 4px;
                 min-height: 28px;
             }

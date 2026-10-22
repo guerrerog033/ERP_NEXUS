@@ -178,7 +178,7 @@ class FormularioDocumentoSoporte(Page):
         self.lbl_iva = QLabel("IVA: $0")
         self.lbl_total = QLabel("Total: $0")
         self.lbl_total.setStyleSheet(
-            "font-weight:700;color:#1B4F8A;",
+            "font-weight:700;color:#1E3A5F;",
         )
 
         acciones.addWidget(

@@ -35,9 +35,10 @@ def _etiquetas_visibles(barra: BarraLateral) -> list[str]:
     ]
 
 
-def test_accesos_rapidos_no_muestra_recientes_con_favoritos(
+def test_barra_lateral_no_muestra_favoritos_aunque_existan(
     monkeypatch,
 ):
+    """La barra lateral solo muestra el menú de módulos."""
 
     _qapp()
 
@@ -57,13 +58,45 @@ def test_accesos_rapidos_no_muestra_recientes_con_favoritos(
 
         barra.actualizar_accesos_rapidos()
 
-    etiquetas = _etiquetas_visibles(
+    assert _etiquetas_visibles(
         barra,
+    ) == []
+    assert barra._contenedor_accesos.isHidden()
+
+
+def test_marcar_activo_resalta_submodulo_y_su_modulo():
+
+    _qapp()
+
+    barra = BarraLateral()
+
+    enlace = next(
+        (
+            (sub, padre, modulo)
+            for sub, padre, modulo in barra._enlaces
+            if sub is not None
+        ),
+        None,
     )
 
-    assert etiquetas == ["FAVORITOS"]
-    assert "RECIENTES" not in etiquetas
-    assert not barra._contenedor_accesos.isHidden()
+    if enlace is None:
+        return
+
+    sub, padre, modulo = enlace
+
+    barra.marcar_activo(
+        modulo,
+    )
+
+    assert sub.objectName() == "BotonSubmoduloActivo"
+    assert padre.objectName() == "BotonModuloActivo"
+
+    barra.marcar_activo(
+        None,
+    )
+
+    assert sub.objectName() == "BotonSubmodulo"
+    assert padre.objectName() == "BotonModulo"
 
 
 def test_accesos_rapidos_oculto_sin_favoritos(

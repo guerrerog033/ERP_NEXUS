@@ -100,7 +100,7 @@ def test_status_etapa_crm():
     )
 
     assert badge["texto"] == "Ganada"
-    assert badge["fondo"] == "#D1FAE5"
+    assert badge["fondo"] == "#ECFDF3"
 
 
 def test_html_listado_registros():
