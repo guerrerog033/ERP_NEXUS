@@ -394,43 +394,17 @@ class VistaFacturaVenta(VistaDocumento):
 
             return
 
-        ventana = QDialog(
-            self,
+        from aplicacion.framework.ui.vista_documento import (
+            mostrar_dialogo_vista,
         )
 
-        ventana.setWindowTitle(
-            f"Nota crédito {nota.numero}",
+        # Se abre como pestaña (o ventana si no hay área de trabajo).
+        mostrar_dialogo_vista(
+            VistaNotaCreditoVenta,
+            nota.id,
+            titulo=f"Nota crédito {nota.numero}",
+            parent=self,
         )
-
-        ventana.setModal(
-            True,
-        )
-
-        ventana.resize(
-            1120,
-            720,
-        )
-
-        layout = QVBoxLayout(
-            ventana,
-        )
-
-        vista = VistaNotaCreditoVenta(
-            id_registro=nota.id,
-            parent=ventana,
-        )
-
-        layout.addWidget(
-            vista,
-        )
-
-        vista.cerrar.connect(
-            ventana.accept,
-        )
-
-        ventana.exec()
-
-        vista.deleteLater()
 
     def _crear_nota_debito(
         self,
@@ -483,43 +457,17 @@ class VistaFacturaVenta(VistaDocumento):
 
             return
 
-        ventana = QDialog(
-            self,
+        from aplicacion.framework.ui.vista_documento import (
+            mostrar_dialogo_vista,
         )
 
-        ventana.setWindowTitle(
-            f"Nota débito {nota.numero}",
+        # Se abre como pestaña (o ventana si no hay área de trabajo).
+        mostrar_dialogo_vista(
+            VistaNotaDebitoVenta,
+            nota.id,
+            titulo=f"Nota débito {nota.numero}",
+            parent=self,
         )
-
-        ventana.setModal(
-            True,
-        )
-
-        ventana.resize(
-            1120,
-            720,
-        )
-
-        layout = QVBoxLayout(
-            ventana,
-        )
-
-        vista = VistaNotaDebitoVenta(
-            id_registro=nota.id,
-            parent=ventana,
-        )
-
-        layout.addWidget(
-            vista,
-        )
-
-        vista.cerrar.connect(
-            ventana.accept,
-        )
-
-        ventana.exec()
-
-        vista.deleteLater()
 
     def _ver_cartera_cliente(
         self,

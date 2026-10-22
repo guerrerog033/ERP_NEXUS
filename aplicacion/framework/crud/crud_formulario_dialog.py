@@ -199,12 +199,94 @@ class CrudFormularioDialog:
 
         return titulo
 
+    def _abrir_formulario_en_pestana(
+        self,
+        id_registro=None,
+        *,
+        modo=None,
+    ):
+        """
+        Abre el formulario como pestaña del área de trabajo (no como
+        ventana flotante). Devuelve el formulario, o ``None`` si no
+        hay área de trabajo y hay que usar la ventana modal.
+        """
+
+        from aplicacion.framework.ui.pestanas import (
+            abrir_en_pestana,
+            area_trabajo,
+            enfocar_pestana,
+        )
+
+        if area_trabajo() is None:
+
+            return None
+
+        clave = None
+
+        if id_registro is not None:
+
+            clave = (
+                type(self).__name__,
+                "formulario",
+                id_registro,
+                str(modo or ""),
+            )
+
+            existente = enfocar_pestana(
+                clave,
+            )
+
+            if existente is not None:
+
+                return existente
+
+        formulario = self.crear_formulario(
+            id_registro=id_registro,
+            modo=modo,
+        )
+
+        formulario.guardado.connect(
+            self.cargar_datos,
+        )
+
+        abrir_en_pestana(
+            formulario,
+            self._invocar_titulo_dialogo_formulario(
+                id_registro,
+                modo=modo,
+            ),
+            clave=clave,
+            ancho_maximo=max(
+                int(
+                    getattr(
+                        formulario,
+                        "ancho",
+                        900,
+                    )
+                    or 900,
+                ),
+                720,
+            )
+            + 40,
+        )
+
+        return formulario
+
     def _mostrar_dialogo_formulario(
         self,
         id_registro=None,
         *,
         modo=None,
-    ) -> None:
+    ):
+
+        formulario_pestana = self._abrir_formulario_en_pestana(
+            id_registro,
+            modo=modo,
+        )
+
+        if formulario_pestana is not None:
+
+            return formulario_pestana
 
         ventana = QDialog(
             self._ventana_padre_formulario(),

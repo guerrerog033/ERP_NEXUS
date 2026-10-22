@@ -501,43 +501,17 @@ class VistaRemision(VistaDocumento):
 
             return
 
-        ventana = QDialog(
-            self,
+        from aplicacion.framework.ui.vista_documento import (
+            mostrar_dialogo_vista,
         )
 
-        ventana.setWindowTitle(
-            f"Guía {guia.numero}",
+        # Se abre como pestaña (o ventana si no hay área de trabajo).
+        mostrar_dialogo_vista(
+            VistaGuiaRemisionElectronica,
+            guia.id,
+            titulo=f"Guía {guia.numero}",
+            parent=self,
         )
-
-        ventana.setModal(
-            True,
-        )
-
-        ventana.resize(
-            1120,
-            720,
-        )
-
-        layout = QVBoxLayout(
-            ventana,
-        )
-
-        vista = VistaGuiaRemisionElectronica(
-            id_registro=guia.id,
-            parent=ventana,
-        )
-
-        layout.addWidget(
-            vista,
-        )
-
-        vista.cerrar.connect(
-            ventana.accept,
-        )
-
-        ventana.exec()
-
-        vista.deleteLater()
 
         self._cargar_datos()
         self.actualizado.emit()
@@ -567,43 +541,17 @@ class VistaRemision(VistaDocumento):
 
             return
 
-        ventana = QDialog(
-            self,
+        from aplicacion.framework.ui.vista_documento import (
+            mostrar_dialogo_vista,
         )
 
-        ventana.setWindowTitle(
-            f"Guía {guia.numero}",
+        # Se abre como pestaña (o ventana si no hay área de trabajo).
+        mostrar_dialogo_vista(
+            VistaGuiaRemisionElectronica,
+            guia.id,
+            titulo=f"Guía {guia.numero}",
+            parent=self,
         )
-
-        ventana.setModal(
-            True,
-        )
-
-        ventana.resize(
-            1120,
-            720,
-        )
-
-        layout = QVBoxLayout(
-            ventana,
-        )
-
-        vista = VistaGuiaRemisionElectronica(
-            id_registro=guia.id,
-            parent=ventana,
-        )
-
-        layout.addWidget(
-            vista,
-        )
-
-        vista.cerrar.connect(
-            ventana.accept,
-        )
-
-        ventana.exec()
-
-        vista.deleteLater()
 
         self._cargar_datos()
         self.actualizado.emit()

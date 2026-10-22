@@ -4,6 +4,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QMessageBox,
     QPushButton,
+    QTabWidget,
     QVBoxLayout,
 )
 
@@ -287,12 +288,24 @@ class TerceroFormulario(FormularioBase):
 
         self._widgets_registros_relacionados = []
 
+        # Pestañas dentro del mismo formulario (antes cada sección
+        # abría una ventana flotante aparte).
         grupo = QGroupBox(
             "Registros relacionados",
         )
 
-        layout_botones = QHBoxLayout(
+        layout_grupo = QVBoxLayout(
             grupo,
+        )
+
+        pestanas = QTabWidget()
+
+        pestanas.setMinimumHeight(
+            260,
+        )
+
+        layout_grupo.addWidget(
+            pestanas,
         )
 
         for (
@@ -311,8 +324,6 @@ class TerceroFormulario(FormularioBase):
                 parent=self,
             )
 
-            widget.hide()
-
             widget.cargar(
                 self.id_registro,
             )
@@ -321,11 +332,9 @@ class TerceroFormulario(FormularioBase):
                 widget,
             )
 
-            layout_botones.addWidget(
-                self._boton_registro_relacionado(
-                    titulo_pestana,
-                    widget,
-                ),
+            pestanas.addTab(
+                widget,
+                titulo_pestana,
             )
 
         widget_portal = PortalAccesoWidget(
@@ -333,16 +342,10 @@ class TerceroFormulario(FormularioBase):
             parent=self,
         )
 
-        widget_portal.hide()
-
-        layout_botones.addWidget(
-            self._boton_registro_relacionado(
-                "Portal",
-                widget_portal,
-            ),
+        pestanas.addTab(
+            widget_portal,
+            "Portal",
         )
-
-        layout_botones.addStretch()
 
         self.card.agregar_widget(
             grupo,

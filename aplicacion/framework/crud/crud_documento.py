@@ -95,6 +95,12 @@ class CrudDocumento:
 
             return
 
+        if self._mostrar_vista_en_pestana(
+            id_registro,
+        ):
+
+            return
+
         ventana = QDialog(
             self._ventana_padre_vista(),
         )
@@ -175,6 +181,86 @@ class CrudDocumento:
         ventana.exec()
 
         vista.deleteLater()
+
+    def _mostrar_vista_en_pestana(
+        self,
+        id_registro: int,
+    ) -> bool:
+        """
+        Abre la vista del documento como pestaña (no ventana
+        flotante). Devuelve ``False`` si no hay área de trabajo.
+        """
+
+        from aplicacion.framework.ui.pestanas import (
+            abrir_en_pestana,
+            area_trabajo,
+            enfocar_pestana,
+        )
+
+        if area_trabajo() is None:
+
+            return False
+
+        clave = (
+            type(self).__name__,
+            "vista",
+            id_registro,
+        )
+
+        if enfocar_pestana(
+            clave,
+        ) is not None:
+
+            return True
+
+        vista = self.vista_documento(
+            id_registro=id_registro,
+        )
+
+        def abrir_edicion():
+
+            formulario = self._mostrar_dialogo_formulario(
+                id_registro=id_registro,
+            )
+
+            guardado = getattr(
+                formulario,
+                "guardado",
+                None,
+            )
+
+            if guardado is not None and hasattr(
+                guardado,
+                "connect",
+            ):
+
+                guardado.connect(
+                    vista.recargar,
+                )
+
+            else:
+
+                vista.recargar()
+
+                self.cargar_datos()
+
+        vista.editar_solicitado.connect(
+            abrir_edicion,
+        )
+
+        vista.actualizado.connect(
+            self.cargar_datos,
+        )
+
+        abrir_en_pestana(
+            vista,
+            self._titulo_dialogo_vista(
+                id_registro,
+            ),
+            clave=clave,
+        )
+
+        return True
 
     def _ventana_padre_vista(
         self,

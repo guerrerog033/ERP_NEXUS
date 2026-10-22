@@ -20,6 +20,35 @@ def mostrar_formulario_factura(
     titulo: str = "Factura de venta",
 ) -> None:
 
+    from aplicacion.framework.ui.pestanas import (
+        abrir_en_pestana,
+        area_trabajo,
+        enfocar_pestana,
+    )
+
+    if area_trabajo() is not None:
+
+        clave = (
+            "FormularioFacturaVenta",
+            id_registro,
+        )
+
+        if enfocar_pestana(
+            clave,
+        ) is not None:
+
+            return
+
+        abrir_en_pestana(
+            FormularioFacturaVenta(
+                id_registro=id_registro,
+            ),
+            titulo,
+            clave=clave,
+        )
+
+        return
+
     ventana = QDialog(
         parent,
     )

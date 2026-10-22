@@ -553,6 +553,55 @@ def mostrar_dialogo_vista(
         QVBoxLayout,
     )
 
+    from aplicacion.framework.ui.pestanas import (
+        abrir_en_pestana,
+        area_trabajo,
+        enfocar_pestana,
+    )
+
+    if area_trabajo() is not None:
+
+        # Pestaña del área de trabajo en vez de ventana flotante.
+        clave = (
+            getattr(
+                vista_cls,
+                "__name__",
+                str(vista_cls),
+            ),
+            "vista",
+            id_registro,
+        )
+
+        if enfocar_pestana(
+            clave,
+        ) is not None:
+
+            return
+
+        vista_pestana = vista_cls(
+            id_registro=id_registro,
+        )
+
+        if al_editar is not None:
+
+            vista_pestana.editar_solicitado.connect(
+                al_editar,
+            )
+
+        if al_actualizar is not None:
+
+            vista_pestana.actualizado.connect(
+                al_actualizar,
+            )
+
+        abrir_en_pestana(
+            vista_pestana,
+            titulo,
+            clave=clave,
+        )
+
+        return
+
     ventana = QDialog(
         parent,
     )

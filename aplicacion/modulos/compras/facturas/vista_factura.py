@@ -1072,43 +1072,17 @@ class VistaFacturaCompra(VistaDocumento):
 
             return
 
-        ventana = QDialog(
-            self,
+        from aplicacion.framework.ui.vista_documento import (
+            mostrar_dialogo_vista,
         )
 
-        ventana.setWindowTitle(
-            f"NC compra {nota.numero}",
+        # Se abre como pestaña (o ventana si no hay área de trabajo).
+        mostrar_dialogo_vista(
+            VistaNotaCreditoCompra,
+            nota.id,
+            titulo=f"NC compra {nota.numero}",
+            parent=self,
         )
-
-        ventana.setModal(
-            True,
-        )
-
-        ventana.resize(
-            1120,
-            720,
-        )
-
-        layout = QVBoxLayout(
-            ventana,
-        )
-
-        vista = VistaNotaCreditoCompra(
-            id_registro=nota.id,
-            parent=ventana,
-        )
-
-        layout.addWidget(
-            vista,
-        )
-
-        vista.cerrar.connect(
-            ventana.accept,
-        )
-
-        ventana.exec()
-
-        vista.deleteLater()
 
     def _vincular_orden_compra(
         self,
