@@ -123,6 +123,8 @@ def main():
     paso("06_nuevo_cliente", lambda: abrir_nuevo("Clientes"))
     paso("07_nuevo_producto", lambda: abrir_nuevo("Productos"))
     paso("08_lista_facturas", lambda: dashboard.modulo_seleccionado("FacturasVenta"))
+    paso("09_nuevo_pedido", lambda: abrir_nuevo("Pedidos"))
+    paso("10_compras", lambda: dashboard.modulo_seleccionado("Compras"))
 
     LOG.close()
 
