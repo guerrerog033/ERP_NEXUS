@@ -340,6 +340,10 @@ class FormularioCotizacion(Page):
             | Qt.AlignmentFlag.AlignVCenter,
         )
 
+        self.card.layout_principal.setSpacing(
+            10,
+        )
+
         self.layout_principal.addWidget(
             self.card,
         )
@@ -643,6 +647,8 @@ class FormularioCotizacion(Page):
 
         acciones_lineas.addWidget(
             self.btn_agregar_linea,
+            0,
+            Qt.AlignmentFlag.AlignTop,
         )
 
         acciones_lineas.addWidget(

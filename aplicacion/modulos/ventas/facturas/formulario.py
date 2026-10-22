@@ -1117,6 +1117,8 @@ class FormularioFacturaVenta(
 
         fila_superior.addWidget(
             self.btn_agregar_linea,
+            0,
+            Qt.AlignmentFlag.AlignTop,
         )
 
         fila_superior.addWidget(
