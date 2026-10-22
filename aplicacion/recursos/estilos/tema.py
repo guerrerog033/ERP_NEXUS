@@ -27,6 +27,26 @@ def aplicar_tema(app):
         encoding="utf-8",
     ) as f:
 
-        app.setStyleSheet(
-            f.read(),
+        contenido = f.read()
+
+    # Las imágenes del tema (flechas de combos y fechas) se referencian
+    # como {ICONOS}/archivo.svg; se resuelven con la ruta absoluta para
+    # que funcionen sin importar desde qué carpeta se abra el ERP.
+    iconos = (
+        Path(__file__)
+        .resolve()
+        .parent
+        .parent
+        .joinpath(
+            "iconos",
+            "acciones",
         )
+        .as_posix()
+    )
+
+    app.setStyleSheet(
+        contenido.replace(
+            "{ICONOS}",
+            iconos,
+        ),
+    )

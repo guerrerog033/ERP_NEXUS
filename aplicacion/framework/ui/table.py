@@ -201,21 +201,13 @@ class Table(QTableWidget):
             }
 
             QHeaderView::section{
-
-                background:#1E3A5F;
-
-                color:white;
-
+                background:#F8FAFC;
+                color:#475569;
                 border:none;
-
-                border-right:1px solid #1E3A5F;
-
-                padding:10px;
-
+                border-bottom:1px solid #E2E8F0;
+                padding:9px 8px;
                 font-size:13px;
-
-                font-weight:bold;
-
+                font-weight:600;
             }
 
             QHeaderView::section:last{

@@ -1438,3 +1438,68 @@ QLabel#DocumentoTotal{
     padding-top:6px;
     border-top:1px solid #E2E8F0;
 }
+
+
+/* ==========================================================
+   Flechas de combos, fechas y números
+   ========================================================== */
+
+QComboBox,
+QDateEdit{
+    padding-right:24px;
+}
+
+QComboBox::drop-down,
+QDateEdit::drop-down{
+    subcontrol-origin:padding;
+    subcontrol-position:center right;
+    width:22px;
+    border:none;
+    background:transparent;
+}
+
+QComboBox::down-arrow,
+QDateEdit::down-arrow{
+    image:url({ICONOS}/flecha_abajo.svg);
+    width:12px;
+    height:12px;
+}
+
+QComboBox::down-arrow:disabled,
+QDateEdit::down-arrow:disabled{
+    image:none;
+}
+
+QSpinBox::up-button,
+QDoubleSpinBox::up-button,
+QDateEdit::up-button{
+    subcontrol-origin:border;
+    subcontrol-position:top right;
+    width:18px;
+    border:none;
+    background:transparent;
+}
+
+QSpinBox::down-button,
+QDoubleSpinBox::down-button,
+QDateEdit::down-button{
+    subcontrol-origin:border;
+    subcontrol-position:bottom right;
+    width:18px;
+    border:none;
+    background:transparent;
+}
+
+QSpinBox::up-arrow,
+QDoubleSpinBox::up-arrow{
+    image:url({ICONOS}/flecha_arriba.svg);
+    width:10px;
+    height:10px;
+}
+
+QSpinBox::down-arrow,
+QDoubleSpinBox::down-arrow{
+    image:url({ICONOS}/flecha_abajo.svg);
+    width:10px;
+    height:10px;
+}

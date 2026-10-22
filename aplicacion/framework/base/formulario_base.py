@@ -125,6 +125,23 @@ class FormularioBase(Page):
             titulo,
         )
 
+        # Título alineado a la izquierda, igual que los documentos.
+        self.card.lbl_titulo.setObjectName(
+            "DocumentoTituloHoja",
+        )
+
+        self.card.lbl_titulo.setAlignment(
+            Qt.AlignLeft
+            | Qt.AlignVCenter,
+        )
+
+        self.card.layout_principal.setContentsMargins(
+            28,
+            22,
+            28,
+            20,
+        )
+
         self.card.setSizePolicy(
             QSizePolicy.Expanding,
             QSizePolicy.Expanding,

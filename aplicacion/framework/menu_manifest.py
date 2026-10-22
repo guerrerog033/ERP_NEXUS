@@ -413,7 +413,7 @@ GRUPOS: list[
                     ("Notas crédito", "NotasCreditoVenta"),
                     ("Notas débito", "NotasDebitoVenta"),
                     ("Facturación recurrente", "FacturasRecurrentes"),
-                    ("Guías de remisión electrónica", "GuiasRemisionElectronica"),
+                    ("Guías electrónicas", "GuiasRemisionElectronica"),
                 ],
             },
             {
