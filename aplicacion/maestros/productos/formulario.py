@@ -1,11 +1,18 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
+    QAbstractItemView,
     QFrame,
     QFormLayout,
     QGroupBox,
     QHBoxLayout,
+    QHeaderView,
+    QLabel,
     QPushButton,
     QScrollArea,
+    QSizePolicy,
+    QTableWidget,
+    QTableWidgetItem,
+    QTabWidget,
     QVBoxLayout,
     QWidget,
 )
@@ -178,6 +185,11 @@ class FormularioProducto(FormularioBase):
             self.definition,
         )
 
+        # Diseño de escritorio (World Office / Sysplus):
+        #   fila 1: Identificación | Imagen
+        #   fila 2: Precios + utilidad | Impuestos | Inventario
+        #   fila 3: pestañas (listas de precio, volumen, descripción,
+        #           existencias, movimientos, kit, lotes)
         contenedor = QWidget()
 
         layout_raiz = QVBoxLayout(
@@ -185,14 +197,14 @@ class FormularioProducto(FormularioBase):
         )
 
         layout_raiz.setContentsMargins(
+            0,
+            0,
+            0,
             4,
-            4,
-            4,
-            8,
         )
 
         layout_raiz.setSpacing(
-            14,
+            8,
         )
 
         panel_campos = QWidget()
@@ -201,18 +213,10 @@ class FormularioProducto(FormularioBase):
             self.engine.construir(),
         )
 
-        layout_raiz.addWidget(
-            panel_campos,
-        )
-
         self.btn_gestionar_variantes = Botones.editar()
 
         self.btn_gestionar_variantes.setText(
-            "Configurar variantes (talla, color, stock)…",
-        )
-
-        self.btn_gestionar_variantes.setMinimumWidth(
-            340,
+            "Configurar variantes…",
         )
 
         self.btn_gestionar_variantes.hide()
@@ -223,6 +227,207 @@ class FormularioProducto(FormularioBase):
 
         self._insertar_boton_variantes(
             panel_campos,
+        )
+
+        grupos = {
+            grupo.title(): grupo
+            for grupo in panel_campos.findChildren(
+                QGroupBox,
+            )
+        }
+
+        # ---- Fila 1: identificación + imagen ----
+        fila_superior = QHBoxLayout()
+
+        fila_superior.setSpacing(
+            10,
+        )
+
+        if "Identificación" in grupos:
+
+            fila_superior.addWidget(
+                grupos["Identificación"],
+                1,
+            )
+
+        self.imagen_widget = ImagenProductoWidget()
+
+        grupo_imagen = self._crear_grupo_contenedor(
+            "Imagen",
+            self.imagen_widget,
+        )
+
+        grupo_imagen.setFixedWidth(
+            300,
+        )
+
+        fila_superior.addWidget(
+            grupo_imagen,
+        )
+
+        layout_raiz.addLayout(
+            fila_superior,
+        )
+
+        # ---- Fila 2: precios / impuestos / inventario ----
+        fila_media = QHBoxLayout()
+
+        fila_media.setSpacing(
+            10,
+        )
+
+        self.lbl_utilidad = QLabel(
+            "—",
+        )
+
+        self.lbl_utilidad.setObjectName(
+            "CajaDocumentoSaldo",
+        )
+
+        self.lbl_utilidad.setToolTip(
+            "Utilidad estimada: precio de venta sin IVA menos el costo.",
+        )
+
+        grupo_precios = grupos.get(
+            "Precios",
+        )
+
+        if grupo_precios is not None and isinstance(
+            grupo_precios.layout(),
+            QFormLayout,
+        ):
+
+            grupo_precios.layout().addRow(
+                "Utilidad estimada",
+                self.lbl_utilidad,
+            )
+
+        for titulo_grupo in (
+            "Precios",
+            "Impuestos",
+            "Inventario",
+        ):
+
+            if titulo_grupo in grupos:
+
+                grupos[titulo_grupo].setSizePolicy(
+                    QSizePolicy.Expanding,
+                    QSizePolicy.Maximum,
+                )
+
+                fila_media.addWidget(
+                    grupos[titulo_grupo],
+                    1,
+                    Qt.AlignTop,
+                )
+
+        layout_raiz.addLayout(
+            fila_media,
+        )
+
+        # ---- Fila 3: pestañas ----
+        self.pestanas_producto = QTabWidget()
+
+        self.pestanas_producto.setObjectName(
+            "PestanasDocumento",
+        )
+
+        self.pestanas_producto.setMinimumHeight(
+            230,
+        )
+
+        self.lista_precios_widget = (
+            ListaPreciosProductoWidget()
+        )
+
+        self.pestanas_producto.addTab(
+            self._pagina_pestana(
+                self.lista_precios_widget,
+            ),
+            "Listas de precio",
+        )
+
+        self.precio_volumen_widget = ListaRegistrosWidget(
+            servicio=ServicioPrecioVolumenProducto,
+            columnas=[
+                ("cantidad_minima", "Cantidad mínima"),
+                ("precio", "Precio"),
+            ],
+            campos=[
+                CampoRegistro(
+                    "cantidad_minima",
+                    "Cantidad mínima",
+                    tipo="numero",
+                    requerido=True,
+                ),
+                CampoRegistro(
+                    "precio",
+                    "Precio",
+                    tipo="numero",
+                    requerido=True,
+                ),
+            ],
+            titulo_dialogo="Escalón de precio por volumen",
+            campo_padre="producto_id",
+        )
+
+        self.pestanas_producto.addTab(
+            self._pagina_pestana(
+                self.precio_volumen_widget,
+            ),
+            "Precios por volumen",
+        )
+
+        grupo_adicional = grupos.get(
+            "Información adicional",
+        )
+
+        if grupo_adicional is not None:
+
+            grupo_adicional.setTitle(
+                "",
+            )
+
+            self.pestanas_producto.addTab(
+                self._pagina_pestana(
+                    grupo_adicional,
+                ),
+                "Descripción",
+            )
+
+        self.tabla_existencias = self._tabla_consulta(
+            [
+                "Bodega",
+                "Existencia",
+                "Reservada",
+                "Disponible",
+            ],
+        )
+
+        self.pestanas_producto.addTab(
+            self._pagina_pestana(
+                self.tabla_existencias,
+            ),
+            "Existencias",
+        )
+
+        self.tabla_movimientos = self._tabla_consulta(
+            [
+                "Fecha",
+                "Tipo",
+                "Bodega",
+                "Cantidad",
+                "Costo unit.",
+                "Saldo",
+                "Referencia",
+            ],
+        )
+
+        self.pestanas_producto.addTab(
+            self._pagina_pestana(
+                self.tabla_movimientos,
+            ),
+            "Movimientos",
         )
 
         self._contenedor_variantes = QWidget()
@@ -281,15 +486,19 @@ class FormularioProducto(FormularioBase):
             campo_padre="kit_id",
         )
 
-        self._grupo_kit = self._crear_grupo_contenedor(
-            "Componentes del kit",
+        self._grupo_kit = self._pagina_pestana(
             self.kit_componentes_widget,
         )
 
         self._grupo_kit.hide()
 
-        layout_raiz.addWidget(
+        self._pagina_kit = self._pagina_pestana(
             self._grupo_kit,
+        )
+
+        self.pestanas_producto.addTab(
+            self._pagina_kit,
+            "Componentes del kit",
         )
 
         self.lote_serie_widget = ListaRegistrosWidget(
@@ -325,57 +534,24 @@ class FormularioProducto(FormularioBase):
             campo_padre="producto_id",
         )
 
-        self._grupo_lote_serie = self._crear_grupo_contenedor(
-            "Lotes / números de serie",
+        self._grupo_lote_serie = self._pagina_pestana(
             self.lote_serie_widget,
         )
 
         self._grupo_lote_serie.hide()
 
-        layout_raiz.addWidget(
+        self._pagina_lote_serie = self._pagina_pestana(
             self._grupo_lote_serie,
         )
 
-        self.lista_precios_widget = (
-            ListaPreciosProductoWidget()
+        self.pestanas_producto.addTab(
+            self._pagina_lote_serie,
+            "Lotes / series",
         )
 
         layout_raiz.addWidget(
-            self._crear_grupo_contenedor(
-                "Listas de precio",
-                self.lista_precios_widget,
-            ),
-        )
-
-        self.precio_volumen_widget = ListaRegistrosWidget(
-            servicio=ServicioPrecioVolumenProducto,
-            columnas=[
-                ("cantidad_minima", "Cantidad mínima"),
-                ("precio", "Precio"),
-            ],
-            campos=[
-                CampoRegistro(
-                    "cantidad_minima",
-                    "Cantidad mínima",
-                    tipo="numero",
-                    requerido=True,
-                ),
-                CampoRegistro(
-                    "precio",
-                    "Precio",
-                    tipo="numero",
-                    requerido=True,
-                ),
-            ],
-            titulo_dialogo="Escalón de precio por volumen",
-            campo_padre="producto_id",
-        )
-
-        layout_raiz.addWidget(
-            self._crear_grupo_contenedor(
-                "Precios por volumen",
-                self.precio_volumen_widget,
-            ),
+            self.pestanas_producto,
+            1,
         )
 
         if not self.es_edicion:
@@ -385,17 +561,6 @@ class FormularioProducto(FormularioBase):
         self.atributos_variante_widget.cambio.connect(
             self._sincronizar_atributos_variantes,
         )
-
-        self.imagen_widget = ImagenProductoWidget()
-
-        layout_raiz.addWidget(
-            self._crear_grupo_contenedor(
-                "Imagen",
-                self.imagen_widget,
-            ),
-        )
-
-        layout_raiz.addStretch()
 
         scroll = QScrollArea()
 
@@ -411,31 +576,8 @@ class FormularioProducto(FormularioBase):
             Qt.ScrollBarAlwaysOff,
         )
 
-        scroll.setMinimumHeight(
-            520,
-        )
-
         scroll.setStyleSheet(
-            """
-            QScrollArea {
-                background: transparent;
-                border: none;
-            }
-            QScrollBar:vertical {
-                width: 8px;
-                background: #f8fafc;
-                margin: 2px 0;
-            }
-            QScrollBar::handle:vertical {
-                background: #64748b;
-                border-radius: 4px;
-                min-height: 28px;
-            }
-            QScrollBar::add-line:vertical,
-            QScrollBar::sub-line:vertical {
-                height: 0;
-            }
-            """
+            "QScrollArea { background: transparent; border: none; }",
         )
 
         scroll.setWidget(
@@ -450,6 +592,8 @@ class FormularioProducto(FormularioBase):
             self.card.contenido.count() - 1,
             1,
         )
+
+        self._conectar_utilidad()
 
         self._configurar_codigo_automatico()
 
@@ -506,6 +650,499 @@ class FormularioProducto(FormularioBase):
             self._cargar_datos_adicionales()
 
         self._crear_botones()
+
+    # -----------------------------------------------------
+    # Piezas del diseño de escritorio
+    # -----------------------------------------------------
+
+    @staticmethod
+    def _pagina_pestana(
+        widget: QWidget,
+    ) -> QWidget:
+
+        pagina = QWidget()
+
+        layout = QVBoxLayout(
+            pagina,
+        )
+
+        layout.setContentsMargins(
+            6,
+            6,
+            6,
+            6,
+        )
+
+        layout.addWidget(
+            widget,
+        )
+
+        return pagina
+
+    @staticmethod
+    def _tabla_consulta(
+        encabezados: list[str],
+    ) -> QTableWidget:
+
+        tabla = QTableWidget(
+            0,
+            len(
+                encabezados,
+            ),
+        )
+
+        tabla.setHorizontalHeaderLabels(
+            encabezados,
+        )
+
+        tabla.verticalHeader().setVisible(
+            False,
+        )
+
+        tabla.setEditTriggers(
+            QAbstractItemView.NoEditTriggers,
+        )
+
+        tabla.setSelectionBehavior(
+            QAbstractItemView.SelectRows,
+        )
+
+        tabla.setAlternatingRowColors(
+            True,
+        )
+
+        tabla.horizontalHeader().setSectionResizeMode(
+            QHeaderView.Stretch,
+        )
+
+        return tabla
+
+    def _sincronizar_pestanas(
+        self,
+    ) -> None:
+
+        pestanas = getattr(
+            self,
+            "pestanas_producto",
+            None,
+        )
+
+        if pestanas is None:
+
+            return
+
+        for pagina, grupo in (
+            (
+                getattr(self, "_pagina_kit", None),
+                getattr(self, "_grupo_kit", None),
+            ),
+            (
+                getattr(self, "_pagina_lote_serie", None),
+                getattr(self, "_grupo_lote_serie", None),
+            ),
+        ):
+
+            if pagina is None or grupo is None:
+
+                continue
+
+            indice = pestanas.indexOf(
+                pagina,
+            )
+
+            if indice >= 0:
+
+                pestanas.setTabVisible(
+                    indice,
+                    not grupo.isHidden(),
+                )
+
+    def _conectar_utilidad(
+        self,
+    ) -> None:
+
+        for nombre in (
+            "precio_venta",
+            "costo",
+        ):
+
+            widget = self.widget(
+                nombre,
+            )
+
+            if widget is not None and hasattr(
+                widget,
+                "valueChanged",
+            ):
+
+                widget.valueChanged.connect(
+                    lambda *_a: self._actualizar_utilidad(),
+                )
+
+        incluye = self.widget(
+            "precio_incluye_iva",
+        )
+
+        if incluye is not None and hasattr(
+            incluye,
+            "toggled",
+        ):
+
+            incluye.toggled.connect(
+                lambda *_a: self._actualizar_utilidad(),
+            )
+
+        impuesto = self.widget(
+            "impuesto_venta_id",
+        )
+
+        if impuesto is not None and hasattr(
+            impuesto,
+            "currentIndexChanged",
+        ):
+
+            impuesto.currentIndexChanged.connect(
+                lambda *_a: self._actualizar_utilidad(),
+            )
+
+        self._actualizar_utilidad()
+
+    @staticmethod
+    def _numero(
+        widget,
+    ) -> float:
+
+        if widget is None:
+
+            return 0.0
+
+        try:
+
+            return float(
+                widget.value(),
+            )
+
+        except (
+            AttributeError,
+            TypeError,
+            ValueError,
+        ):
+
+            return 0.0
+
+    def _tarifa_iva_venta(
+        self,
+    ) -> float:
+
+        import re
+
+        combo = self.widget(
+            "impuesto_venta_id",
+        )
+
+        if combo is None or not hasattr(
+            combo,
+            "currentText",
+        ):
+
+            return 0.0
+
+        coincidencia = re.search(
+            r"(\d+(?:[.,]\d+)?)\s*%",
+            combo.currentText(),
+        )
+
+        if coincidencia is None:
+
+            return 0.0
+
+        return float(
+            coincidencia.group(1).replace(
+                ",",
+                ".",
+            ),
+        )
+
+    def _actualizar_utilidad(
+        self,
+    ) -> None:
+
+        etiqueta = getattr(
+            self,
+            "lbl_utilidad",
+            None,
+        )
+
+        if etiqueta is None:
+
+            return
+
+        precio = self._numero(
+            self.widget(
+                "precio_venta",
+            ),
+        )
+
+        costo = self._numero(
+            self.widget(
+                "costo",
+            ),
+        )
+
+        incluye = self.widget(
+            "precio_incluye_iva",
+        )
+
+        base = precio
+
+        if incluye is not None and incluye.isChecked():
+
+            tarifa = self._tarifa_iva_venta()
+
+            base = precio / (
+                1 + tarifa / 100
+            ) if tarifa else precio
+
+        if base <= 0:
+
+            etiqueta.setText(
+                "—",
+            )
+
+            etiqueta.setProperty(
+                "vencido",
+                False,
+            )
+
+        else:
+
+            utilidad = base - costo
+
+            porcentaje = utilidad / base * 100
+
+            from aplicacion.framework.ui.documento_escritorio import (
+                formato_moneda,
+            )
+
+            etiqueta.setText(
+                f"{formato_moneda(utilidad)}  ({porcentaje:.1f} %)",
+            )
+
+            etiqueta.setProperty(
+                "vencido",
+                utilidad < 0,
+            )
+
+        etiqueta.style().unpolish(
+            etiqueta,
+        )
+
+        etiqueta.style().polish(
+            etiqueta,
+        )
+
+    def _cargar_existencias_y_movimientos(
+        self,
+    ) -> None:
+
+        if not self.id_registro:
+
+            return
+
+        try:
+
+            from aplicacion.base_datos.conexion import SessionLocal
+            from aplicacion.modulos.inventario.modelos import (
+                Bodega,
+                ExistenciaBodega,
+            )
+
+            db = SessionLocal()
+
+            try:
+
+                filas = (
+                    db.query(
+                        ExistenciaBodega,
+                        Bodega,
+                    )
+                    .join(
+                        Bodega,
+                        Bodega.id == ExistenciaBodega.bodega_id,
+                    )
+                    .filter(
+                        ExistenciaBodega.producto_id
+                        == self.id_registro,
+                    )
+                    .all()
+                )
+
+                existencias = [
+                    (
+                        f"{bodega.codigo} - {bodega.nombre}",
+                        float(existencia.cantidad or 0),
+                        float(existencia.cantidad_reservada or 0),
+                    )
+                    for existencia, bodega in filas
+                ]
+
+            finally:
+
+                db.close()
+
+        except Exception:
+
+            existencias = []
+
+        self.tabla_existencias.setRowCount(
+            len(
+                existencias,
+            ),
+        )
+
+        for fila, (bodega, cantidad, reservada) in enumerate(
+            existencias,
+        ):
+
+            for columna, texto in enumerate(
+                (
+                    bodega,
+                    f"{cantidad:,.2f}",
+                    f"{reservada:,.2f}",
+                    f"{cantidad - reservada:,.2f}",
+                ),
+            ):
+
+                item = QTableWidgetItem(
+                    texto,
+                )
+
+                if columna:
+
+                    item.setTextAlignment(
+                        Qt.AlignRight
+                        | Qt.AlignVCenter,
+                    )
+
+                self.tabla_existencias.setItem(
+                    fila,
+                    columna,
+                    item,
+                )
+
+        try:
+
+            from aplicacion.modulos.inventario.servicios import (
+                ServicioInventario,
+            )
+
+            movimientos = ServicioInventario.consultar_kardex(
+                producto_id=self.id_registro,
+            )[-200:]
+
+        except Exception:
+
+            movimientos = []
+
+        movimientos = list(
+            reversed(
+                movimientos,
+            ),
+        )
+
+        self.tabla_movimientos.setRowCount(
+            len(
+                movimientos,
+            ),
+        )
+
+        for fila, movimiento in enumerate(
+            movimientos,
+        ):
+
+            fecha = movimiento.get(
+                "fecha",
+            )
+
+            textos = (
+                fecha.strftime("%d/%m/%Y")
+                if hasattr(fecha, "strftime")
+                else str(fecha or ""),
+                str(movimiento.get("tipo", "")),
+                str(movimiento.get("bodega", "")),
+                f"{float(movimiento.get('cantidad') or 0):,.2f}",
+                f"{float(movimiento.get('costo_unitario') or 0):,.2f}",
+                f"{float(movimiento.get('saldo') or 0):,.2f}",
+                str(movimiento.get("referencia", "")),
+            )
+
+            for columna, texto in enumerate(
+                textos,
+            ):
+
+                item = QTableWidgetItem(
+                    texto,
+                )
+
+                if 3 <= columna <= 5:
+
+                    item.setTextAlignment(
+                        Qt.AlignRight
+                        | Qt.AlignVCenter,
+                    )
+
+                self.tabla_movimientos.setItem(
+                    fila,
+                    columna,
+                    item,
+                )
+
+    def teclas_contexto(
+        self,
+    ) -> list:
+
+        teclas = super().teclas_contexto()
+
+        extra = [
+            ("F6", "Listas de precio", lambda: self.pestanas_producto.setCurrentIndex(0)),
+            ("F7", "Código de barras", self._enfocar_codigo_barras),
+            ("F8", "Existencias", self._ver_existencias),
+        ]
+
+        return teclas[:1] + extra + teclas[1:]
+
+    def _enfocar_codigo_barras(
+        self,
+    ) -> None:
+
+        widget = self.widget(
+            "codigo_barras",
+        )
+
+        if widget is not None:
+
+            widget.setFocus()
+
+            if hasattr(
+                widget,
+                "selectAll",
+            ):
+
+                widget.selectAll()
+
+    def _ver_existencias(
+        self,
+    ) -> None:
+
+        indice = self.pestanas_producto.indexOf(
+            self.tabla_existencias.parentWidget(),
+        )
+
+        if indice >= 0:
+
+            self.pestanas_producto.setCurrentIndex(
+                indice,
+            )
 
     def _insertar_boton_variantes(
         self,
@@ -592,6 +1229,8 @@ class FormularioProducto(FormularioBase):
             visible,
         )
 
+        self._sincronizar_pestanas()
+
     def _actualizar_lote_serie_visible(
         self,
         _valor=None,
@@ -619,6 +1258,8 @@ class FormularioProducto(FormularioBase):
         self._grupo_lote_serie.setVisible(
             requiere,
         )
+
+        self._sincronizar_pestanas()
 
     @staticmethod
     def _texto_producto_componente(
@@ -777,6 +1418,10 @@ class FormularioProducto(FormularioBase):
         self.precio_volumen_widget.cargar(
             self.id_registro,
         )
+
+        self._cargar_existencias_y_movimientos()
+
+        self._actualizar_utilidad()
 
     def _requiere_registros_relacionados(
         self,

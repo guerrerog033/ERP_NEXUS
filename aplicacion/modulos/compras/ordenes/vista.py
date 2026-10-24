@@ -479,6 +479,12 @@ class _DialogoOrdenCompra(QDialog):
 
 
 
+
+        self._botones_dialogo = botones
+
+
+
+
         # Enter en cant/costo avanza como una planilla (producto →
         # cant → costo → agregar); ver keyPressEvent.
         self.cantidad.lineEdit().returnPressed.connect(
@@ -491,6 +497,70 @@ class _DialogoOrdenCompra(QDialog):
         self._foco_inicial_aplicado = False
 
 
+
+
+    def preparar_para_pestana(
+        self,
+    ) -> None:
+        """
+        La orden se abre como pestaña (no como ventana flotante) con
+        el mismo diseño de las facturas: título, barra de acciones,
+        caja del proveedor y teclas de función.
+        """
+
+        from aplicacion.framework.ui.documento_escritorio import (
+            aplicar_diseno_documento,
+        )
+
+        layout = self.layout()
+
+        layout.removeWidget(
+            self._botones_dialogo,
+        )
+
+        self._botones_dialogo.hide()
+
+        fila = QHBoxLayout()
+
+        btn_guardar = QPushButton(
+            "Guardar",
+        )
+
+        btn_guardar.clicked.connect(
+            self._guardar,
+        )
+
+        btn_cancelar = QPushButton(
+            "Cancelar",
+        )
+
+        btn_cancelar.clicked.connect(
+            self.reject,
+        )
+
+        fila.addWidget(
+            btn_guardar,
+        )
+
+        fila.addWidget(
+            btn_cancelar,
+        )
+
+        layout.addLayout(
+            fila,
+        )
+
+        self.layout_principal = layout
+
+        aplicar_diseno_documento(
+            self,
+            "Nueva orden de compra",
+            area="compras",
+            tercero=self.proveedor,
+            etiqueta_tercero="Proveedor",
+            titulo_tercero="Información del proveedor",
+            cartera="cxp",
+        )
 
     def keyPressEvent(
         self,
@@ -1050,19 +1120,52 @@ class OrdenesCompraPage(InquiryPage):
 
     def _nueva(self) -> None:
 
-
-
-        dialogo = _DialogoOrdenCompra(
-
-            self,
-
+        from aplicacion.framework.ui.pestanas import (
+            abrir_en_pestana,
+            area_trabajo,
         )
 
+        area = area_trabajo()
 
+        if area is not None:
+
+            dialogo = _DialogoOrdenCompra()
+
+            dialogo.setWindowFlags(
+                Qt.WindowType.Widget,
+            )
+
+            dialogo.preparar_para_pestana()
+
+            contenedor = abrir_en_pestana(
+                dialogo,
+                "Nueva orden de compra",
+                ancho_maximo=1240,
+            )
+
+            def _al_terminar(
+                resultado,
+            ) -> None:
+
+                area.cerrar_widget(
+                    contenedor,
+                )
+
+                if resultado:
+
+                    self._consultar()
+
+            dialogo.finished.connect(
+                _al_terminar,
+            )
+
+            return
+
+        dialogo = _DialogoOrdenCompra(
+            self,
+        )
 
         if dialogo.exec():
-
-
 
             self._consultar()
 
