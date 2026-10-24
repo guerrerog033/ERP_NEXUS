@@ -1297,3 +1297,1110 @@ def quitar_item(
                 sub,
                 0,
             )
+
+
+# =========================================================
+# Orden de la tecla Tab
+# =========================================================
+
+
+def _recolectar_foco(
+    objeto,
+    salida: list,
+) -> None:
+
+    from PySide6.QtWidgets import (
+        QScrollArea,
+        QTabWidget,
+        QWidget as _QWidget,
+    )
+
+    if isinstance(
+        objeto,
+        QLayout,
+    ):
+
+        for indice in range(
+            objeto.count(),
+        ):
+
+            item = objeto.itemAt(
+                indice,
+            )
+
+            if item.widget() is not None:
+
+                _recolectar_foco(
+                    item.widget(),
+                    salida,
+                )
+
+            elif item.layout() is not None:
+
+                _recolectar_foco(
+                    item.layout(),
+                    salida,
+                )
+
+        return
+
+    if not isinstance(
+        objeto,
+        _QWidget,
+    ):
+
+        return
+
+    if isinstance(
+        objeto,
+        QTableWidget,
+    ):
+
+        for fila in range(
+            objeto.rowCount(),
+        ):
+
+            for columna in range(
+                objeto.columnCount(),
+            ):
+
+                if objeto.isColumnHidden(
+                    columna,
+                ):
+
+                    continue
+
+                celda = objeto.cellWidget(
+                    fila,
+                    columna,
+                )
+
+                if celda is not None:
+
+                    _recolectar_foco(
+                        celda,
+                        salida,
+                    )
+
+        return
+
+    if isinstance(
+        objeto,
+        QTabWidget,
+    ):
+
+        for indice in range(
+            objeto.count(),
+        ):
+
+            _recolectar_foco(
+                objeto.widget(
+                    indice,
+                ),
+                salida,
+            )
+
+        return
+
+    if isinstance(
+        objeto,
+        QScrollArea,
+    ):
+
+        if objeto.widget() is not None:
+
+            _recolectar_foco(
+                objeto.widget(),
+                salida,
+            )
+
+        return
+
+    if objeto.focusPolicy() & Qt.FocusPolicy.TabFocus:
+
+        salida.append(
+            objeto,
+        )
+
+        return
+
+    if objeto.layout() is not None:
+
+        _recolectar_foco(
+            objeto.layout(),
+            salida,
+        )
+
+
+def orden_tab_visual(
+    raiz,
+    *,
+    al_final: list | None = None,
+) -> list:
+    """
+    Ordena la tecla Tab según cómo se ven los campos (de arriba a
+    abajo y de izquierda a derecha). Hace falta después de mover
+    widgets a otros contenedores: Qt los manda al final de la cadena.
+    """
+
+    widgets: list = []
+
+    _recolectar_foco(
+        raiz,
+        widgets,
+    )
+
+    finales = list(
+        al_final or [],
+    )
+
+    widgets = [
+        widget
+        for widget in widgets
+        if widget not in finales
+    ] + finales
+
+    for anterior, siguiente in zip(
+        widgets,
+        widgets[1:],
+    ):
+
+        QWidget.setTabOrder(
+            anterior,
+            siguiente,
+        )
+
+    return widgets
+
+
+# =========================================================
+# Diseño de escritorio genérico para formularios sencillos
+# =========================================================
+
+
+def _tomar_items(
+    layout: QLayout,
+) -> list:
+
+    elementos = []
+
+    while layout.count():
+
+        item = layout.takeAt(
+            0,
+        )
+
+        if item.widget() is not None:
+
+            elementos.append(
+                item.widget(),
+            )
+
+        elif item.layout() is not None:
+
+            elementos.append(
+                item.layout(),
+            )
+
+    return elementos
+
+
+def _botones_de(
+    layout: QLayout,
+) -> list:
+
+    botones = []
+
+    for indice in range(
+        layout.count(),
+    ):
+
+        widget = layout.itemAt(
+            indice,
+        ).widget()
+
+        if isinstance(
+            widget,
+            QPushButton,
+        ):
+
+            botones.append(
+                widget,
+            )
+
+    return botones
+
+
+def _caja_desde_formulario(
+    formulario,
+    excluir: set,
+) -> CajaDatos:
+
+    from PySide6.QtWidgets import QFormLayout, QTextEdit
+
+    caja = CajaDatos(
+        "Datos del documento",
+    )
+
+    pares = []
+    anchos = []
+
+    if isinstance(
+        formulario,
+        QFormLayout,
+    ):
+
+        for fila in range(
+            formulario.rowCount(),
+        ):
+
+            etiqueta = formulario.itemAt(
+                fila,
+                QFormLayout.ItemRole.LabelRole,
+            )
+
+            campo = formulario.itemAt(
+                fila,
+                QFormLayout.ItemRole.FieldRole,
+            ) or formulario.itemAt(
+                fila,
+                QFormLayout.ItemRole.SpanningRole,
+            )
+
+            widget_campo = campo.widget() if campo is not None else None
+            widget_etiqueta = etiqueta.widget() if etiqueta is not None else None
+
+            if widget_campo is None or widget_campo in excluir:
+
+                if widget_etiqueta is not None:
+
+                    widget_etiqueta.hide()
+
+                continue
+
+            if isinstance(
+                widget_campo,
+                QTextEdit,
+            ):
+
+                anchos.append(
+                    (
+                        widget_etiqueta,
+                        widget_campo,
+                    ),
+                )
+
+            else:
+
+                pares.append(
+                    (
+                        widget_etiqueta,
+                        widget_campo,
+                    ),
+                )
+
+    elif isinstance(
+        formulario,
+        QGridLayout,
+    ):
+
+        posiciones = []
+
+        for indice in range(
+            formulario.count(),
+        ):
+
+            fila, columna, _f, columnas = formulario.getItemPosition(
+                indice,
+            )
+
+            posiciones.append(
+                (
+                    fila,
+                    columna,
+                    formulario.itemAt(
+                        indice,
+                    ).widget(),
+                ),
+            )
+
+        por_fila: dict = {}
+
+        for fila, columna, widget in posiciones:
+
+            por_fila.setdefault(
+                fila,
+                {},
+            )[columna] = widget
+
+        for fila in sorted(
+            por_fila,
+        ):
+
+            columnas = por_fila[fila]
+
+            for columna in sorted(
+                columnas,
+            ):
+
+                widget = columnas[columna]
+
+                if (
+                    widget is None
+                    or isinstance(
+                        widget,
+                        QLabel,
+                    )
+                ):
+
+                    continue
+
+                etiqueta = columnas.get(
+                    columna - 1,
+                )
+
+                if widget in excluir:
+
+                    if isinstance(
+                        etiqueta,
+                        QLabel,
+                    ):
+
+                        etiqueta.hide()
+
+                    continue
+
+                pares.append(
+                    (
+                        etiqueta
+                        if isinstance(
+                            etiqueta,
+                            QLabel,
+                        )
+                        else None,
+                        widget,
+                    ),
+                )
+
+    for indice, (etiqueta, campo) in enumerate(
+        pares,
+    ):
+
+        fila = indice // 2
+        columna = (indice % 2) * 2
+
+        if etiqueta is not None:
+
+            etiqueta.setObjectName(
+                "CajaDocumentoEtiqueta",
+            )
+
+            caja.grid.addWidget(
+                etiqueta,
+                fila,
+                columna,
+            )
+
+        caja.grid.addWidget(
+            campo,
+            fila,
+            columna + 1,
+        )
+
+    fila = (len(pares) + 1) // 2
+
+    for etiqueta, campo in anchos:
+
+        if etiqueta is not None:
+
+            etiqueta.setObjectName(
+                "CajaDocumentoEtiqueta",
+            )
+
+            caja.grid.addWidget(
+                etiqueta,
+                fila,
+                0,
+                Qt.AlignmentFlag.AlignTop,
+            )
+
+        campo.setMaximumHeight(
+            60,
+        )
+
+        caja.grid.addWidget(
+            campo,
+            fila,
+            1,
+            1,
+            3,
+        )
+
+        fila += 1
+
+    caja.grid.setColumnStretch(
+        1,
+        1,
+    )
+
+    caja.grid.setColumnStretch(
+        3,
+        1,
+    )
+
+    return caja
+
+
+def _envolver_layout(
+    layout: QLayout,
+) -> QWidget:
+    """Pasa los items de un layout suelto a un widget nuevo."""
+
+    from PySide6.QtWidgets import QBoxLayout
+
+    contenedor = QFrame()
+
+    if isinstance(
+        layout,
+        QBoxLayout,
+    ):
+
+        nuevo = QBoxLayout(
+            layout.direction(),
+            contenedor,
+        )
+
+    else:
+
+        nuevo = QHBoxLayout(
+            contenedor,
+        )
+
+    nuevo.setContentsMargins(
+        0,
+        0,
+        0,
+        0,
+    )
+
+    nuevo.setSpacing(
+        layout.spacing() if layout.spacing() >= 0 else 6,
+    )
+
+    while layout.count():
+
+        item = layout.takeAt(
+            0,
+        )
+
+        if item.widget() is not None:
+
+            nuevo.addWidget(
+                item.widget(),
+                0,
+                item.alignment(),
+            )
+
+        elif item.layout() is not None:
+
+            interno = item.layout()
+
+            interno.setParent(
+                None,
+            )
+
+            nuevo.addLayout(
+                interno,
+            )
+
+        elif item.spacerItem() is not None:
+
+            nuevo.addStretch(
+                1,
+            )
+
+    return contenedor
+
+
+def aplicar_diseno_documento(
+    pagina,
+    titulo: str,
+    *,
+    area: str = "",
+    numero: QWidget | None = None,
+    tercero: QWidget | None = None,
+    etiqueta_tercero: str = "Cliente",
+    titulo_tercero: str = "Información del cliente",
+    cartera: str = "cxc",
+) -> None:
+    """
+    Reorganiza un formulario de documento sencillo (recibo de caja,
+    egreso, documento soporte, comprobante contable…) con el mismo
+    diseño de la factura: barra de título con número, barra de
+    acciones arriba, cajas con marco y teclas de función.
+    """
+
+    from PySide6.QtWidgets import (
+        QFormLayout,
+        QMessageBox,
+        QTextEdit,
+    )
+
+    from aplicacion.framework.ui.atajos import pulsar, registrar_atajos
+    from aplicacion.framework.ui.card import Card
+    from aplicacion.framework.ui.colores_modulo import COLORES_AREA
+
+    layout_pagina = pagina.layout_principal
+
+    crudos = _tomar_items(
+        layout_pagina,
+    )
+
+    elementos = []
+    tarjetas_viejas = []
+
+    for elemento in crudos:
+
+        if isinstance(
+            elemento,
+            Card,
+        ):
+
+            elementos.extend(
+                _tomar_items(
+                    elemento.contenido,
+                ),
+            )
+
+            tarjetas_viejas.append(
+                elemento,
+            )
+
+        else:
+
+            elementos.append(
+                elemento,
+            )
+
+    # ---- Botones de abajo -> barra de acciones ----
+
+    botones = []
+
+    for elemento in reversed(
+        elementos,
+    ):
+
+        if isinstance(
+            elemento,
+            QLayout,
+        ):
+
+            encontrados = _botones_de(
+                elemento,
+            )
+
+            if any(
+                "guardar" in boton.text().lower()
+                for boton in encontrados
+            ):
+
+                botones = encontrados
+
+                elementos.remove(
+                    elemento,
+                )
+
+                break
+
+    hoja = Card(
+        "",
+    )
+
+    hoja.setObjectName(
+        "card",
+    )
+
+    hoja.layout_principal.setContentsMargins(
+        0,
+        0,
+        0,
+        10,
+    )
+
+    hoja.layout_principal.setSpacing(
+        6,
+    )
+
+    hoja.contenido.setContentsMargins(
+        10,
+        0,
+        10,
+        0,
+    )
+
+    hoja.contenido.setSpacing(
+        6,
+    )
+
+    color = COLORES_AREA.get(
+        area,
+        "#1E3A5F",
+    )
+
+    barra_titulo = BarraTituloDocumento(
+        titulo,
+        color,
+    )
+
+    if numero is not None:
+
+        if isinstance(
+            numero,
+            QLabel,
+        ) or getattr(
+            numero,
+            "isReadOnly",
+            lambda: False,
+        )():
+
+            numero.setFixedWidth(
+                140,
+            )
+
+            barra_titulo.set_numero_widget(
+                numero,
+            )
+
+        else:
+
+            barra_titulo.caja_numero.hide()
+
+            numero = None
+
+    else:
+
+        barra_titulo.caja_numero.hide()
+
+    hoja.layout_principal.insertWidget(
+        0,
+        barra_titulo,
+    )
+
+    barra_acciones = BarraAccionesDocumento()
+
+    hoja.layout_principal.insertWidget(
+        1,
+        barra_acciones,
+    )
+
+    boton_guardar = None
+    boton_cerrar = None
+
+    for boton in botones:
+
+        texto = boton.text().lower()
+
+        if "guardar" in texto and boton_guardar is None:
+
+            boton_guardar = boton
+
+    if boton_guardar is not None:
+
+        boton_guardar.setObjectName(
+            "BotonPrimario",
+        )
+
+        barra_acciones.agregar(
+            boton_guardar,
+            "guardar",
+            "F10",
+        )
+
+    for boton in botones:
+
+        if boton is boton_guardar:
+
+            continue
+
+        texto = boton.text().lower()
+
+        if "cancelar" in texto or "cerrar" in texto:
+
+            boton_cerrar = boton
+
+            boton.setText(
+                "Cerrar",
+            )
+
+            barra_acciones.agregar_al_final(
+                boton,
+                "cerrar",
+                "Esc",
+            )
+
+        else:
+
+            icono = (
+                "imprimir"
+                if "imprim" in texto
+                else "pdf"
+                if "pdf" in texto
+                else None
+            )
+
+            barra_acciones.agregar(
+                boton,
+                icono,
+            )
+
+    # ---- Cabecera -> cajas con marco ----
+
+    excluir = set()
+
+    if numero is not None:
+
+        excluir.add(
+            numero,
+        )
+
+    if tercero is not None:
+
+        excluir.add(
+            tercero,
+        )
+
+    indice_cabecera = None
+
+    for indice, elemento in enumerate(
+        elementos,
+    ):
+
+        formulario = None
+
+        if isinstance(
+            elemento,
+            (
+                QFormLayout,
+                QGridLayout,
+            ),
+        ):
+
+            formulario = elemento
+
+        elif isinstance(
+            elemento,
+            QWidget,
+        ) and isinstance(
+            elemento.layout(),
+            (
+                QFormLayout,
+                QGridLayout,
+            ),
+        ):
+
+            formulario = elemento.layout()
+
+        if formulario is not None:
+
+            indice_cabecera = indice
+
+            break
+
+    panel_tercero = None
+
+    if indice_cabecera is not None:
+
+        cabecera = elementos[indice_cabecera]
+
+        formulario = (
+            cabecera
+            if isinstance(
+                cabecera,
+                QLayout,
+            )
+            else cabecera.layout()
+        )
+
+        caja_documento = _caja_desde_formulario(
+            formulario,
+            excluir,
+        )
+
+        fila_cajas = QWidget()
+
+        layout_cajas = QHBoxLayout(
+            fila_cajas,
+        )
+
+        layout_cajas.setContentsMargins(
+            0,
+            0,
+            0,
+            0,
+        )
+
+        layout_cajas.setSpacing(
+            8,
+        )
+
+        if tercero is not None:
+
+            if tercero.minimumHeight() > 28:
+
+                tercero.setFixedHeight(
+                    28,
+                )
+
+            panel_tercero = PanelTercero(
+                titulo_tercero,
+                tercero,
+                etiqueta=etiqueta_tercero,
+                cartera=cartera,
+            )
+
+            layout_cajas.addWidget(
+                panel_tercero,
+                1,
+            )
+
+            valor = getattr(
+                tercero,
+                "valor",
+                lambda: None,
+            )()
+
+            if valor:
+
+                try:
+
+                    panel_tercero.mostrar_tercero(
+                        int(
+                            valor,
+                        ),
+                    )
+
+                except (
+                    TypeError,
+                    ValueError,
+                ):
+
+                    pass
+
+        layout_cajas.addWidget(
+            caja_documento,
+            1,
+        )
+
+        fila_cajas.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Maximum,
+        )
+
+        if isinstance(
+            cabecera,
+            QWidget,
+        ):
+
+            cabecera.hide()
+
+            cabecera.deleteLater()
+
+        elementos[indice_cabecera] = fila_cajas
+
+    # ---- Resto, en el mismo orden ----
+
+    boton_agregar = None
+
+    for elemento in elementos:
+
+        if isinstance(
+            elemento,
+            QLayout,
+        ):
+
+            con_agregar = [
+                boton
+                for boton in _botones_de(
+                    elemento,
+                )
+                if "agregar" in boton.text().lower()
+            ]
+
+            widget = _envolver_layout(
+                elemento,
+            )
+
+            if con_agregar:
+
+                boton_agregar = con_agregar[0]
+
+                boton_agregar.setObjectName(
+                    "BotonAgregarLinea",
+                )
+
+                widget.setObjectName(
+                    "DocumentoFilaTotales",
+                )
+
+                widget.layout().setContentsMargins(
+                    4,
+                    2,
+                    10,
+                    2,
+                )
+
+            elemento = widget
+
+        if isinstance(
+            elemento,
+            QTableWidget,
+        ):
+
+            hoja.contenido.addWidget(
+                elemento,
+                1,
+            )
+
+            continue
+
+        if isinstance(
+            elemento,
+            QTextEdit,
+        ):
+
+            elemento.setMaximumHeight(
+                90,
+            )
+
+        hoja.contenido.addWidget(
+            elemento,
+        )
+
+    layout_pagina.setContentsMargins(
+        8,
+        8,
+        8,
+        8,
+    )
+
+    layout_pagina.addWidget(
+        hoja,
+    )
+
+    for tarjeta in tarjetas_viejas:
+
+        tarjeta.hide()
+
+        tarjeta.deleteLater()
+
+    pagina.barra_titulo = barra_titulo
+    pagina.barra_acciones = barra_acciones
+    pagina.panel_tercero = panel_tercero
+
+    # ---- Teclas ----
+
+    def cerrar_con_escape():
+
+        respuesta = QMessageBox.question(
+            pagina,
+            "Cerrar",
+            "¿Cerrar el documento sin guardar los cambios?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+
+        if respuesta != QMessageBox.Yes:
+
+            return
+
+        if boton_cerrar is not None:
+
+            boton_cerrar.click()
+
+        elif hasattr(
+            pagina,
+            "cerrar",
+        ):
+
+            pagina.cerrar.emit()
+
+    atajos = [
+        ("Escape", cerrar_con_escape),
+    ]
+
+    teclas = []
+
+    if boton_guardar is not None:
+
+        atajos.append(
+            (
+                (
+                    "Ctrl+S",
+                    "F10",
+                ),
+                lambda: pulsar(boton_guardar),
+            ),
+        )
+
+        teclas.append(
+            ("F10", "Guardar", lambda: pulsar(boton_guardar)),
+        )
+
+    boton_tercero = getattr(
+        tercero,
+        "btn",
+        None,
+    )
+
+    if boton_tercero is not None:
+
+        atajos.append(
+            ("F3", lambda: pulsar(boton_tercero)),
+        )
+
+        teclas.append(
+            ("F3", etiqueta_tercero, lambda: pulsar(boton_tercero)),
+        )
+
+        boton_tercero.setToolTip(
+            f"Buscar {etiqueta_tercero.lower()} (F3)",
+        )
+
+    if boton_agregar is not None:
+
+        atajos.append(
+            ("Ctrl+L", lambda: pulsar(boton_agregar)),
+        )
+
+        teclas.append(
+            ("Ctrl+L", "Agregar línea", lambda: pulsar(boton_agregar)),
+        )
+
+    teclas.append(
+        ("Tab", "Siguiente campo", lambda: pagina.focusNextChild()),
+    )
+
+    teclas.append(
+        ("Esc", "Cerrar", cerrar_con_escape),
+    )
+
+    registrar_atajos(
+        pagina,
+        atajos,
+    )
+
+    pagina.teclas_contexto = lambda: list(
+        teclas,
+    )
+
+    orden_tab_visual(
+        hoja.contenido,
+        al_final=[
+            boton
+            for boton in (
+                boton_guardar,
+                boton_cerrar,
+            )
+            if boton is not None
+        ],
+    )

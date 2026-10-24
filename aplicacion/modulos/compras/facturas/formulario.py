@@ -552,7 +552,7 @@ class FormularioFacturaCompra(Page):
         )
 
         btn_agregar.clicked.connect(
-            self._agregar_fila,
+            lambda _checked=False: self._agregar_fila(),
         )
 
         # ---------------- Fila de totales del detalle ----------------
@@ -888,6 +888,7 @@ class FormularioFacturaCompra(Page):
         self._btn_guardar = btn_guardar
         self._btn_agregar = btn_agregar
         self._btn_importar = btn_importar
+        self._hoja = hoja
 
         from aplicacion.framework.ui.atajos import (
             pulsar,
@@ -936,6 +937,8 @@ class FormularioFacturaCompra(Page):
         self.agregar_widget(
             hoja,
         )
+
+        self._ordenar_tab_escritorio()
 
         if not self.es_edicion:
 
@@ -1239,6 +1242,33 @@ class FormularioFacturaCompra(Page):
 
         self._recalcular_fila(
             fila,
+        )
+
+        self._ordenar_tab_escritorio()
+
+    def _ordenar_tab_escritorio(
+        self,
+    ) -> None:
+
+        hoja = getattr(
+            self,
+            "_hoja",
+            None,
+        )
+
+        if hoja is None:
+
+            return
+
+        from aplicacion.framework.ui.documento_escritorio import (
+            orden_tab_visual,
+        )
+
+        orden_tab_visual(
+            hoja.contenido,
+            al_final=[
+                self._btn_guardar,
+            ],
         )
 
     def _borrar_fila(
