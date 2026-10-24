@@ -499,6 +499,15 @@ class CajaDatos(QGroupBox):
             Qt.TextInteractionFlag.TextSelectableByMouse,
         )
 
+        lbl.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Preferred,
+        )
+
+        lbl.setMinimumWidth(
+            60,
+        )
+
         return lbl
 
 
@@ -1141,6 +1150,42 @@ def caja_totales(
     layout.addStretch(
         1,
     )
+
+    interno = panel.layout()
+
+    if interno is not None:
+
+        interno.setContentsMargins(
+            12,
+            6,
+            12,
+            8,
+        )
+
+        if isinstance(
+            interno,
+            QGridLayout,
+        ):
+
+            interno.setVerticalSpacing(
+                4,
+            )
+
+        else:
+
+            interno.setSpacing(
+                4,
+            )
+
+    for combo in panel.findChildren(
+        QWidget,
+    ):
+
+        if type(combo).__name__ == "CeldaRetencionCombo":
+
+            combo.setMaximumHeight(
+                28,
+            )
 
     caja.setSizePolicy(
         QSizePolicy.Policy.Preferred,
