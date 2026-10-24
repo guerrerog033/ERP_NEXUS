@@ -122,7 +122,13 @@ class FormularioFacturaVenta(
         )
 
         self.card.contenido.setSpacing(
-            0,
+            8,
+        )
+
+        # El espacio sobrante va al final y no entre el título y la
+        # cabecera (antes quedaba un hueco grande arriba).
+        self.card.contenido.addStretch(
+            1,
         )
 
         self._recalcular_totales()

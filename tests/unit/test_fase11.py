@@ -124,7 +124,7 @@ def test_design_tokens():
 
     assert colores.PRIMARY == "#1E3A5F"
     assert Colores.PRIMARIO == colores.PRIMARY
-    assert dimensiones.CONTROL_MD == 36
+    assert dimensiones.CONTROL_MD == 30
 
 
 def test_form_builder_sin_stylesheet_inline():

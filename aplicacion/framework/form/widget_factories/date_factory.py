@@ -18,7 +18,7 @@ class DateWidgetFactory:
         )
 
         widget.setMinimumHeight(
-            36
+            30
         )
 
         widget.setEnabled(

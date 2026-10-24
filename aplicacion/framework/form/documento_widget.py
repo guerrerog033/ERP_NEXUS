@@ -25,7 +25,7 @@ class DocumentoWidget(QLineEdit):
         self.tipo_documento = ""
         self.resultado = None
 
-        self.setMinimumHeight(36)
+        self.setMinimumHeight(30)
 
         self.editingFinished.connect(
             self._editing_finished,

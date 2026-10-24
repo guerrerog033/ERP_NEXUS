@@ -12,7 +12,7 @@ class PhoneWidgetFactory:
         widget = QLineEdit()
 
         widget.setMinimumHeight(
-            36
+            30
         )
 
         widget.setEnabled(
