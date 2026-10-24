@@ -1367,6 +1367,20 @@ class FormularioCotizacion(Page):
                 filas_ordenadas,
             ):
 
+                columnas_usadas = [
+                    columna
+                    for fila_item, columna, _c, widget in posiciones
+                    if fila_item == fila
+                    and widget is not None
+                    and widget not in excluir
+                ]
+
+                corrimiento = (
+                    2
+                    if columnas_usadas and min(columnas_usadas) >= 2
+                    else 0
+                )
+
                 for fila_item, columna, columnas, widget in posiciones:
 
                     if (
@@ -1376,6 +1390,33 @@ class FormularioCotizacion(Page):
                     ):
 
                         continue
+
+                    columna -= corrimiento
+
+                    if isinstance(
+                        widget,
+                        QComboBox,
+                    ):
+
+                        widget.setSizeAdjustPolicy(
+                            QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon,
+                        )
+
+                        widget.setMinimumContentsLength(
+                            8,
+                        )
+
+                    if not isinstance(
+                        widget,
+                        QLabel,
+                    ):
+
+                        widget.setMinimumWidth(
+                            min(
+                                widget.minimumWidth(),
+                                110,
+                            ),
+                        )
 
                     if isinstance(
                         widget,
@@ -1449,12 +1490,12 @@ class FormularioCotizacion(Page):
 
             fila_cajas.addWidget(
                 self.panel_tercero,
-                5,
+                1,
             )
 
             fila_cajas.addWidget(
                 caja_documento,
-                5,
+                1,
             )
 
             nueva.setSizePolicy(
@@ -1736,6 +1777,45 @@ class FormularioCotizacion(Page):
             contenido.addWidget(
                 pie,
             )
+
+        # El detalle se queda con el alto sobrante (como la rejilla
+        # grande de Magister) en vez de dejar un hueco abajo.
+        for indice in range(
+            contenido.count() - 1,
+            -1,
+            -1,
+        ):
+
+            if contenido.itemAt(
+                indice,
+            ).spacerItem() is not None:
+
+                contenido.takeAt(
+                    indice,
+                )
+
+        objetivo_tabla = getattr(
+            self,
+            "panel_tabla",
+            None,
+        ) or getattr(
+            self,
+            "scroll_tabla",
+            None,
+        )
+
+        if objetivo_tabla is not None:
+
+            indice_tabla = contenido.indexOf(
+                objetivo_tabla,
+            )
+
+            if indice_tabla >= 0:
+
+                contenido.setStretch(
+                    indice_tabla,
+                    1,
+                )
 
         self._actualizar_resumen_escritorio()
 

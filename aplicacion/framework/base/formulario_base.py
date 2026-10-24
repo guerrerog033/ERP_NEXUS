@@ -181,8 +181,98 @@ class FormularioBase(Page):
                 420,
             )
 
+            self._poner_barra_titulo(
+                titulo,
+            )
+
         self.layout_principal.addWidget(
             self.card,
+        )
+
+    def _poner_barra_titulo(
+        self,
+        titulo: str,
+    ) -> None:
+        """
+        Barra de título de escritorio con el color del módulo desde
+        donde se abrió el formulario ("Nuevo cliente", "Editar
+        producto"...), igual que en los documentos.
+        """
+
+        if not titulo:
+
+            return
+
+        from aplicacion.framework.app_context import AppContext
+        from aplicacion.framework.form.modo import ModoFormulario
+        from aplicacion.framework.ui.colores_modulo import color_modulo
+        from aplicacion.framework.ui.documento_escritorio import (
+            BarraTituloDocumento,
+        )
+
+        area = getattr(
+            AppContext,
+            "area_trabajo",
+            None,
+        )
+
+        modulo_id = getattr(
+            area.currentWidget() if area is not None else None,
+            "_modulo_id",
+            None,
+        ) or ""
+
+        prefijo = {
+            ModoFormulario.NUEVO: "Nuevo",
+            ModoFormulario.EDICION: "Editar",
+            ModoFormulario.CONSULTA: "Consultar",
+        }.get(
+            getattr(
+                self,
+                "modo",
+                None,
+            ),
+            "",
+        )
+
+        texto = (
+            f"{prefijo} · {titulo}"
+            if prefijo
+            else titulo
+        )
+
+        self.barra_titulo = BarraTituloDocumento(
+            texto,
+            color_modulo(
+                modulo_id,
+            ),
+        )
+
+        self.barra_titulo.caja_numero.hide()
+
+        self.card.lbl_titulo.hide()
+
+        self.card.lbl_titulo.setText(
+            "",
+        )
+
+        self.card.layout_principal.insertWidget(
+            0,
+            self.barra_titulo,
+        )
+
+        self.card.layout_principal.setContentsMargins(
+            0,
+            0,
+            0,
+            14,
+        )
+
+        self.card.contenido.setContentsMargins(
+            24,
+            10,
+            24,
+            0,
         )
 
     # =====================================================

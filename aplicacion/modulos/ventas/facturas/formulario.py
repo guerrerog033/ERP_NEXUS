@@ -418,6 +418,56 @@ class FormularioFacturaVenta(
             ALTURA_ENCABEZADO_TABLA,
         )
 
+        if getattr(
+            self,
+            "_diseno_escritorio_aplicado",
+            False,
+        ):
+
+            # Detalle de escritorio: la rejilla ocupa todo el alto
+            # disponible y se desplaza cuando hay muchas líneas.
+            altura_fila_base = (
+                self.tabla.rowHeight(
+                    0,
+                )
+                if self.tabla.rowCount() > 0
+                else self.tabla.verticalHeader().defaultSectionSize()
+            )
+
+            self.tabla.setSizePolicy(
+                QSizePolicy.Policy.Expanding,
+                QSizePolicy.Policy.Expanding,
+            )
+
+            self.tabla.setMinimumHeight(
+                ALTURA_ENCABEZADO_TABLA
+                + 3 * altura_fila_base
+                + 4,
+            )
+
+            self.tabla.setMaximumHeight(
+                16777215,
+            )
+
+            self.tabla.setVerticalScrollBarPolicy(
+                Qt.ScrollBarPolicy.ScrollBarAsNeeded,
+            )
+
+            self.panel_tabla.setSizePolicy(
+                QSizePolicy.Policy.Expanding,
+                QSizePolicy.Policy.Expanding,
+            )
+
+            self.panel_tabla.setMinimumHeight(
+                self.tabla.minimumHeight(),
+            )
+
+            self.panel_tabla.setMaximumHeight(
+                16777215,
+            )
+
+            return
+
         filas = max(
             self.tabla.rowCount(),
             1,
