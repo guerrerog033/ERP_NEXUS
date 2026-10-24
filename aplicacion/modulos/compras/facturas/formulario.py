@@ -847,6 +847,42 @@ class FormularioFacturaCompra(Page):
             barra,
         )
 
+        from aplicacion.framework.ui.atajos import (
+            pulsar,
+            registrar_atajos,
+        )
+
+        self.setProperty(
+            "enter_propio",
+            True,
+        )
+
+        registrar_atajos(
+            self,
+            (
+                (("Ctrl+S", "F10"), lambda: pulsar(btn_guardar)),
+                ("F3", lambda: pulsar(self.proveedor.btn)),
+                ("Ctrl+L", lambda: pulsar(btn_agregar)),
+                ("Ctrl+I", lambda: pulsar(btn_importar)),
+            ),
+        )
+
+        btn_guardar.setToolTip(
+            "Guardar (Ctrl+S)",
+        )
+
+        btn_agregar.setToolTip(
+            "Agregar línea (Ctrl+L)",
+        )
+
+        btn_importar.setToolTip(
+            "Importar XML DIAN (Ctrl+I)",
+        )
+
+        self.proveedor.btn.setToolTip(
+            "Buscar proveedor (F3)",
+        )
+
         self.setMinimumWidth(
             min(
                 self.ancho,

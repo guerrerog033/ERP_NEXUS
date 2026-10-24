@@ -303,9 +303,14 @@ class FormBuilder:
             QSizePolicy.Minimum,
         )
 
-        groupbox.setVisible(
-            grupo.visible
-        )
+        # setVisible(True) sobre un widget sin padre lo muestra como
+        # ventana suelta (parpadeo al abrir formularios). Solo se
+        # oculta cuando corresponde; al agregarlo al formulario se ve.
+        if not grupo.visible:
+
+            groupbox.setVisible(
+                False,
+            )
 
         # -------------------------------------------------
         # Una columna

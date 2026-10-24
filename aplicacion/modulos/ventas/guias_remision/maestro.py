@@ -15,6 +15,9 @@ from aplicacion.framework.crud.crud_documento import (
 from aplicacion.framework.crud.crud_master import (
     CrudMaster,
 )
+from aplicacion.modulos.ventas.guias_remision.guia_definition import (
+    FormularioGuiaRemisionLista,
+)
 from aplicacion.modulos.ventas.guias_remision.datasource import (
     GuiaRemisionElectronicaDataSource,
 )
@@ -39,6 +42,8 @@ class MaestroGuiasRemisionElectronica(
     titulo_singular = "Guía remisión electrónica"
 
     datasource = GuiaRemisionElectronicaDataSource
+
+    formulario = FormularioGuiaRemisionLista
 
     vista_documento = VistaGuiaRemisionElectronica
 
