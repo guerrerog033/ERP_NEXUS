@@ -11,8 +11,8 @@ from aplicacion.recursos.estilos.tema import habilitar_fondo_qss
 from aplicacion.recursos.ui.recursos import Recursos
 
 
-COLOR_ICONO = "#64748B"
-COLOR_ICONO_ACTIVO = "#1E3A5F"
+COLOR_ICONO = "#B4C0CF"
+COLOR_ICONO_ACTIVO = "#FFFFFF"
 
 
 def _pixmap_tenido(

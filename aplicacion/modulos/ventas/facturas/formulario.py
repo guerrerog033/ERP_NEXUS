@@ -297,12 +297,13 @@ class FormularioFacturaVenta(
                 estilo
                 + """
             QHeaderView::section {
-                background: #F8FAFC;
-                color: #475569;
+                background: #C9D2DD;
+                color: #1E293B;
                 font-weight: 600;
-                padding: 8px 6px;
+                padding: 5px 6px;
                 border: none;
-                border-bottom: 1px solid #E2E8F0;
+                border-right: 1px solid #B8C2CE;
+                border-bottom: 1px solid #AEB8C5;
             }
             """
             )

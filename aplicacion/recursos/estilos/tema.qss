@@ -1579,3 +1579,377 @@ QPushButton#BotonQuitarFila:hover{
     background:#FEF3F2;
     border-color:#FECDCA;
 }
+
+
+/* ==========================================================
+   ESTILO ESCRITORIO — "Gris acero"
+   (va al final: reemplaza lo anterior con igual especificidad)
+
+     Fondo ventana .... #D9DEE5     Paneles ......... #E8ECF1
+     Panel interno .... #F2F4F7     Encabezados ..... #C9D2DD
+     Bordes ........... #B8C2CE     Borde suave ..... #C9D2DD
+     Barra lateral .... #2B3A4E     Campos/tablas ... #FFFFFF
+     Acento ........... #1E3A5F
+   Esquinas casi rectas (3px), menos relleno, controles compactos.
+   ========================================================== */
+
+QMainWindow,
+QWidget#Dashboard,
+QWidget#Inicio,
+QTabWidget#AreaTrabajo,
+QTabWidget#AreaTrabajo::pane,
+QFrame#PanelInicio,
+QWidget#HubContabilidad,
+QWidget#PanelGerencialPage{
+    background-color:#D9DEE5;
+}
+
+QWidget{
+    font-size:9.5pt;
+}
+
+/* ---------- Barra superior y de estado ---------- */
+
+QWidget#BarraSuperior{
+    background-color:#E8ECF1;
+    border-bottom:1px solid #B8C2CE;
+}
+
+QLineEdit#BarraSuperiorBusqueda{
+    background:#FFFFFF;
+    border:1px solid #B8C2CE;
+    border-radius:3px;
+}
+
+QToolButton#BarraSuperiorUsuario,
+QToolButton#BarraSuperiorNotificaciones{
+    border:1px solid #B8C2CE;
+    border-radius:3px;
+    background:#F2F4F7;
+}
+
+QWidget#BarraEstado{
+    background-color:#C9D2DD;
+    border-top:1px solid #B8C2CE;
+}
+
+QWidget#BarraEstado QLabel,
+QLabel#BarraEstadoTexto{
+    color:#334155;
+}
+
+/* ---------- Barra lateral oscura ---------- */
+
+QWidget#BarraLateral,
+QScrollArea#BarraLateralScroll,
+QScrollArea#BarraLateralScroll QAbstractScrollArea::viewport,
+QWidget#BarraLateralContenedor{
+    background-color:#2B3A4E;
+    border:none;
+}
+
+QLabel#BarraLateralEtiqueta{
+    color:#8FA0B5;
+    padding:14px 16px 4px 16px;
+}
+
+QFrame#BotonModulo,
+QFrame#BotonModuloPendiente,
+QFrame#BotonModuloActivo{
+    border-radius:3px;
+    margin:0 6px;
+}
+
+QFrame#BotonModulo:hover,
+QFrame#BotonModuloPendiente:hover{
+    background-color:#34465D;
+}
+
+QFrame#BotonModuloActivo{
+    background-color:#3D5574;
+}
+
+QLabel#BotonModuloTitulo{
+    color:#DCE3EC;
+}
+
+QFrame#BotonModuloActivo QLabel#BotonModuloTitulo{
+    color:#FFFFFF;
+}
+
+QLabel#BotonModuloFlecha,
+QFrame#BotonModuloActivo QLabel#BotonModuloFlecha{
+    color:#8FA0B5;
+}
+
+QFrame#BotonSubmodulo,
+QFrame#BotonSubmoduloActivo{
+    border-radius:3px;
+    margin:0 6px;
+}
+
+QFrame#BotonSubmodulo:hover{
+    background-color:#34465D;
+}
+
+QFrame#BotonSubmoduloActivo{
+    background-color:#22303F;
+}
+
+QLabel#BotonSubmoduloTitulo{
+    color:#B4C0CF;
+}
+
+QFrame#BotonSubmodulo:hover QLabel#BotonSubmoduloTitulo,
+QFrame#BotonSubmoduloActivo QLabel#BotonSubmoduloTitulo{
+    color:#FFFFFF;
+}
+
+QPushButton#BarraLateralToggle{
+    background:#22303F;
+    color:#B4C0CF;
+    border-top:1px solid #1B2633;
+}
+
+QPushButton#BarraLateralToggle:hover{
+    background:#34465D;
+    color:#FFFFFF;
+}
+
+QScrollArea#BarraLateralScroll QScrollBar::handle:vertical{
+    background:#46586F;
+}
+
+/* ---------- Pestañas clásicas ---------- */
+
+QTabWidget#AreaTrabajo QTabBar{
+    background:#D9DEE5;
+}
+
+QTabWidget#AreaTrabajo QTabBar::tab{
+    background:#C9D2DD;
+    color:#334155;
+    border:1px solid #B8C2CE;
+    border-bottom:none;
+    border-top-left-radius:3px;
+    border-top-right-radius:3px;
+    padding:5px 28px 5px 12px;
+    margin:4px 2px 0 0;
+}
+
+QTabWidget#AreaTrabajo QTabBar::tab:selected{
+    background:#E8ECF1;
+    color:#1E3A5F;
+    font-weight:600;
+    border-bottom:none;
+    margin-top:2px;
+}
+
+QTabWidget#AreaTrabajo QTabBar::tab:hover{
+    background:#D3DAE3;
+}
+
+QTabWidget#AreaTrabajo::pane{
+    border-top:1px solid #B8C2CE;
+}
+
+/* ---------- Paneles y tarjetas ---------- */
+
+QFrame#card{
+    background:#E8ECF1;
+    border:1px solid #B8C2CE;
+    border-radius:4px;
+}
+
+QFrame#TarjetaInicio,
+QFrame#PanelModulo,
+QWidget#DataGrid,
+QFrame#InicioListaRecientes,
+QFrame#TarjetaProcesoContabilidad,
+QFrame#PanelGerencialKpi,
+QFrame#PanelGerencialEmbudo{
+    background:#E8ECF1;
+    border:1px solid #B8C2CE;
+    border-radius:4px;
+}
+
+QGroupBox,
+QGroupBox#FormGroupBox{
+    background:#F2F4F7;
+    border:1px solid #C3CCD8;
+    border-radius:3px;
+    margin-top:12px;
+    padding-top:12px;
+}
+
+QWidget#PanelTotalesDocumento{
+    background:#F2F4F7;
+    border:1px solid #C3CCD8;
+    border-radius:3px;
+}
+
+QLabel#DocumentoTituloHoja{
+    font-size:13pt;
+    padding:0 0 2px 0;
+}
+
+QLabel#InicioTitulo{
+    font-size:15pt;
+}
+
+QLabel#TarjetaInicioValor{
+    font-size:15pt;
+}
+
+QDialog,
+QMessageBox{
+    background-color:#E8ECF1;
+}
+
+/* ---------- Controles compactos ---------- */
+
+QLineEdit,
+QComboBox,
+QDateEdit,
+QSpinBox,
+QDoubleSpinBox,
+QTextEdit,
+QPlainTextEdit{
+    border:1px solid #AEB8C5;
+    border-radius:2px;
+    padding:3px 6px;
+    background:#FFFFFF;
+}
+
+QComboBox,
+QDateEdit{
+    padding-right:22px;
+}
+
+QLineEdit:read-only,
+QLineEdit:disabled,
+QComboBox:disabled,
+QDateEdit:disabled,
+QSpinBox:disabled,
+QDoubleSpinBox:disabled{
+    background:#EEF1F5;
+}
+
+QPushButton,
+QPushButton#BotonSecundario,
+QToolButton#MaestroToolbarMas,
+QPushButton#BotonAccesoRapido,
+QPushButton#BotonRapido{
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #FAFBFC, stop:1 #E3E8EE);
+    color:#1E293B;
+    border:1px solid #AEB8C5;
+    border-radius:3px;
+    padding:4px 12px;
+    min-height:20px;
+}
+
+QPushButton:hover,
+QPushButton#BotonSecundario:hover,
+QToolButton#MaestroToolbarMas:hover,
+QPushButton#BotonAccesoRapido:hover,
+QPushButton#BotonRapido:hover{
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #FFFFFF, stop:1 #EAF0F7);
+    border-color:#7D8DA1;
+}
+
+QPushButton:pressed,
+QPushButton#BotonSecundario:pressed{
+    background:#D6DDE6;
+}
+
+QPushButton:disabled{
+    background:#E6EAEF;
+    color:#94A3B8;
+    border-color:#C9D2DD;
+}
+
+QPushButton#BotonPrimario,
+QPushButton#BotonRapidoDestacado{
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #2B4C78, stop:1 #1E3A5F);
+    color:#FFFFFF;
+    border:1px solid #152C49;
+    border-radius:3px;
+    padding:4px 14px;
+    min-height:20px;
+}
+
+QPushButton#BotonPrimario:hover,
+QPushButton#BotonRapidoDestacado:hover{
+    background:#2B4C78;
+}
+
+QPushButton#BotonPeligro{
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #FAFBFC, stop:1 #E3E8EE);
+    color:#B42318;
+    border:1px solid #D9A39D;
+    border-radius:3px;
+    padding:4px 12px;
+    min-height:20px;
+}
+
+QPushButton#BotonPeligro:hover{
+    background:#FEF3F2;
+    border-color:#B42318;
+}
+
+QPushButton#BotonAgregarLinea{
+    background:transparent;
+    border:1px dashed #9AA8BA;
+    border-radius:3px;
+    padding:4px 12px;
+}
+
+QPushButton#BotonQuitarFila,
+QPushButton#BotonEnlace{
+    background:transparent;
+    border:none;
+}
+
+/* ---------- Tablas con rejilla ---------- */
+
+QTableWidget,
+QTableView{
+    background:#FFFFFF;
+    alternate-background-color:#F4F6F9;
+    gridline-color:#D5DCE4;
+    border:1px solid #AEB8C5;
+    border-radius:2px;
+}
+
+QHeaderView,
+QHeaderView::section,
+QTableCornerButton::section{
+    background:#C9D2DD;
+    color:#1E293B;
+}
+
+QHeaderView::section{
+    padding:5px 6px;
+    border:none;
+    border-right:1px solid #B8C2CE;
+    border-bottom:1px solid #AEB8C5;
+    font-weight:600;
+}
+
+QTableWidget::item:selected,
+QTableView::item:selected{
+    background:#C9D9EC;
+    color:#1E293B;
+}
+
+/* ---------- Menús ---------- */
+
+QMenu{
+    background:#F2F4F7;
+    border:1px solid #AEB8C5;
+    border-radius:2px;
+}
+
+QMenu::item:selected{
+    background:#C9D9EC;
+}
