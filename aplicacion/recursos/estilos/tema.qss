@@ -1563,3 +1563,19 @@ QPushButton#BotonEnlace:hover{
     color:#2B4C78;
     text-decoration:underline;
 }
+
+
+QPushButton#BotonQuitarFila{
+    background:transparent;
+    color:#B42318;
+    border:1px solid transparent;
+    border-radius:6px;
+    padding:0;
+    min-height:0;
+    font-weight:600;
+}
+
+QPushButton#BotonQuitarFila:hover{
+    background:#FEF3F2;
+    border-color:#FECDCA;
+}

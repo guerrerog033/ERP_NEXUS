@@ -587,6 +587,19 @@ class FormularioFacturaCompra(Page):
             44,
         )
 
+        for columna, ancho_columna in (
+            (COL_CANTIDAD, 110),
+            (COL_PRECIO, 130),
+            (COL_IMPUESTO, 130),
+            (COL_TOTAL, 130),
+            (COL_BORRAR, 48),
+        ):
+
+            self.tabla.setColumnWidth(
+                columna,
+                ancho_columna,
+            )
+
         self.tabla.setMinimumHeight(
             200,
         )
@@ -1079,8 +1092,17 @@ class FormularioFacturaCompra(Page):
         btn_borrar = QPushButton(
             "✕",
         )
-        btn_borrar.setFixedWidth(
-            28,
+        btn_borrar.setObjectName(
+            "BotonQuitarFila",
+        )
+
+        btn_borrar.setToolTip(
+            "Quitar esta línea",
+        )
+
+        btn_borrar.setFixedSize(
+            30,
+            30,
         )
         btn_borrar.clicked.connect(
             lambda _c=False, f=fila: self._borrar_fila(
