@@ -1503,3 +1503,48 @@ QDoubleSpinBox::down-arrow{
     width:10px;
     height:10px;
 }
+
+
+/* ==========================================================
+   Casillas de verificación y opciones
+   ========================================================== */
+
+QCheckBox::indicator,
+QTableView::indicator,
+QTableWidget::indicator{
+    width:16px;
+    height:16px;
+    border:1px solid #94A3B8;
+    border-radius:4px;
+    background:#FFFFFF;
+}
+
+QCheckBox::indicator:hover{
+    border-color:#1E3A5F;
+}
+
+QCheckBox::indicator:checked,
+QTableView::indicator:checked,
+QTableWidget::indicator:checked{
+    background:#1E3A5F;
+    border-color:#1E3A5F;
+    image:url({ICONOS}/check.svg);
+}
+
+QCheckBox::indicator:disabled{
+    background:#F1F5F9;
+    border-color:#CBD5E1;
+}
+
+QRadioButton::indicator{
+    width:16px;
+    height:16px;
+    border:1px solid #94A3B8;
+    border-radius:8px;
+    background:#FFFFFF;
+}
+
+QRadioButton::indicator:checked{
+    border:5px solid #1E3A5F;
+    background:#FFFFFF;
+}
