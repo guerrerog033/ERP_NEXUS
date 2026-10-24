@@ -124,31 +124,32 @@ class TableView(QTableView):
             QTableView{
                 background:#FFFFFF;
                 color:#1E293B;
-                border:1px solid #E2E8F0;
-                border-radius:8px;
-                alternate-background-color:#F8FAFC;
-                selection-background-color:#EAF0F7;
+                border:1px solid #AEB8C5;
+                border-radius:2px;
+                alternate-background-color:#F4F6F9;
+                selection-background-color:#C9D9EC;
                 selection-color:#1E293B;
                 font-size:13px;
                 outline:none;
             }
             QTableView::item{
-                padding:8px;
+                padding:3px 6px;
                 border:none;
             }
             QTableView::item:selected{
-                background:#EAF0F7;
+                background:#C9D9EC;
                 color:#1E293B;
             }
             QTableView::item:hover{
                 background:#F8FAFC;
             }
             QHeaderView::section{
-                background:#F8FAFC;
-                color:#475569;
+                background:#C9D2DD;
+                color:#1E293B;
                 border:none;
-                border-bottom:1px solid #E2E8F0;
-                padding:9px 8px;
+                border-right:1px solid #B8C2CE;
+                border-bottom:1px solid #AEB8C5;
+                padding:5px 6px;
                 font-size:13px;
                 font-weight:600;
             }

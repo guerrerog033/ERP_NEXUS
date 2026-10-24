@@ -93,11 +93,11 @@ class FormularioProducto(FormularioBase):
             QGroupBox {
                 font-size: 14px;
                 font-weight: 600;
-                border: 1px solid #e2e8f0;
-                border-radius: 8px;
+                border: 1px solid #C3CCD8;
+                border-radius: 3px;
                 margin-top: 8px;
                 padding-top: 12px;
-                background: white;
+                background: #F2F4F7;
             }
             QGroupBox::title {
                 left: 12px;

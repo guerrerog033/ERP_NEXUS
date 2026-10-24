@@ -47,23 +47,23 @@ class Card(QFrame):
         self.setStyleSheet("""
 QFrame#card{
 
-    background:#ffffff;
+    background:#E8ECF1;
 
-    border:1px solid #e2e8f0;
+    border:1px solid #B8C2CE;
 
-    border-radius:12px;
+    border-radius:4px;
 
 }
 
 QLabel#titulo{
 
-    font-size:22px;
+    font-size:15px;
 
     font-weight:700;
 
     color:#1e293b;
 
-    padding-bottom:16px;
+    padding-bottom:6px;
 
     border:none;
 
@@ -73,13 +73,13 @@ QLabel#titulo{
         self.layout_principal = QVBoxLayout(self)
 
         self.layout_principal.setContentsMargins(
-            36,
-            30,
-            36,
-            30,
+            18,
+            14,
+            18,
+            14,
         )
 
-        self.layout_principal.setSpacing(24)
+        self.layout_principal.setSpacing(10)
 
         self.lbl_titulo = QLabel()
 
@@ -106,7 +106,7 @@ QLabel#titulo{
             0,
         )
 
-        self.contenido.setSpacing(22)
+        self.contenido.setSpacing(12)
 
         self.layout_principal.addLayout(
             self.contenido,
