@@ -237,6 +237,20 @@ class FormularioComprobanteEgreso(Page):
             botones,
         )
 
+        from aplicacion.framework.ui.documento_escritorio import (
+            aplicar_diseno_documento,
+        )
+
+        aplicar_diseno_documento(
+            self,
+            "Comprobante de egreso",
+            area="bancos",
+            tercero=self.proveedor,
+            etiqueta_tercero="Proveedor",
+            titulo_tercero="Información del proveedor",
+            cartera="cxp",
+        )
+
         self._actualizar_modo_anticipo(
             False,
         )

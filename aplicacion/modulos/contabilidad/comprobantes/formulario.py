@@ -177,6 +177,16 @@ class FormularioComprobante(Page):
             botones,
         )
 
+        from aplicacion.framework.ui.documento_escritorio import (
+            aplicar_diseno_documento,
+        )
+
+        aplicar_diseno_documento(
+            self,
+            "Comprobante contable",
+            area="contabilidad",
+        )
+
         if self.id_registro is None:
 
             self._agregar_linea()

@@ -1359,12 +1359,29 @@ class FormularioFacturaVenta(
             return
 
         cabecera: list[QWidget] = [
-            self.fecha,
             self.cliente.btn,
+            self.fecha,
             self.vendedor,
             self.cmb_tipo,
             self.cmb_contacto,
         ]
+
+        for extra in (
+            "cmb_moneda_referencia",
+            "spin_tasa_cambio_referencia",
+        ):
+
+            widget_extra = getattr(
+                self,
+                extra,
+                None,
+            )
+
+            if widget_extra is not None:
+
+                cabecera.append(
+                    widget_extra,
+                )
 
         for widget in cabecera:
 

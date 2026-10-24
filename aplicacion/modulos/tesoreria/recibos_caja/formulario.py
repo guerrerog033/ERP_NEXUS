@@ -238,6 +238,20 @@ class FormularioReciboCaja(Page):
             botones,
         )
 
+        from aplicacion.framework.ui.documento_escritorio import (
+            aplicar_diseno_documento,
+        )
+
+        aplicar_diseno_documento(
+            self,
+            "Recibo de caja",
+            area="bancos",
+            tercero=self.cliente,
+            etiqueta_tercero="Cliente",
+            titulo_tercero="Información del cliente",
+            cartera="cxc",
+        )
+
         self._actualizar_modo_anticipo(
             False,
         )

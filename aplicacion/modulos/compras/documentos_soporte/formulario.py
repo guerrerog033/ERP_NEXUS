@@ -231,6 +231,21 @@ class FormularioDocumentoSoporte(Page):
             botones,
         )
 
+        from aplicacion.framework.ui.documento_escritorio import (
+            aplicar_diseno_documento,
+        )
+
+        aplicar_diseno_documento(
+            self,
+            "Documento soporte" if self.es_edicion else "Nuevo documento soporte",
+            area="compras",
+            numero=self.txt_numero,
+            tercero=self.proveedor,
+            etiqueta_tercero="Proveedor",
+            titulo_tercero="Información del proveedor",
+            cartera="cxp",
+        )
+
         if self.es_edicion:
 
             self._cargar()

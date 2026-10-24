@@ -1821,6 +1821,8 @@ class FormularioCotizacion(Page):
 
         self._actualizar_resumen_escritorio()
 
+        self._ordenar_tab_escritorio()
+
     def _actualizar_resumen_escritorio(
         self,
         lineas: list | None = None,
@@ -3406,6 +3408,45 @@ class FormularioCotizacion(Page):
         )
 
         self._recalcular_totales()
+
+        self._ordenar_tab_escritorio()
+
+    def _ordenar_tab_escritorio(
+        self,
+    ) -> None:
+        """Tab recorre la hoja en el orden en que se ve."""
+
+        if not getattr(
+            self,
+            "_diseno_escritorio_aplicado",
+            False,
+        ):
+
+            return
+
+        from aplicacion.framework.ui.documento_escritorio import (
+            orden_tab_visual,
+        )
+
+        orden_tab_visual(
+            self.card.contenido,
+            al_final=[
+                self.btn_guardar,
+                self.btn_cancelar,
+            ],
+        )
+
+        configurar = getattr(
+            self,
+            "_configurar_navegacion_tab",
+            None,
+        )
+
+        if callable(
+            configurar,
+        ):
+
+            configurar()
 
     def _fila_de_celda(
         self,
