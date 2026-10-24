@@ -128,6 +128,9 @@ def main():
     paso("11_nueva_factura_compra", lambda: abrir_nuevo("FacturasCompra"))
     paso("12_nuevo_documento_soporte", lambda: abrir_nuevo("DocumentosSoporte"))
     paso("13_ordenes_compra", lambda: dashboard.modulo_seleccionado("OrdenesCompra"))
+    paso("14_nuevo_recibo_caja", lambda: abrir_nuevo("RecibosCaja"))
+    paso("15_nuevo_egreso", lambda: abrir_nuevo("ComprobantesEgreso"))
+    paso("16_nuevo_comprobante", lambda: abrir_nuevo("ComprobantesContables"))
 
     LOG.close()
 
