@@ -216,9 +216,11 @@ class BotonModulo(QFrame):
             12,
         )
 
-        self.lbl_flecha.setVisible(
-            con_submenu,
-        )
+        if not con_submenu:
+
+            self.lbl_flecha.setVisible(
+                False,
+            )
 
         self._con_submenu = con_submenu
 

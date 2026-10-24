@@ -15,9 +15,14 @@ class CheckWidgetFactory:
             field.habilitado
         )
 
-        widget.setVisible(
-            field.visible
-        )
+        # setVisible(True) sobre un widget sin padre lo muestra como
+        # ventana suelta (parpadeo al abrir formularios). Solo se
+        # oculta cuando corresponde; al agregarlo al formulario se ve.
+        if not field.visible:
+
+            widget.setVisible(
+                False,
+            )
 
         if field.valor_inicial is not None:
 
