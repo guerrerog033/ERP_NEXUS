@@ -97,6 +97,8 @@ class MaestroComprobantes(
         self,
         id_registro=None,
         parent=None,
+        *,
+        modo=None,
     ):
 
         return FormularioComprobante(
