@@ -1035,6 +1035,12 @@ class FormularioCotizacion(Page):
 
             self._agregar_linea()
 
+        # Las subclases que adaptan la pantalla lo llaman al final de
+        # su propio _crear_ui.
+        if type(self)._crear_ui is FormularioCotizacion._crear_ui:
+
+            self._aplicar_diseno_escritorio()
+
     def _registrar_atajos_documento(
         self,
     ) -> None:
@@ -1059,6 +1065,7 @@ class FormularioCotizacion(Page):
                 ("Ctrl+L", lambda: pulsar(self.btn_agregar_linea)),
                 ("Ctrl+Delete", self._quitar_fila_actual),
                 ("Ctrl+P", lambda: pulsar(self.btn_imprimir)),
+                ("Escape", self._cerrar_con_escape),
             ),
         )
 
@@ -1072,6 +1079,896 @@ class FormularioCotizacion(Page):
             boton.setToolTip(
                 texto,
             )
+
+    # =====================================================
+    # Diseño de escritorio (título con número, barra de
+    # acciones, cajas con marco, pestañas y caja de totales)
+    # =====================================================
+
+    etiqueta_tercero = "Cliente"
+
+    titulo_caja_tercero = "Información del cliente"
+
+    cartera_tercero = "cxc"
+
+    def _color_documento(
+        self,
+    ) -> str:
+
+        from aplicacion.framework.ui.colores_modulo import COLORES_AREA
+
+        return COLORES_AREA.get(
+            "ventas",
+            "#1E3A5F",
+        )
+
+    def _aplicar_diseno_escritorio(
+        self,
+    ) -> None:
+
+        if getattr(
+            self,
+            "_diseno_escritorio_aplicado",
+            False,
+        ):
+
+            return
+
+        self._diseno_escritorio_aplicado = True
+
+        from aplicacion.framework.ui.documento_escritorio import (
+            BarraAccionesDocumento,
+            BarraTituloDocumento,
+            CajaDatos,
+            PanelTercero,
+            TablaResumenImpuestos,
+            caja_totales,
+            indice_en_layout,
+            quitar_item,
+        )
+
+        from PySide6.QtWidgets import QTabWidget
+
+        card = self.card
+        contenido = card.contenido
+
+        card.layout_principal.setContentsMargins(
+            0,
+            0,
+            0,
+            10,
+        )
+
+        card.layout_principal.setSpacing(
+            6,
+        )
+
+        contenido.setContentsMargins(
+            10,
+            0,
+            10,
+            0,
+        )
+
+        contenido.setSpacing(
+            6,
+        )
+
+        # ---- 1. Barra de título con el número a la derecha ----
+
+        card.lbl_titulo.hide()
+
+        self.barra_titulo = BarraTituloDocumento(
+            self._titulo_documento(),
+            self._color_documento(),
+        )
+
+        card.layout_principal.insertWidget(
+            0,
+            self.barra_titulo,
+        )
+
+        # ---- 2. Barra de acciones arriba ----
+
+        self.barra_acciones = BarraAccionesDocumento()
+
+        card.layout_principal.insertWidget(
+            1,
+            self.barra_acciones,
+        )
+
+        indice_botones = indice_en_layout(
+            contenido,
+            self.btn_guardar,
+        )
+
+        self.barra_acciones.agregar(
+            self.btn_guardar,
+            "guardar",
+            "F10",
+        )
+
+        if self.btn_pdf.text() == "Enviar":
+
+            self.barra_acciones.agregar(
+                self.btn_pdf,
+                "correo",
+            )
+
+        self.barra_acciones.agregar_separador()
+
+        self.barra_acciones.agregar(
+            self.btn_imprimir,
+            "imprimir",
+            "Ctrl+P",
+        )
+
+        if self.btn_pdf.text() != "Enviar":
+
+            self.barra_acciones.agregar(
+                self.btn_pdf,
+                "pdf",
+            )
+
+        self.barra_acciones.agregar(
+            self.btn_correo,
+            "correo",
+        )
+
+        self.barra_acciones.agregar(
+            self.btn_whatsapp,
+            "nuevo",
+        )
+
+        self.btn_cancelar.setText(
+            "Cerrar",
+        )
+
+        self.barra_acciones.agregar_al_final(
+            self.btn_cancelar,
+            "cerrar",
+            "Esc",
+        )
+
+        if indice_botones >= 0:
+
+            quitar_item(
+                contenido,
+                indice_botones,
+            )
+
+        for indice in range(
+            contenido.count() - 1,
+            -1,
+            -1,
+        ):
+
+            widget = contenido.itemAt(
+                indice,
+            ).widget()
+
+            if (
+                widget is not None
+                and widget.objectName() == "DocumentoSeparador"
+            ):
+
+                quitar_item(
+                    contenido,
+                    indice,
+                )
+
+        # ---- 3. Cabecera en dos cajas con marco ----
+
+        indice_cabecera = indice_en_layout(
+            contenido,
+            self.cliente,
+        )
+
+        cabecera_vieja = (
+            contenido.itemAt(
+                indice_cabecera,
+            ).widget()
+            if indice_cabecera >= 0
+            else None
+        )
+
+        grid_viejo = (
+            cabecera_vieja.layout()
+            if cabecera_vieja is not None
+            else None
+        )
+
+        if isinstance(
+            grid_viejo,
+            QGridLayout,
+        ):
+
+            posiciones = []
+
+            for indice in range(
+                grid_viejo.count(),
+            ):
+
+                item = grid_viejo.itemAt(
+                    indice,
+                )
+
+                fila, columna, _filas, columnas = (
+                    grid_viejo.getItemPosition(
+                        indice,
+                    )
+                )
+
+                posiciones.append(
+                    (
+                        fila,
+                        columna,
+                        columnas,
+                        item.widget(),
+                    ),
+                )
+
+            def fila_de(
+                objetivo,
+            ):
+
+                for fila, columna, _c, widget in posiciones:
+
+                    if widget is objetivo:
+
+                        return fila, columna
+
+                return None, None
+
+            fila_cliente, _ = fila_de(
+                self.cliente,
+            )
+
+            fila_numero, columna_numero = fila_de(
+                self.txt_numero,
+            )
+
+            excluir = {
+                self.cliente,
+                self.txt_numero,
+            }
+
+            for fila, columna, _c, widget in posiciones:
+
+                if fila == fila_cliente and columna == 0:
+
+                    excluir.add(
+                        widget,
+                    )
+
+                if (
+                    fila == fila_numero
+                    and columna_numero is not None
+                    and columna == columna_numero - 1
+                ):
+
+                    excluir.add(
+                        widget,
+                    )
+
+            caja_documento = CajaDatos(
+                "Datos del documento",
+            )
+
+            filas_ordenadas = sorted(
+                {
+                    fila
+                    for fila, _col, _c, widget in posiciones
+                    if widget is not None and widget not in excluir
+                },
+            )
+
+            for nueva_fila, fila in enumerate(
+                filas_ordenadas,
+            ):
+
+                for fila_item, columna, columnas, widget in posiciones:
+
+                    if (
+                        fila_item != fila
+                        or widget is None
+                        or widget in excluir
+                    ):
+
+                        continue
+
+                    if isinstance(
+                        widget,
+                        QLabel,
+                    ) and columna % 2 == 0:
+
+                        widget.setObjectName(
+                            "CajaDocumentoEtiqueta",
+                        )
+
+                    if (
+                        widget.minimumHeight() == widget.maximumHeight()
+                        and widget.minimumHeight() > 28
+                    ):
+
+                        widget.setFixedHeight(
+                            28,
+                        )
+
+                    caja_documento.grid.addWidget(
+                        widget,
+                        nueva_fila,
+                        columna,
+                        1,
+                        columnas,
+                    )
+
+            caja_documento.grid.setColumnStretch(
+                1,
+                1,
+            )
+
+            caja_documento.grid.setColumnStretch(
+                3,
+                1,
+            )
+
+            if self.cliente.minimumHeight() > 28:
+
+                self.cliente.setFixedHeight(
+                    28,
+                )
+
+            self.panel_tercero = PanelTercero(
+                self.titulo_caja_tercero,
+                self.cliente,
+                etiqueta=self.etiqueta_tercero,
+                cartera=self.cartera_tercero,
+            )
+
+            self.barra_titulo.set_numero_widget(
+                self.txt_numero,
+            )
+
+            nueva = QWidget()
+
+            fila_cajas = QHBoxLayout(
+                nueva,
+            )
+
+            fila_cajas.setContentsMargins(
+                0,
+                0,
+                0,
+                0,
+            )
+
+            fila_cajas.setSpacing(
+                8,
+            )
+
+            fila_cajas.addWidget(
+                self.panel_tercero,
+                5,
+            )
+
+            fila_cajas.addWidget(
+                caja_documento,
+                5,
+            )
+
+            nueva.setSizePolicy(
+                QSizePolicy.Policy.Expanding,
+                QSizePolicy.Policy.Maximum,
+            )
+
+            contenido.insertWidget(
+                indice_cabecera,
+                nueva,
+            )
+
+            contenido.removeWidget(
+                cabecera_vieja,
+            )
+
+            cabecera_vieja.hide()
+
+            cabecera_vieja.deleteLater()
+
+            # En edición el cliente ya viene cargado.
+            valor_cliente = (
+                self.cliente.valor()
+                if hasattr(
+                    self.cliente,
+                    "valor",
+                )
+                else None
+            )
+
+            id_cliente = getattr(
+                valor_cliente,
+                "valor",
+                valor_cliente,
+            )
+
+            if id_cliente:
+
+                try:
+
+                    self.panel_tercero.mostrar_tercero(
+                        int(
+                            id_cliente,
+                        ),
+                    )
+
+                except (
+                    TypeError,
+                    ValueError,
+                ):
+
+                    pass
+
+        # ---- 4. Pie: pestañas a la izquierda, totales a la derecha ----
+
+        panel_observaciones = self.observaciones.parentWidget()
+
+        panel_totales = self.lbl_total.parentWidget()
+
+        panel_pagos = getattr(
+            self,
+            "panel_pagos",
+            None,
+        )
+
+        indice_pie = indice_en_layout(
+            contenido,
+            panel_totales,
+        )
+
+        self.pestanas_pie = QTabWidget()
+
+        self.pestanas_pie.setObjectName(
+            "PestanasDocumento",
+        )
+
+        self.pestanas_pie.setDocumentMode(
+            False,
+        )
+
+        for etiqueta in panel_observaciones.findChildren(
+            QLabel,
+        ):
+
+            if etiqueta.objectName() == "DocumentoEtiquetaSeccion":
+
+                etiqueta.hide()
+
+        panel_observaciones.layout().setContentsMargins(
+            6,
+            6,
+            6,
+            6,
+        )
+
+        self.observaciones.setMinimumHeight(
+            70,
+        )
+
+        self.observaciones.setMaximumHeight(
+            16777215,
+        )
+
+        self.pestanas_pie.addTab(
+            panel_observaciones,
+            "Observaciones",
+        )
+
+        if panel_pagos is not None:
+
+            for etiqueta in panel_pagos.findChildren(
+                QLabel,
+            ):
+
+                if etiqueta.text() == "Formas de pago":
+
+                    etiqueta.hide()
+
+            panel_pagos.layout().setContentsMargins(
+                8,
+                8,
+                8,
+                8,
+            )
+
+            contenedor_pagos = QWidget()
+
+            layout_pagos = QVBoxLayout(
+                contenedor_pagos,
+            )
+
+            layout_pagos.setContentsMargins(
+                0,
+                0,
+                0,
+                0,
+            )
+
+            layout_pagos.addWidget(
+                panel_pagos,
+            )
+
+            layout_pagos.addStretch(
+                1,
+            )
+
+            self.pestanas_pie.addTab(
+                contenedor_pagos,
+                "Formas de pago",
+            )
+
+        self.tabla_impuestos = TablaResumenImpuestos()
+
+        self.pestanas_pie.addTab(
+            self.tabla_impuestos,
+            "Impuestos",
+        )
+
+        self.pestanas_pie.setMinimumHeight(
+            130,
+        )
+
+        self.pestanas_pie.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Preferred,
+        )
+
+        panel_totales.setMinimumWidth(
+            330,
+        )
+
+        panel_totales.setMaximumWidth(
+            16777215,
+        )
+
+        caja = caja_totales(
+            panel_totales,
+        )
+
+        caja.setFixedWidth(
+            380,
+        )
+
+        # Fila de totales bajo el detalle (Magister): agregar línea a
+        # la izquierda y el resumen de cantidades a la derecha.
+        self.fila_totales_detalle = QFrame()
+
+        self.fila_totales_detalle.setObjectName(
+            "DocumentoFilaTotales",
+        )
+
+        layout_fila_totales = QHBoxLayout(
+            self.fila_totales_detalle,
+        )
+
+        layout_fila_totales.setContentsMargins(
+            4,
+            2,
+            10,
+            2,
+        )
+
+        layout_fila_totales.addWidget(
+            self.btn_agregar_linea,
+        )
+
+        layout_fila_totales.addStretch(
+            1,
+        )
+
+        self.lbl_resumen_lineas = QLabel(
+            "",
+        )
+
+        self.lbl_resumen_lineas.setObjectName(
+            "DocumentoResumenLineas",
+        )
+
+        layout_fila_totales.addWidget(
+            self.lbl_resumen_lineas,
+        )
+
+        pie = QWidget()
+
+        layout_pie = QHBoxLayout(
+            pie,
+        )
+
+        layout_pie.setContentsMargins(
+            0,
+            0,
+            0,
+            0,
+        )
+
+        layout_pie.setSpacing(
+            8,
+        )
+
+        layout_pie.addWidget(
+            self.pestanas_pie,
+            1,
+        )
+
+        layout_pie.addWidget(
+            caja,
+            0,
+            Qt.AlignmentFlag.AlignTop,
+        )
+
+        pie.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Maximum,
+        )
+
+        if indice_pie >= 0:
+
+            quitar_item(
+                contenido,
+                indice_pie,
+            )
+
+            contenido.insertWidget(
+                indice_pie,
+                pie,
+            )
+
+            contenido.insertWidget(
+                indice_pie,
+                self.fila_totales_detalle,
+            )
+
+        else:
+
+            contenido.addWidget(
+                self.fila_totales_detalle,
+            )
+
+            contenido.addWidget(
+                pie,
+            )
+
+        self._actualizar_resumen_escritorio()
+
+    def _actualizar_resumen_escritorio(
+        self,
+        lineas: list | None = None,
+        resumen: dict | None = None,
+    ) -> None:
+        """Fila de totales del detalle y pestaña de impuestos."""
+
+        if not getattr(
+            self,
+            "_diseno_escritorio_aplicado",
+            False,
+        ):
+
+            return
+
+        try:
+
+            if lineas is None:
+
+                lineas = self._obtener_lineas()
+
+            if resumen is None:
+
+                resumen = ServicioCotizacion._calcular_resumen(
+                    lineas,
+                    self.celda_retefuente.valor(),
+                    self.celda_reteica.valor(),
+                    self.celda_reteiva.valor(),
+                )
+
+        except Exception:
+
+            return
+
+        con_producto = [
+            linea
+            for linea in lineas
+            if linea.get(
+                "producto_id",
+            )
+            or (
+                linea.get(
+                    "descripcion",
+                )
+                or ""
+            ).strip()
+        ]
+
+        cantidad = sum(
+            float(
+                linea.get(
+                    "cantidad",
+                    0,
+                )
+                or 0,
+            )
+            for linea in con_producto
+        )
+
+        from aplicacion.framework.ui.documento_escritorio import (
+            formato_moneda,
+        )
+
+        self.lbl_resumen_lineas.setText(
+            f"Líneas: {len(con_producto)}     "
+            f"Cantidad: {cantidad:,.2f}     "
+            f"Subtotal: {formato_moneda(resumen.get('subtotal', 0))}     "
+            f"IVA: {formato_moneda(resumen.get('iva', 0))}",
+        )
+
+        grupos: dict = {}
+
+        for linea in con_producto:
+
+            impuesto_id = linea.get(
+                "impuesto_id",
+            )
+
+            try:
+
+                base, total = ServicioCotizacion._calcular_linea(
+                    float(
+                        linea.get(
+                            "cantidad",
+                            0,
+                        )
+                        or 0,
+                    ),
+                    float(
+                        linea.get(
+                            "precio_unitario",
+                            0,
+                        )
+                        or 0,
+                    ),
+                    impuesto_id,
+                    linea.get(
+                        "precio_incluye_iva",
+                        False,
+                    ),
+                )
+
+                tarifa = ServicioCotizacion._porcentaje_impuesto(
+                    impuesto_id,
+                )
+
+            except Exception:
+
+                continue
+
+            clave = (
+                impuesto_id,
+                tarifa,
+            )
+
+            acumulado = grupos.setdefault(
+                clave,
+                [
+                    0.0,
+                    0.0,
+                ],
+            )
+
+            acumulado[0] += base
+            acumulado[1] += total - base
+
+        filas = [
+            (
+                f"IVA {tarifa:g} %" if tarifa else "Excluido / exento",
+                base,
+                tarifa,
+                valor,
+            )
+            for (_id, tarifa), (base, valor) in sorted(
+                grupos.items(),
+                key=lambda par: -float(par[0][1] or 0),
+            )
+        ]
+
+        for nombre, celda, clave in (
+            ("Retefuente", self.celda_retefuente, "retefuente"),
+            ("ReteICA", self.celda_reteica, "reteica"),
+            ("ReteIVA", self.celda_reteiva, "reteiva"),
+        ):
+
+            valor = float(
+                resumen.get(
+                    clave,
+                    0,
+                )
+                or 0,
+            )
+
+            if valor:
+
+                tarifa = ServicioCotizacion._porcentaje_impuesto(
+                    celda.valor(),
+                )
+
+                base = (
+                    resumen.get(
+                        "iva",
+                        0,
+                    )
+                    if clave == "reteiva"
+                    else resumen.get(
+                        "subtotal",
+                        0,
+                    )
+                )
+
+                filas.append(
+                    (
+                        nombre,
+                        base,
+                        tarifa,
+                        -valor,
+                    ),
+                )
+
+        self.tabla_impuestos.mostrar(
+            filas,
+        )
+
+    def _cerrar_con_escape(
+        self,
+    ) -> None:
+
+        respuesta = QMessageBox.question(
+            self,
+            "Cerrar",
+            "¿Cerrar el documento sin guardar los cambios?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+
+        if respuesta == QMessageBox.Yes:
+
+            self.cerrar.emit()
+
+    def teclas_contexto(
+        self,
+    ) -> list:
+        """Teclas que muestra la barra inferior en el documento."""
+
+        from aplicacion.framework.ui.atajos import pulsar
+
+        teclas = [
+            ("F10", "Guardar", lambda: pulsar(self.btn_guardar)),
+            (
+                "F3",
+                self.etiqueta_tercero,
+                lambda: pulsar(self.cliente.btn),
+            ),
+            ("F4", "Producto", self._buscar_producto_fila_actual),
+            ("Ctrl+L", "Agregar línea", lambda: pulsar(self.btn_agregar_linea)),
+            ("Ctrl+Supr", "Quitar línea", self._quitar_fila_actual),
+        ]
+
+        if not self.btn_imprimir.isHidden():
+
+            teclas.append(
+                ("Ctrl+P", "Imprimir", lambda: pulsar(self.btn_imprimir)),
+            )
+
+        teclas.append(
+            ("Esc", "Cerrar", self._cerrar_con_escape),
+        )
+
+        return teclas
 
     def _fila_con_foco(
         self,
@@ -2837,6 +3734,11 @@ class FormularioCotizacion(Page):
 
         self.lbl_total.setText(
             f"Total: $ {resumen['total']:,.2f}",
+        )
+
+        self._actualizar_resumen_escritorio(
+            lineas,
+            resumen,
         )
 
     def _obtener_lineas(self) -> list[dict]:

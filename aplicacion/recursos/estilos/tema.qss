@@ -2276,3 +2276,218 @@ QHeaderView::section{
     background:qlineargradient(x1:0, y1:0, x2:0, y2:1,
         stop:0 #E6EBF1, stop:1 #C9D2DD);
 }
+
+/* ---------- Documentos de escritorio ---------- */
+
+QWidget#DocumentoPagina QFrame#card{
+    background:#E8ECF1;
+    border:1px solid #AEB8C5;
+    border-radius:3px;
+}
+
+QFrame#DocumentoBarraTitulo{
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #34506F, stop:1 #1E3A5F);
+    border:none;
+    border-top-left-radius:3px;
+    border-top-right-radius:3px;
+}
+
+QLabel#DocumentoBarraTituloTexto{
+    color:#FFFFFF;
+    font-size:13pt;
+    font-weight:700;
+    letter-spacing:0.3px;
+}
+
+QLabel#DocumentoEstado{
+    background:rgba(255,255,255,0.18);
+    color:#FFFFFF;
+    border-radius:2px;
+    padding:1px 8px;
+}
+
+QFrame#DocumentoCajaNumero{
+    background:#FFFFFF;
+    border:1px solid #16293F;
+    border-radius:3px;
+}
+
+QLabel#DocumentoCajaNumeroEtiqueta{
+    color:#5A6878;
+    font-size:8.5pt;
+    font-weight:600;
+}
+
+QLabel#DocumentoNumero,
+QLineEdit#DocumentoNumero{
+    color:#B42318;
+    font-size:12pt;
+    font-weight:700;
+    background:transparent;
+    border:none;
+    padding:0;
+}
+
+QFrame#DocumentoBarraAcciones{
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #F7F9FB, stop:1 #E3E8EE);
+    border:none;
+    border-bottom:1px solid #C3CCD8;
+}
+
+QPushButton#BotonAccionDocumento{
+    background:transparent;
+    border:1px solid transparent;
+    border-radius:3px;
+    color:#1E293B;
+    padding:3px 10px;
+    font-weight:500;
+}
+
+QPushButton#BotonAccionDocumento:hover{
+    background:#FFFFFF;
+    border:1px solid #A9B7C8;
+}
+
+QPushButton#BotonAccionDocumento:pressed{
+    background:#C9D9EC;
+}
+
+QFrame#DocumentoBarraAcciones QPushButton#BotonPrimario{
+    padding:3px 14px;
+}
+
+QGroupBox#CajaDocumento{
+    background:#F2F4F7;
+    border:1px solid #AEB8C5;
+    border-radius:3px;
+    margin-top:10px;
+    padding-top:8px;
+    font-weight:700;
+    color:#1E3A5F;
+}
+
+QGroupBox#CajaDocumento::title{
+    subcontrol-origin:margin;
+    subcontrol-position:top left;
+    left:8px;
+    padding:0 4px;
+    background:#E8ECF1;
+    color:#1E3A5F;
+}
+
+QLabel#CajaDocumentoEtiqueta{
+    color:#334155;
+    font-weight:600;
+}
+
+QLabel#CajaDocumentoDato{
+    color:#0F172A;
+    background:#FFFFFF;
+    border:1px solid #D0D7E0;
+    border-radius:2px;
+    padding:2px 6px;
+    min-height:18px;
+}
+
+QLabel#CajaDocumentoSaldo{
+    color:#0F5132;
+    background:#E7F4EC;
+    border:1px solid #B7DCC5;
+    border-radius:2px;
+    padding:2px 6px;
+    font-weight:700;
+    min-height:18px;
+}
+
+QLabel#CajaDocumentoSaldo[vencido="true"]{
+    color:#B42318;
+    background:#FDECEA;
+    border:1px solid #F3B8B2;
+}
+
+QFrame#DocumentoFilaTotales{
+    background:#DDE3EA;
+    border:1px solid #C3CCD8;
+    border-radius:2px;
+}
+
+QLabel#DocumentoResumenLineas{
+    color:#1E3A5F;
+    font-weight:600;
+}
+
+QFrame#DocumentoFilaTotales QPushButton#BotonAgregarLinea{
+    border:1px solid #9AA8BA;
+    border-style:dashed;
+    background:#F4F6F9;
+    padding:2px 10px;
+}
+
+QTabWidget#PestanasDocumento::pane{
+    background:#F2F4F7;
+    border:1px solid #AEB8C5;
+    border-radius:0 3px 3px 3px;
+    top:-1px;
+}
+
+QTabWidget#PestanasDocumento QTabBar::tab{
+    background:#D5DCE5;
+    color:#334155;
+    border:1px solid #AEB8C5;
+    border-bottom:none;
+    border-top-left-radius:3px;
+    border-top-right-radius:3px;
+    padding:3px 14px;
+    margin-right:2px;
+}
+
+QTabWidget#PestanasDocumento QTabBar::tab:selected{
+    background:#F2F4F7;
+    color:#1E3A5F;
+    font-weight:600;
+}
+
+QFrame#CajaTotales{
+    background:#F2F4F7;
+    border:1px solid #AEB8C5;
+    border-radius:3px;
+}
+
+QLabel#CajaTotalesTitulo{
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #34506F, stop:1 #1E3A5F);
+    color:#FFFFFF;
+    font-weight:700;
+    padding:4px 10px;
+    border-top-left-radius:2px;
+    border-top-right-radius:2px;
+}
+
+QFrame#CajaTotales QWidget#PanelTotalesDocumento{
+    background:transparent;
+    border:none;
+}
+
+QFrame#CajaTotales QLabel#DocumentoTotal{
+    color:#0F2740;
+    font-size:14pt;
+    font-weight:700;
+    border-top:1px solid #C3CCD8;
+    padding-top:4px;
+}
+
+QTableWidget#TablaResumenImpuestos{
+    border:none;
+}
+
+/* Barra de teclas: textos siempre legibles */
+
+QPushButton#BotonTecla QLabel#TeclaTexto{
+    color:#1E293B;
+}
+
+QPushButton#BotonTecla QLabel#TeclaTapa{
+    color:#1E3A5F;
+}

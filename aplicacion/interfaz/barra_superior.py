@@ -179,7 +179,7 @@ class BarraSuperior(QWidget):
         self.btn_usuario.setObjectName("BarraSuperiorUsuario")
         self.btn_usuario.setPopupMode(QToolButton.InstantPopup)
         self.btn_usuario.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
-        self.btn_usuario.setIcon(icono_modulo("terceros", "#1E3A5F", 16))
+        self.btn_usuario.setIcon(icono_modulo("terceros", "#FFFFFF", 16))
         self.btn_usuario.setText(usuario.nombre)
         self.btn_usuario.setCursor(Qt.PointingHandCursor)
         self.btn_usuario.setFocusPolicy(Qt.NoFocus)
