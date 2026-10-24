@@ -552,7 +552,7 @@ class FormularioFacturaCompra(Page):
         )
 
         btn_agregar.clicked.connect(
-            self._agregar_fila,
+            lambda _checked=False: self._agregar_fila(),
         )
 
         # ---------------- Fila de totales del detalle ----------------

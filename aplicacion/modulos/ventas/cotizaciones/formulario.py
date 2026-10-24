@@ -997,8 +997,10 @@ class FormularioCotizacion(Page):
             botones,
         )
 
+        # El lambda evita que Qt pase el "checked" (False) del botón
+        # como producto_id.
         self.btn_agregar_linea.clicked.connect(
-            self._agregar_linea,
+            lambda _checked=False: self._agregar_linea(),
         )
 
         self.btn_guardar.clicked.connect(
@@ -3249,6 +3251,13 @@ class FormularioCotizacion(Page):
         precio_incluye_iva=False,
         imagen=None,
     ):
+
+        if isinstance(
+            producto_id,
+            bool,
+        ):
+
+            producto_id = None
 
         fila = self.tabla.rowCount()
 
