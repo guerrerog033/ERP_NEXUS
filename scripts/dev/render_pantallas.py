@@ -125,6 +125,9 @@ def main():
     paso("08_lista_facturas", lambda: dashboard.modulo_seleccionado("FacturasVenta"))
     paso("09_nuevo_pedido", lambda: abrir_nuevo("Pedidos"))
     paso("10_compras", lambda: dashboard.modulo_seleccionado("Compras"))
+    paso("11_nueva_factura_compra", lambda: abrir_nuevo("FacturasCompra"))
+    paso("12_nuevo_documento_soporte", lambda: abrir_nuevo("DocumentosSoporte"))
+    paso("13_ordenes_compra", lambda: dashboard.modulo_seleccionado("OrdenesCompra"))
 
     LOG.close()
 
