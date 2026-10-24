@@ -81,7 +81,7 @@ class FormularioProducto(FormularioBase):
 
     datasource = ProductoDataSource
 
-    ancho = 920
+    ancho = 1200
 
     alto = 860
 
@@ -258,7 +258,7 @@ class FormularioProducto(FormularioBase):
         )
 
         grupo_imagen.setFixedWidth(
-            300,
+            270,
         )
 
         fila_superior.addWidget(
