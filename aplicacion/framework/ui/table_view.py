@@ -56,7 +56,7 @@ class TableView(QTableView):
         )
 
         self.setShowGrid(
-            False,
+            True,
         )
 
         self.setWordWrap(
@@ -126,9 +126,10 @@ class TableView(QTableView):
                 color:#1E293B;
                 border:1px solid #AEB8C5;
                 border-radius:2px;
-                alternate-background-color:#F4F6F9;
-                selection-background-color:#C9D9EC;
-                selection-color:#1E293B;
+                alternate-background-color:#EAEFF5;
+                gridline-color:#D5DCE4;
+                selection-background-color:#3A6EA5;
+                selection-color:#FFFFFF;
                 font-size:13px;
                 outline:none;
             }
@@ -137,14 +138,14 @@ class TableView(QTableView):
                 border:none;
             }
             QTableView::item:selected{
-                background:#C9D9EC;
-                color:#1E293B;
+                background:#3A6EA5;
+                color:#FFFFFF;
             }
             QTableView::item:hover{
-                background:#F8FAFC;
+                background:#DCE6F1;
             }
             QHeaderView::section{
-                background:#C9D2DD;
+                background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #E6EBF1, stop:1 #C9D2DD);
                 color:#1E293B;
                 border:none;
                 border-right:1px solid #B8C2CE;

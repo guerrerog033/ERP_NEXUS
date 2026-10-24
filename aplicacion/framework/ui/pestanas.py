@@ -95,6 +95,14 @@ def abrir_en_pestana(
 
     contenedor._clave_pestana = clave
 
+    # Hereda el módulo de la pestaña desde donde se abrió (color y
+    # nombre en la barra de estado).
+    contenedor._modulo_id = getattr(
+        area.currentWidget(),
+        "_modulo_id",
+        None,
+    )
+
     layout = QVBoxLayout(
         contenedor,
     )

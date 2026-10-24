@@ -195,6 +195,10 @@ class CrudEventos(QObject):
                 ("Delete", lambda: pulsar(self.btn_eliminar)),
                 (("Ctrl+F", "F3"), enfocar_buscador),
                 ("F5", self.actualizar),
+                ("Ctrl+P", self._imprimir_desde_tecla),
+                ("Ctrl+E", self._excel_desde_tecla),
+                ("Home", lambda: self._navegar_lista("primero")),
+                ("End", lambda: self._navegar_lista("ultimo")),
             ),
         )
 
@@ -222,6 +226,90 @@ class CrudEventos(QObject):
                 )
 
 
+
+    def _imprimir_desde_tecla(
+        self,
+    ) -> None:
+
+        accion = getattr(
+            self,
+            "btn_imprimir",
+            None,
+        )
+
+        if accion is not None and hasattr(
+            accion,
+            "trigger",
+        ):
+
+            accion.trigger()
+
+    def _excel_desde_tecla(
+        self,
+    ) -> None:
+
+        accion = getattr(
+            self,
+            "btn_excel",
+            None,
+        )
+
+        if accion is not None and hasattr(
+            accion,
+            "trigger",
+        ):
+
+            accion.trigger()
+
+    def _navegar_lista(
+        self,
+        destino: str,
+    ) -> None:
+
+        grid = getattr(
+            self,
+            "grid",
+            None,
+        )
+
+        if grid is not None and hasattr(
+            grid,
+            "navegar",
+        ):
+
+            grid.navegar(
+                destino,
+            )
+
+    def teclas_contexto(
+        self,
+    ) -> list:
+        """Teclas que muestra la barra inferior para esta lista."""
+
+        from aplicacion.framework.ui.atajos import pulsar
+
+        def enfocar_buscador():
+
+            if self.txt_buscar is not None:
+
+                self.txt_buscar.setFocus()
+
+                self.txt_buscar.selectAll()
+
+        teclas = [
+            ("Ctrl+N", "Nuevo", lambda: pulsar(self.btn_nuevo)),
+            ("F2", "Editar", lambda: pulsar(self.btn_editar)),
+        ]
+
+        teclas += [
+            ("Supr", "Eliminar", lambda: pulsar(self.btn_eliminar)),
+            ("F3", "Buscar", enfocar_buscador),
+            ("F5", "Actualizar", self.actualizar),
+            ("Ctrl+P", "Imprimir", self._imprimir_desde_tecla),
+            ("Ctrl+E", "Excel", self._excel_desde_tecla),
+        ]
+
+        return teclas
 
     def imprimir_listado(
 

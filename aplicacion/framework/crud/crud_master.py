@@ -141,9 +141,13 @@ class CrudMaster(
 
         self._filtros_consulta = []
 
+        self._filtro_fechas = []
+
         self._configurar_paginacion()
 
         self._configurar_filtros()
+
+        self._configurar_busqueda_avanzada()
 
         self.cargar_datos()
 
@@ -173,9 +177,213 @@ class CrudMaster(
             self.ir_a_pagina,
         )
 
-        self.grid.layout_principal.addWidget(
-            self.paginador,
+        layout_pie = getattr(
+            self.grid,
+            "layout_pie",
+            None,
         )
+
+        if layout_pie is not None:
+
+            layout_pie.addWidget(
+                self.paginador,
+            )
+
+        else:
+
+            self.grid.layout_principal.addWidget(
+                self.paginador,
+            )
+
+    # ==================================================
+    # Buscar por / rango de fechas
+    # ==================================================
+
+    # Nombre de la columna de fecha para el filtro "Desde / Hasta".
+    # None = detectarla en la definición de la tabla; "" = sin filtro.
+    columna_fecha_filtro: str | None = None
+
+    def _columna_fecha(
+        self,
+    ) -> str:
+
+        configurada = type(
+            self,
+        ).columna_fecha_filtro
+
+        if configurada is not None:
+
+            return configurada
+
+        from aplicacion.framework.table.date_column import DateColumn
+
+        for columna in self.table_definition.obtener_columnas():
+
+            if isinstance(
+                columna,
+                DateColumn,
+            ) and columna.nombre in {
+                "fecha",
+                "fecha_emision",
+                "fecha_documento",
+                "fecha_elaboracion",
+            }:
+
+                return columna.nombre
+
+        return ""
+
+    def _configurar_busqueda_avanzada(
+        self,
+    ) -> None:
+
+        toolbar = getattr(
+            self.grid,
+            "toolbar",
+            None,
+        )
+
+        if toolbar is None or not hasattr(
+            toolbar,
+            "configurar_columnas_busqueda",
+        ):
+
+            return
+
+        toolbar.configurar_columnas_busqueda(
+            [
+                (
+                    columna.nombre,
+                    columna.etiqueta,
+                )
+                for columna in self.table_definition.obtener_visibles()
+                if columna.etiqueta
+            ],
+        )
+
+        toolbar.columna_busqueda_cambiada.connect(
+            lambda _c: self._aplicar_filtro_columna(),
+        )
+
+        self._campo_fecha = self._columna_fecha()
+
+        if self._campo_fecha:
+
+            toolbar.habilitar_fechas(
+                True,
+            )
+
+            toolbar.fechas_aplicadas.connect(
+                self._aplicar_rango_fechas,
+            )
+
+            toolbar.fechas_limpiadas.connect(
+                self._limpiar_rango_fechas,
+            )
+
+    def _aplicar_rango_fechas(
+        self,
+        desde,
+        hasta,
+    ) -> None:
+
+        from aplicacion.framework.datagrid.filtros import FiltroConsulta
+
+        self._filtro_fechas = [
+            FiltroConsulta(
+                campo=self._campo_fecha,
+                operador="gte",
+                valor=desde.toPython(),
+            ),
+            FiltroConsulta(
+                campo=self._campo_fecha,
+                operador="lte",
+                valor=hasta.toPython(),
+            ),
+        ]
+
+        self._pagina_actual = 1
+
+        self.cargar_datos()
+
+    def _limpiar_rango_fechas(
+        self,
+    ) -> None:
+
+        self._filtro_fechas = []
+
+        self._pagina_actual = 1
+
+        self.cargar_datos()
+
+    def _aplicar_filtro_columna(
+        self,
+    ) -> None:
+        """
+        "Buscar por" una columna: oculta las filas cargadas cuyo valor
+        en esa columna no contiene el texto buscado.
+        """
+
+        toolbar = getattr(
+            self.grid,
+            "toolbar",
+            None,
+        )
+
+        tabla = self.table_engine.widget if self.table_engine else None
+
+        if toolbar is None or tabla is None or not hasattr(
+            toolbar,
+            "columna_busqueda",
+        ):
+
+            return
+
+        modelo = tabla.model()
+
+        if modelo is None:
+
+            return
+
+        columna = toolbar.columna_busqueda()
+
+        texto = (
+            self.txt_buscar.text().strip().lower()
+            if self.txt_buscar is not None
+            else ""
+        )
+
+        nombres = self.table_definition.nombres()
+
+        indice_columna = (
+            nombres.index(columna)
+            if columna in nombres
+            else -1
+        )
+
+        for fila in range(
+            modelo.rowCount(),
+        ):
+
+            oculta = False
+
+            if texto and indice_columna >= 0:
+
+                valor = modelo.index(
+                    fila,
+                    indice_columna,
+                ).data()
+
+                oculta = texto not in str(
+                    valor if valor is not None else "",
+                ).lower()
+
+            tabla.setRowHidden(
+                fila,
+                oculta,
+            )
+
+        self.grid.actualizar_posicion()
 
     # ==================================================
     # Crear backend
