@@ -321,6 +321,32 @@ class FormularioBase(Page):
     # Botones
     # =====================================================
 
+    def _registrar_atajos_formulario(
+        self,
+    ) -> None:
+
+        from aplicacion.framework.ui.atajos import (
+            pulsar,
+            registrar_atajos,
+        )
+
+        # Enter pasa al siguiente campo, como Tab (FiltroTeclado).
+        self.setProperty(
+            "enter_avanza",
+            True,
+        )
+
+        registrar_atajos(
+            self,
+            (
+                (("Ctrl+S", "F10"), lambda: pulsar(self.btn_guardar)),
+            ),
+        )
+
+        self.btn_guardar.setToolTip(
+            "Guardar (Ctrl+S)",
+        )
+
     def _crear_botones(self):
 
         from aplicacion.framework.form.modo import (
@@ -360,6 +386,8 @@ class FormularioBase(Page):
         self.card.agregar_layout(
             layout
         )
+
+        self._registrar_atajos_formulario()
 
     @property
     def widgets(self):

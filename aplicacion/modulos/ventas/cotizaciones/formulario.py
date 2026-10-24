@@ -1025,6 +1025,8 @@ class FormularioCotizacion(Page):
             self.enviar_correo,
         )
 
+        self._registrar_atajos_documento()
+
         if self.es_edicion:
 
             self._cargar_registro()
@@ -1032,6 +1034,135 @@ class FormularioCotizacion(Page):
         else:
 
             self._agregar_linea()
+
+    def _registrar_atajos_documento(
+        self,
+    ) -> None:
+
+        from aplicacion.framework.ui.atajos import (
+            pulsar,
+            registrar_atajos,
+        )
+
+        # La tabla de ítems ya maneja Enter por su cuenta.
+        self.setProperty(
+            "enter_propio",
+            True,
+        )
+
+        registrar_atajos(
+            self,
+            (
+                (("Ctrl+S", "F10"), lambda: pulsar(self.btn_guardar)),
+                ("F3", lambda: pulsar(self.cliente.btn)),
+                ("F4", self._buscar_producto_fila_actual),
+                ("Ctrl+L", lambda: pulsar(self.btn_agregar_linea)),
+                ("Ctrl+Delete", self._quitar_fila_actual),
+                ("Ctrl+P", lambda: pulsar(self.btn_imprimir)),
+            ),
+        )
+
+        for boton, texto in (
+            (self.btn_guardar, "Guardar (Ctrl+S)"),
+            (self.btn_agregar_linea, "Agregar línea (Ctrl+L)"),
+            (self.cliente.btn, "Buscar cliente (F3)"),
+            (self.btn_imprimir, "Imprimir (Ctrl+P)"),
+        ):
+
+            boton.setToolTip(
+                texto,
+            )
+
+    def _fila_con_foco(
+        self,
+    ) -> int:
+        """
+        Fila de la tabla donde está el cursor; si el foco no está en
+        la tabla, la fila seleccionada o la última.
+        """
+
+        from PySide6.QtWidgets import QApplication
+
+        foco = QApplication.focusWidget()
+
+        if foco is not None:
+
+            for fila in range(
+                self.tabla.rowCount(),
+            ):
+
+                for columna in range(
+                    self.tabla.columnCount(),
+                ):
+
+                    celda = self.tabla.cellWidget(
+                        fila,
+                        columna,
+                    )
+
+                    if celda is not None and (
+                        celda is foco
+                        or celda.isAncestorOf(
+                            foco,
+                        )
+                    ):
+
+                        return fila
+
+        if self.tabla.currentRow() >= 0:
+
+            return self.tabla.currentRow()
+
+        return self.tabla.rowCount() - 1
+
+    def _buscar_producto_fila_actual(
+        self,
+    ) -> None:
+
+        from aplicacion.framework.ui.atajos import pulsar
+
+        if self.tabla.rowCount() == 0:
+
+            pulsar(
+                self.btn_agregar_linea,
+            )
+
+        fila = self._fila_con_foco()
+
+        if fila < 0:
+
+            return
+
+        boton = self._boton_producto_fila(
+            fila,
+        )
+
+        if boton is not None:
+
+            pulsar(
+                boton,
+            )
+
+    def _quitar_fila_actual(
+        self,
+    ) -> None:
+
+        fila = self._fila_con_foco()
+
+        if fila < 0:
+
+            return
+
+        celda = self.tabla.cellWidget(
+            fila,
+            COL_BORRAR,
+        )
+
+        if celda is not None:
+
+            self._quitar_fila_celda(
+                celda,
+            )
 
     def _titulo_documento(
         self,

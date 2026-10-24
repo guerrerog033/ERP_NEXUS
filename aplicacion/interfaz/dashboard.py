@@ -1,4 +1,4 @@
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QHBoxLayout,
@@ -292,7 +292,61 @@ class Dashboard(QWidget):
             self._activar_busqueda,
         )
 
+        from aplicacion.framework.ui.atajos import (
+            instalar_filtro_teclado,
+            mostrar_ayuda,
+            registrar_atajos,
+        )
+
+        instalar_filtro_teclado()
+
+        registrar_atajos(
+            self,
+            (
+                ("F1", lambda: mostrar_ayuda(self)),
+                ("Ctrl+W", self.area_trabajo.cerrar_actual),
+                ("Ctrl+Tab", lambda: self._cambiar_pestana(1)),
+                ("Ctrl+Shift+Tab", lambda: self._cambiar_pestana(-1)),
+            ),
+            contexto=Qt.ShortcutContext.WindowShortcut,
+        )
+
         self.area_trabajo.mostrar_inicio()
+
+    def _cambiar_pestana(
+        self,
+        paso: int,
+    ) -> None:
+
+        area = self.area_trabajo
+
+        visibles = [
+            indice
+            for indice in range(
+                area.count(),
+            )
+            if area.isTabVisible(
+                indice,
+            )
+        ]
+
+        if not visibles:
+
+            return
+
+        actual = area.currentIndex()
+
+        posicion = (
+            visibles.index(actual)
+            if actual in visibles
+            else 0
+        )
+
+        area.setCurrentIndex(
+            visibles[
+                (posicion + paso) % len(visibles)
+            ],
+        )
 
     def _activar_busqueda(
         self,
