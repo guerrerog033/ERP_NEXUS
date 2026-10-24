@@ -79,7 +79,7 @@ class Table(QTableWidget):
         )
 
         self.setShowGrid(
-            False
+            True
         )
 
         self.setWordWrap(
@@ -166,7 +166,8 @@ class Table(QTableWidget):
 
                 border-radius:2px;
 
-                alternate-background-color:#F4F6F9;
+                alternate-background-color:#EAEFF5;
+                gridline-color:#D5DCE4;
 
                 selection-background-color:#C9D9EC;
 
@@ -188,9 +189,9 @@ class Table(QTableWidget):
 
             QTableWidget::item:selected{
 
-                background:#C9D9EC;
+                background:#3A6EA5;
 
-                color:#1E293B;
+                color:#FFFFFF;
 
             }
 
@@ -201,7 +202,7 @@ class Table(QTableWidget):
             }
 
             QHeaderView::section{
-                background:#C9D2DD;
+                background:qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #E6EBF1, stop:1 #C9D2DD);
                 color:#1E293B;
                 border:none;
                 border-right:1px solid #B8C2CE;

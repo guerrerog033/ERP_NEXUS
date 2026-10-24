@@ -340,12 +340,59 @@ class FormularioBase(Page):
             self,
             (
                 (("Ctrl+S", "F10"), lambda: pulsar(self.btn_guardar)),
+                ("Escape", self._cerrar_con_escape),
             ),
         )
 
         self.btn_guardar.setToolTip(
             "Guardar (Ctrl+S)",
         )
+
+    def _cerrar_con_escape(
+        self,
+    ) -> None:
+        """Esc cierra; si se puede guardar, pregunta antes."""
+
+        from PySide6.QtWidgets import QMessageBox
+
+        if self.btn_guardar.isVisible():
+
+            respuesta = QMessageBox.question(
+                self,
+                "Cerrar",
+                "¿Cerrar sin guardar los cambios?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.No,
+            )
+
+            if respuesta != QMessageBox.Yes:
+
+                return
+
+        self.cerrar_formulario()
+
+    def teclas_contexto(
+        self,
+    ) -> list:
+
+        from aplicacion.framework.ui.atajos import pulsar
+
+        teclas = []
+
+        if self.btn_guardar.isVisibleTo(
+            self,
+        ):
+
+            teclas.append(
+                ("F10", "Guardar", lambda: pulsar(self.btn_guardar)),
+            )
+
+        teclas += [
+            ("Tab", "Siguiente campo", lambda: self.focusNextChild()),
+            ("Esc", "Cerrar", self._cerrar_con_escape),
+        ]
+
+        return teclas
 
     def _crear_botones(self):
 

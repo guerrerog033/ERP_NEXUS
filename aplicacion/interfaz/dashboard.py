@@ -18,6 +18,8 @@ from aplicacion.framework.modulo_manager import ModuloManager
 from aplicacion.interfaz.area_trabajo import AreaTrabajo
 from aplicacion.interfaz.barra_estado import BarraEstado
 from aplicacion.interfaz.barra_lateral import BarraLateral
+from aplicacion.interfaz.barra_menu import BarraMenu
+from aplicacion.interfaz.barra_teclas import BarraTeclas
 from aplicacion.interfaz.barra_superior import BarraSuperior
 from aplicacion.interfaz.buscador_modulos import BuscadorModulos
 from aplicacion.interfaz.navegacion_usuario import NavegacionUsuario
@@ -123,9 +125,15 @@ class Dashboard(QWidget):
         self,
     ):
 
+        self.barra_menu = BarraMenu(
+            self,
+        )
+
         self.barra_superior = BarraSuperior(
             self.usuario
         )
+
+        self.barra_teclas = BarraTeclas()
 
         self.barra_lateral = BarraLateral()
 
@@ -145,6 +153,22 @@ class Dashboard(QWidget):
 
         self.area_trabajo.inicio.modulo_solicitado.connect(
             self.modulo_seleccionado,
+        )
+
+        self.barra_menu.modulo_seleccionado.connect(
+            self.modulo_seleccionado,
+        )
+
+        self.barra_menu.accion_solicitada.connect(
+            self._accion_menu,
+        )
+
+        self.barra_superior.modulo_solicitado.connect(
+            self.modulo_seleccionado,
+        )
+
+        self.area_trabajo.currentChanged.connect(
+            self._pestana_cambiada,
         )
 
     # =====================================================
@@ -191,12 +215,20 @@ class Dashboard(QWidget):
         )
 
         principal.addWidget(
+            self.barra_menu
+        )
+
+        principal.addWidget(
             self.barra_superior
         )
 
         principal.addLayout(
             contenido,
             1,
+        )
+
+        principal.addWidget(
+            self.barra_teclas
         )
 
         principal.addWidget(
@@ -311,7 +343,172 @@ class Dashboard(QWidget):
             contexto=Qt.ShortcutContext.WindowShortcut,
         )
 
+        from aplicacion.framework.ui.atajos import mostrar_ayuda as _ayuda
+
+        self.barra_teclas.set_teclas_generales(
+            (
+                ("F1", "Ayuda", lambda: _ayuda(self)),
+                ("Ctrl+K", "Buscar módulo", self._activar_busqueda),
+                ("Ctrl+W", "Cerrar pestaña", self.area_trabajo.cerrar_actual),
+            ),
+        )
+
         self.area_trabajo.mostrar_inicio()
+
+        self._pestana_cambiada(
+            self.area_trabajo.currentIndex(),
+        )
+
+    # =====================================================
+    # Pestaña activa → barra de teclas y barra de estado
+    # =====================================================
+
+    def _pestana_cambiada(
+        self,
+        indice: int,
+    ) -> None:
+
+        from aplicacion.framework.ui.colores_modulo import (
+            color_modulo,
+            nombre_area,
+        )
+
+        widget = self.area_trabajo.widget(
+            indice,
+        )
+
+        self.barra_teclas.actualizar_desde(
+            widget,
+        )
+
+        modulo_id = getattr(
+            widget,
+            "_modulo_id",
+            None,
+        )
+
+        if indice <= 0 or widget is None:
+
+            self.barra_estado.set_modulo(
+                "Inicio",
+            )
+
+            self.barra_estado.set_pantalla(
+                "",
+            )
+
+        else:
+
+            self.barra_estado.set_modulo(
+                nombre_area(modulo_id or "") or "ERP",
+                color_modulo(modulo_id or ""),
+            )
+
+            self.barra_estado.set_pantalla(
+                self.area_trabajo.tabText(
+                    indice,
+                ),
+            )
+
+        self.barra_estado.set_registro(
+            "",
+        )
+
+        if modulo_id:
+
+            self.barra_lateral.marcar_activo(
+                modulo_id,
+            )
+
+    def actualizar_barra_teclas(
+        self,
+    ) -> None:
+
+        self.barra_teclas.actualizar_desde(
+            self.area_trabajo.currentWidget(),
+        )
+
+    def _accion_menu(
+        self,
+        clave: str,
+    ) -> None:
+
+        from aplicacion.framework.ui.atajos import mostrar_ayuda
+
+        acciones = {
+            "buscar_modulo": self._activar_busqueda,
+            "cerrar_sesion": self._cerrar_sesion,
+            "salir": self._salir,
+            "pestana_siguiente": lambda: self._cambiar_pestana(1),
+            "pestana_anterior": lambda: self._cambiar_pestana(-1),
+            "cerrar_pestana": self.area_trabajo.cerrar_actual,
+            "cerrar_todas": self._cerrar_todas,
+            "ayuda": lambda: mostrar_ayuda(self),
+            "acerca_de": self._acerca_de,
+        }
+
+        accion = acciones.get(
+            clave,
+        )
+
+        if accion is not None:
+
+            accion()
+
+    def _cerrar_todas(
+        self,
+    ) -> None:
+
+        for indice in range(
+            self.area_trabajo.count() - 1,
+            0,
+            -1,
+        ):
+
+            self.area_trabajo.cerrar_pestana(
+                indice,
+            )
+
+    def _salir(
+        self,
+    ) -> None:
+
+        ventana = self.window()
+
+        if ventana is not None:
+
+            ventana.close()
+
+    def _acerca_de(
+        self,
+    ) -> None:
+
+        nombre = (
+            Configuracion.obtener(
+                "erp",
+                "nombre",
+            )
+            or self.TITULO
+        )
+
+        empresa = (
+            Configuracion.obtener(
+                "empresa",
+                "nombre",
+            )
+            or ""
+        )
+
+        QMessageBox.about(
+            self,
+            f"Acerca de {nombre}",
+            f"<b>{nombre}</b><br>Sistema contable y administrativo"
+            + (
+                f"<br><br>Licenciado a: {empresa}"
+                if empresa
+                else ""
+            ),
+        )
 
     def _cambiar_pestana(
         self,

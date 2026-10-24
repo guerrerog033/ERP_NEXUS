@@ -55,6 +55,12 @@ class ModuloManager:
 
         pagina.setContenido(modulo)
 
+        pagina._modulo_id = nombre
+
+        pagina.set_modulo(
+            nombre,
+        )
+
         self.area_trabajo.abrir(
             pagina,
             titulo_visible,

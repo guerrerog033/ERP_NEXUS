@@ -1915,7 +1915,7 @@ QPushButton#BotonEnlace{
 QTableWidget,
 QTableView{
     background:#FFFFFF;
-    alternate-background-color:#F4F6F9;
+    alternate-background-color:#EAEFF5;
     gridline-color:#D5DCE4;
     border:1px solid #AEB8C5;
     border-radius:2px;
@@ -1938,8 +1938,8 @@ QHeaderView::section{
 
 QTableWidget::item:selected,
 QTableView::item:selected{
-    background:#C9D9EC;
-    color:#1E293B;
+    background:#3A6EA5;
+    color:#FFFFFF;
 }
 
 /* ---------- Menús ---------- */
@@ -1952,4 +1952,327 @@ QMenu{
 
 QMenu::item:selected{
     background:#C9D9EC;
+}
+
+/* ==========================================================
+   VENTANA DE ESCRITORIO — lo mejor de Siigo Pyme, Sysplus,
+   World Office y Magister
+   (menú clásico, barra de herramientas con íconos, barra de
+   teclas de función, barra de estado por celdas, encabezados
+   de módulo con color, listas con "Buscar por" y navegador)
+   ========================================================== */
+
+/* ---------- Barra de menú (Archivo, Comercial…) ---------- */
+
+QMenuBar#BarraMenu{
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #F4F6F9, stop:1 #E3E8EE);
+    border-bottom:1px solid #C3CCD8;
+    padding:1px 4px;
+    color:#1E293B;
+}
+
+QMenuBar#BarraMenu::item{
+    background:transparent;
+    padding:3px 10px;
+    border-radius:2px;
+}
+
+QMenuBar#BarraMenu::item:selected{
+    background:#C9D9EC;
+    color:#0F2740;
+}
+
+QMenuBar#BarraMenu::item:pressed{
+    background:#1E3A5F;
+    color:#FFFFFF;
+}
+
+QMenu{
+    padding:3px 0;
+}
+
+QMenu::item{
+    padding:5px 28px 5px 26px;
+    color:#1E293B;
+}
+
+QMenu::item:selected{
+    background:#3A6EA5;
+    color:#FFFFFF;
+}
+
+QMenu::item:disabled{
+    color:#7B8794;
+}
+
+QMenu::separator{
+    height:1px;
+    background:#C3CCD8;
+    margin:3px 8px;
+}
+
+QMenu::icon{
+    padding-left:6px;
+}
+
+/* ---------- Cabecera: herramientas + sesión ---------- */
+
+QWidget#BarraSuperior{
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #EEF1F5, stop:1 #D8DEE6);
+    border-bottom:1px solid #AEB8C5;
+}
+
+QToolButton#BotonHerramienta{
+    background:transparent;
+    border:1px solid transparent;
+    border-radius:3px;
+    color:#1E293B;
+    font-size:8.5pt;
+    padding:2px 6px 1px 6px;
+    min-width:54px;
+}
+
+QToolButton#BotonHerramienta:hover{
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #FFFFFF, stop:1 #E4EBF3);
+    border:1px solid #A9B7C8;
+}
+
+QToolButton#BotonHerramienta:pressed{
+    background:#C9D9EC;
+    border:1px solid #8EA2BA;
+}
+
+QFrame#BarraHerramientasSeparador,
+QFrame#ToolbarSeparador{
+    background:#B8C2CE;
+    border:none;
+    margin:0 4px;
+}
+
+QFrame#PanelSesion{
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #2E4460, stop:1 #1E3A5F);
+    border:1px solid #16293F;
+    border-radius:4px;
+}
+
+QFrame#PanelSesion QLabel#BarraSuperiorTitulo{
+    color:#FFFFFF;
+    font-size:11pt;
+    letter-spacing:0.5px;
+}
+
+QFrame#PanelSesion QLabel#BarraSuperiorEtiqueta{
+    color:#AFC0D4;
+    font-size:8.5pt;
+}
+
+QFrame#PanelSesion QLabel#BarraSuperiorFecha{
+    color:#FFFFFF;
+    font-size:8.5pt;
+    font-weight:600;
+}
+
+QFrame#PanelSesion QToolButton#BarraSuperiorUsuario,
+QFrame#PanelSesion QToolButton#BarraSuperiorNotificaciones{
+    background:rgba(255,255,255,0.10);
+    border:1px solid rgba(255,255,255,0.22);
+    border-radius:3px;
+    color:#FFFFFF;
+    padding:2px 8px;
+}
+
+QFrame#PanelSesion QToolButton#BarraSuperiorUsuario:hover,
+QFrame#PanelSesion QToolButton#BarraSuperiorNotificaciones:hover{
+    background:rgba(255,255,255,0.20);
+}
+
+QFrame#PanelSesion QLineEdit#BarraSuperiorBusqueda{
+    background:#FFFFFF;
+    border:1px solid #16293F;
+    border-radius:3px;
+    padding:2px 6px;
+    min-height:20px;
+    color:#1E293B;
+}
+
+/* ---------- Barra de teclas de función ---------- */
+
+QWidget#BarraTeclas{
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #E3E8EE, stop:1 #CCD4DE);
+    border-top:1px solid #AEB8C5;
+}
+
+QPushButton#BotonTecla{
+    background:transparent;
+    border:1px solid transparent;
+    border-radius:3px;
+    min-height:22px;
+    max-height:22px;
+    padding:0;
+}
+
+QPushButton#BotonTecla:hover{
+    background:#F4F6F9;
+    border:1px solid #A9B7C8;
+}
+
+QPushButton#BotonTecla:pressed{
+    background:#C9D9EC;
+}
+
+QPushButton#BotonTecla:disabled QLabel{
+    color:#8A96A3;
+}
+
+QLabel#TeclaTapa{
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #FFFFFF, stop:1 #E2E7EE);
+    border:1px solid #9AA8BA;
+    border-bottom:2px solid #8392A6;
+    border-radius:3px;
+    color:#1E3A5F;
+    font-size:8pt;
+    font-weight:700;
+    padding:0 5px;
+    min-width:18px;
+}
+
+QLabel#TeclaTexto{
+    color:#1E293B;
+    font-size:8.5pt;
+}
+
+/* ---------- Barra de estado por celdas (Magister) ---------- */
+
+QWidget#BarraEstado{
+    background:#D5DCE5;
+    border-top:1px solid #AEB8C5;
+}
+
+QFrame#BarraEstadoCelda{
+    border:none;
+    border-left:1px solid #B3BECB;
+}
+
+QWidget#BarraEstado QLabel,
+QLabel#BarraEstadoTexto{
+    color:#334155;
+    font-size:8.5pt;
+}
+
+QLabel#BarraEstadoTextoDestacado{
+    color:#1E3A5F;
+    font-size:8.5pt;
+    font-weight:600;
+}
+
+/* ---------- Encabezado de módulo con color ---------- */
+
+QWidget#PaginaModulo{
+    background:#D9DEE5;
+}
+
+QFrame#PanelModulo{
+    background:#E8ECF1;
+    border:1px solid #B8C2CE;
+    border-radius:3px;
+}
+
+QFrame#EncabezadoModulo{
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #F7F9FB, stop:1 #E3E8EE);
+    border-bottom:1px solid #C3CCD8;
+    border-top-left-radius:3px;
+    border-top-right-radius:3px;
+}
+
+QLabel#PaginaModuloTitulo{
+    color:#0F2740;
+    font-size:12.5pt;
+    font-weight:700;
+}
+
+QLabel#PaginaModuloSubtitulo{
+    color:#5A6878;
+    font-size:8.5pt;
+}
+
+/* ---------- Listas: herramientas, búsqueda y pie ---------- */
+
+QWidget#DataGrid{
+    background:transparent;
+    border:none;
+}
+
+QFrame#BarraHerramientasLista{
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #F7F9FB, stop:1 #E6EBF1);
+    border:1px solid #C3CCD8;
+    border-radius:3px;
+}
+
+QToolButton#BotonBarraLista,
+QToolButton#MaestroToolbarMas{
+    background:transparent;
+    border:1px solid transparent;
+    border-radius:3px;
+    color:#1E293B;
+    padding:3px 8px;
+}
+
+QToolButton#BotonBarraLista:hover,
+QToolButton#MaestroToolbarMas:hover{
+    background:#FFFFFF;
+    border:1px solid #A9B7C8;
+}
+
+QFrame#BarraBusquedaLista{
+    background:#DDE3EA;
+    border:1px solid #C3CCD8;
+    border-radius:3px;
+}
+
+QLabel#EtiquetaBusqueda{
+    color:#1E3A5F;
+    font-weight:600;
+}
+
+QFrame#PieListado{
+    background:#DDE3EA;
+    border:1px solid #C3CCD8;
+    border-radius:3px;
+}
+
+QToolButton#BotonNavegador{
+    background:transparent;
+    border:1px solid transparent;
+    border-radius:2px;
+    padding:2px;
+}
+
+QToolButton#BotonNavegador:hover{
+    background:#FFFFFF;
+    border:1px solid #A9B7C8;
+}
+
+QLabel#NavegadorPosicion{
+    background:#FFFFFF;
+    border:1px solid #B8C2CE;
+    border-radius:2px;
+    color:#1E293B;
+    padding:1px 8px;
+}
+
+QLabel#DataGridTotal{
+    color:#475569;
+}
+
+QHeaderView::section{
+    background:qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #E6EBF1, stop:1 #C9D2DD);
 }

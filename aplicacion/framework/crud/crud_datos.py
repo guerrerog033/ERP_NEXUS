@@ -35,10 +35,20 @@ class CrudDatos:
                 },
             )
 
-        filtros = getattr(
-            self,
-            "_filtros_consulta",
-            None,
+        filtros = list(
+            getattr(
+                self,
+                "_filtros_consulta",
+                None,
+            )
+            or [],
+        ) + list(
+            getattr(
+                self,
+                "_filtro_fechas",
+                None,
+            )
+            or [],
         )
 
         if filtros:
@@ -312,6 +322,13 @@ class CrudDatos:
             registros,
         )
 
+        if hasattr(
+            self,
+            "_aplicar_filtro_columna",
+        ):
+
+            self._aplicar_filtro_columna()
+
         self.grid.actualizar_total(
             self._ultimo_total,
         )
@@ -342,10 +359,45 @@ class CrudDatos:
 
         self._iniciar_carga(
             "Cargando registros...",
-            lambda: self.servicio.listar(
-                **self._parametros_listado(),
+            lambda: self._listar_con_respaldo(
+                self.servicio.listar,
+                self._parametros_listado(),
             ),
         )
+
+    @staticmethod
+    def _listar_con_respaldo(
+        funcion,
+        parametros: dict,
+    ):
+        """
+        Algunos listados propios no aceptan ``filtros``; en ese caso
+        se repite la consulta sin ellos en lugar de fallar.
+        """
+
+        try:
+
+            return funcion(
+                **parametros,
+            )
+
+        except TypeError:
+
+            if "filtros" not in parametros:
+
+                raise
+
+            sin_filtros = dict(
+                parametros,
+            )
+
+            sin_filtros.pop(
+                "filtros",
+            )
+
+            return funcion(
+                **sin_filtros,
+            )
 
     def ir_a_pagina(
         self,
@@ -381,9 +433,12 @@ class CrudDatos:
 
         self._iniciar_carga(
             "Buscando...",
-            lambda: self.servicio.buscar(
-                texto,
-                **parametros,
+            lambda: self._listar_con_respaldo(
+                lambda **kw: self.servicio.buscar(
+                    texto,
+                    **kw,
+                ),
+                parametros,
             ),
         )
 
