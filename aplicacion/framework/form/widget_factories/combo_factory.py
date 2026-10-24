@@ -12,7 +12,7 @@ class ComboWidgetFactory:
         widget = QComboBox()
 
         widget.setMinimumHeight(
-            36
+            30
         )
 
         widget.setSizePolicy(

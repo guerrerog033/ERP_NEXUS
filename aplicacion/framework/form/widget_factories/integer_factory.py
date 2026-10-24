@@ -12,7 +12,7 @@ class IntegerWidgetFactory:
         widget = QSpinBox()
 
         widget.setMinimumHeight(
-            36
+            30
         )
 
         widget.setEnabled(

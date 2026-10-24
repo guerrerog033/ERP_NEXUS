@@ -16,7 +16,7 @@ class PasswordWidgetFactory:
         )
 
         widget.setMinimumHeight(
-            36
+            30
         )
 
         widget.setEnabled(

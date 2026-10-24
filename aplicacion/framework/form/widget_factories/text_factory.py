@@ -12,7 +12,7 @@ class TextWidgetFactory:
         widget = QLineEdit()
 
         widget.setMinimumHeight(
-            36
+            30
         )
 
         widget.setSizePolicy(
