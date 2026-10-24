@@ -1403,7 +1403,7 @@ class FormularioCotizacion(Page):
                         )
 
                         widget.setMinimumContentsLength(
-                            8,
+                            15,
                         )
 
                     if not isinstance(
@@ -1592,7 +1592,7 @@ class FormularioCotizacion(Page):
         )
 
         self.observaciones.setMinimumHeight(
-            70,
+            50,
         )
 
         self.observaciones.setMaximumHeight(
@@ -1655,7 +1655,7 @@ class FormularioCotizacion(Page):
         )
 
         self.pestanas_pie.setMinimumHeight(
-            130,
+            110,
         )
 
         self.pestanas_pie.setSizePolicy(

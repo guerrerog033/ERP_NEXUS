@@ -223,9 +223,9 @@ class FormularioBase(Page):
         ) or ""
 
         prefijo = {
-            ModoFormulario.NUEVO: "Nuevo",
-            ModoFormulario.EDICION: "Editar",
-            ModoFormulario.CONSULTA: "Consultar",
+            ModoFormulario.NUEVO: "Nuevo registro",
+            ModoFormulario.EDICION: "Editar registro",
+            ModoFormulario.CONSULTA: "Consulta",
         }.get(
             getattr(
                 self,
@@ -236,7 +236,7 @@ class FormularioBase(Page):
         )
 
         texto = (
-            f"{prefijo} · {titulo}"
+            f"{titulo}  ·  {prefijo}"
             if prefijo
             else titulo
         )

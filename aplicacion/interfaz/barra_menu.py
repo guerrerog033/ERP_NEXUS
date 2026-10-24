@@ -217,6 +217,24 @@ class BarraMenu(QMenuBar):
 
         ventana.addSeparator()
 
+        # El menú de arriba ya lleva a todos los módulos; el panel
+        # lateral queda opcional para quien lo prefiera.
+        self.accion_menu_lateral = ventana.addAction(
+            "Mostrar menú lateral",
+        )
+
+        self.accion_menu_lateral.setCheckable(
+            True,
+        )
+
+        self.accion_menu_lateral.toggled.connect(
+            lambda _v: self.accion_solicitada.emit(
+                "menu_lateral",
+            ),
+        )
+
+        ventana.addSeparator()
+
         self._accion(
             ventana,
             "Cerrar pestaña",

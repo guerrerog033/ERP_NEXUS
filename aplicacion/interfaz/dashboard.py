@@ -353,6 +353,8 @@ class Dashboard(QWidget):
             ),
         )
 
+        self._configurar_menu_lateral()
+
         self.area_trabajo.mostrar_inicio()
 
         self._pestana_cambiada(
@@ -445,6 +447,7 @@ class Dashboard(QWidget):
             "cerrar_todas": self._cerrar_todas,
             "ayuda": lambda: mostrar_ayuda(self),
             "acerca_de": self._acerca_de,
+            "menu_lateral": self._aplicar_menu_lateral,
         }
 
         accion = acciones.get(
@@ -454,6 +457,62 @@ class Dashboard(QWidget):
         if accion is not None:
 
             accion()
+
+    _CLAVE_MENU_LATERAL = "interfaz/menu_lateral_visible"
+
+    def _configurar_menu_lateral(
+        self,
+    ) -> None:
+        """Por defecto se trabaja solo con el menú de arriba."""
+
+        from PySide6.QtCore import QSettings
+
+        visible = QSettings(
+            "ERP_NEXUS",
+            "Interfaz",
+        ).value(
+            self._CLAVE_MENU_LATERAL,
+            False,
+            type=bool,
+        )
+
+        accion = self.barra_menu.accion_menu_lateral
+
+        accion.blockSignals(
+            True,
+        )
+
+        accion.setChecked(
+            visible,
+        )
+
+        accion.blockSignals(
+            False,
+        )
+
+        self.barra_lateral.setVisible(
+            visible,
+        )
+
+    def _aplicar_menu_lateral(
+        self,
+    ) -> None:
+
+        from PySide6.QtCore import QSettings
+
+        visible = self.barra_menu.accion_menu_lateral.isChecked()
+
+        self.barra_lateral.setVisible(
+            visible,
+        )
+
+        QSettings(
+            "ERP_NEXUS",
+            "Interfaz",
+        ).setValue(
+            self._CLAVE_MENU_LATERAL,
+            visible,
+        )
 
     def _cerrar_todas(
         self,
