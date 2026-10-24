@@ -1548,3 +1548,18 @@ QRadioButton::indicator:checked{
     border:5px solid #1E3A5F;
     background:#FFFFFF;
 }
+
+
+QPushButton#BotonEnlace{
+    background:transparent;
+    border:none;
+    color:#1E3A5F;
+    font-weight:600;
+    padding:2px 0;
+    text-align:left;
+}
+
+QPushButton#BotonEnlace:hover{
+    color:#2B4C78;
+    text-decoration:underline;
+}
