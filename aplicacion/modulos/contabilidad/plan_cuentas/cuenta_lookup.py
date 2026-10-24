@@ -16,6 +16,14 @@ class PlanCuentaLookup(LookupDataSource):
 
     campo_codigo = "codigo"
 
+    def __init__(
+        self,
+    ) -> None:
+        # Busca directamente en el servicio (ver ``buscar``); no usa
+        # el datasource genérico. Antes la base exigía uno y el Libro
+        # mayor fallaba al abrir con "Debe definir datasource".
+        pass
+
     def buscar(
         self,
         texto: str = "",
