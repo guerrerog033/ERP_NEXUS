@@ -13,6 +13,9 @@ from aplicacion.framework.crud.crud_documento import (
 from aplicacion.framework.crud.crud_master import (
     CrudMaster,
 )
+from aplicacion.modulos.compras.notas_credito.nota_credito_definition import (
+    FormularioNotaCreditoCompraLista,
+)
 from aplicacion.modulos.compras.notas_credito.datasource import (
     NotaCreditoCompraDataSource,
 )
@@ -34,6 +37,8 @@ class MaestroNotasCreditoCompra(
     titulo_singular = "Nota crédito de compra"
 
     datasource = NotaCreditoCompraDataSource
+
+    formulario = FormularioNotaCreditoCompraLista
 
     vista_documento = VistaNotaCreditoCompra
 
