@@ -90,6 +90,11 @@ class BarraTituloDocumento(QFrame):
             "DocumentoBarraTitulo",
         )
 
+        self.setSizePolicy(
+            QSizePolicy.Policy.Preferred,
+            QSizePolicy.Policy.Fixed,
+        )
+
         self.setAttribute(
             Qt.WidgetAttribute.WA_StyledBackground,
             True,
@@ -252,6 +257,11 @@ class BarraAccionesDocumento(QFrame):
 
         self.setObjectName(
             "DocumentoBarraAcciones",
+        )
+
+        self.setSizePolicy(
+            QSizePolicy.Policy.Preferred,
+            QSizePolicy.Policy.Fixed,
         )
 
         self.setAttribute(
@@ -2283,6 +2293,33 @@ def aplicar_diseno_documento(
 
         hoja.contenido.addWidget(
             elemento,
+        )
+
+    hay_tabla = any(
+        isinstance(
+            elemento,
+            QTableWidget,
+        )
+        and not elemento.isHidden()
+        for elemento in elementos
+    )
+
+    if not hay_tabla:
+
+        # Sin detalle que crezca, el espacio sobrante va al final
+        # (si no, lo tomaba la barra de título).
+        hoja.contenido.addStretch(
+            1,
+        )
+
+    for barra in (
+        barra_titulo,
+        barra_acciones,
+    ):
+
+        barra.setSizePolicy(
+            QSizePolicy.Policy.Preferred,
+            QSizePolicy.Policy.Fixed,
         )
 
     layout_pagina.setContentsMargins(
