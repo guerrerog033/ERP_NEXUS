@@ -587,6 +587,19 @@ class FormularioFacturaCompra(Page):
             44,
         )
 
+        for columna, ancho_columna in (
+            (COL_CANTIDAD, 110),
+            (COL_PRECIO, 130),
+            (COL_IMPUESTO, 130),
+            (COL_TOTAL, 130),
+            (COL_BORRAR, 48),
+        ):
+
+            self.tabla.setColumnWidth(
+                columna,
+                ancho_columna,
+            )
+
         self.tabla.setMinimumHeight(
             200,
         )
