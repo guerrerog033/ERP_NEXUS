@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
     QDateEdit,
     QDoubleSpinBox,
     QFileDialog,
+    QFrame,
     QGridLayout,
     QHBoxLayout,
     QHeaderView,
@@ -104,40 +105,97 @@ class FormularioFacturaCompra(Page):
 
         super()._crear_ui()
 
-        cabecera = Card(
-            "Datos de la factura de compra",
+        self.setObjectName(
+            "DocumentoPagina",
         )
 
-        panel_cabecera = QWidget()
-
-        grid = QGridLayout(
-            panel_cabecera,
-        )
-
-        grid.setContentsMargins(
+        self.layout_principal.setContentsMargins(
             0,
             0,
             0,
             0,
         )
 
-        grid.setHorizontalSpacing(
-            12,
+        # Una sola "hoja" como en ventas: título, cabecera en dos
+        # columnas, tabla, observaciones + totales y botones abajo.
+        # Antes la cabecera mostraba 15 campos seguidos (CUFE, prefijo,
+        # consecutivo, formato, retenciones...) y se veía recargada.
+        hoja = Card(
+            "",
         )
 
-        grid.setVerticalSpacing(
-            8,
+        hoja.layout_principal.setContentsMargins(
+            28,
+            22,
+            28,
+            18,
         )
 
+        hoja.layout_principal.setSpacing(
+            10,
+        )
+
+        hoja.contenido.setSpacing(
+            16,
+        )
+
+        # ---------------- Título + importar XML ----------------
+        fila_titulo = QHBoxLayout()
+
+        lbl_titulo = QLabel(
+            "Factura de compra"
+            if self.es_edicion
+            else "Nueva factura de compra",
+        )
+
+        lbl_titulo.setObjectName(
+            "DocumentoTituloHoja",
+        )
+
+        fila_titulo.addWidget(
+            lbl_titulo,
+        )
+
+        fila_titulo.addStretch()
+
+        btn_importar = QPushButton(
+            "Importar XML DIAN",
+        )
+
+        btn_importar.setObjectName(
+            "BotonSecundario",
+        )
+
+        btn_importar.setToolTip(
+            "Llena proveedor, número, CUFE y líneas desde el XML "
+            "de la factura electrónica del proveedor.",
+        )
+
+        btn_importar.clicked.connect(
+            self._importar_xml,
+        )
+
+        fila_titulo.addWidget(
+            btn_importar,
+        )
+
+        hoja.agregar_layout(
+            fila_titulo,
+        )
+
+        # ---------------- Campos ----------------
         self.txt_numero = QLineEdit()
+
         self.txt_numero.setReadOnly(
             True,
         )
 
         self.fecha = QDateEdit()
+
         self.fecha.setCalendarPopup(
             True,
         )
+
         self.fecha.setDate(
             QDate.currentDate(),
         )
@@ -151,139 +209,55 @@ class FormularioFacturaCompra(Page):
         )
 
         self.txt_nit = QLineEdit()
+
         self.txt_razon = QLineEdit()
-        self.txt_numero_proveedor = QLineEdit()
-        self.txt_prefijo = QLineEdit()
-        self.txt_consecutivo = QLineEdit()
-        self.txt_cufe = QLineEdit()
-        self.observaciones = QTextEdit()
-        self.observaciones.setMaximumHeight(
-            60,
-        )
 
-        fila = 0
-
-        grid.addWidget(
-            QLabel("Número interno"),
-            fila,
-            0,
-        )
-        grid.addWidget(
-            self.txt_numero,
-            fila,
-            1,
-        )
-        grid.addWidget(
-            QLabel("Fecha"),
-            fila,
-            2,
-        )
-        grid.addWidget(
-            self.fecha,
-            fila,
-            3,
-        )
-
-        fila += 1
-
-        grid.addWidget(
-            QLabel("Proveedor"),
-            fila,
-            0,
-        )
-        grid.addWidget(
-            self.proveedor,
-            fila,
-            1,
-            1,
-            3,
-        )
-
-        fila += 1
-
-        grid.addWidget(
-            QLabel("NIT"),
-            fila,
-            0,
-        )
-        grid.addWidget(
+        for campo_info in (
             self.txt_nit,
-            fila,
-            1,
-        )
-        grid.addWidget(
-            QLabel("Razón social"),
-            fila,
-            2,
-        )
-        grid.addWidget(
             self.txt_razon,
-            fila,
-            3,
+        ):
+
+            campo_info.setReadOnly(
+                True,
+            )
+
+            campo_info.setPlaceholderText(
+                "Se llena al elegir el proveedor",
+            )
+
+        self.txt_numero_proveedor = QLineEdit()
+
+        self.txt_numero_proveedor.setPlaceholderText(
+            "Número",
         )
 
-        fila += 1
+        self.txt_prefijo = QLineEdit()
 
-        grid.addWidget(
-            QLabel("Factura proveedor"),
-            fila,
-            0,
-        )
-        grid.addWidget(
-            self.txt_numero_proveedor,
-            fila,
-            1,
-        )
-        grid.addWidget(
-            QLabel("Prefijo"),
-            fila,
-            2,
-        )
-        grid.addWidget(
-            self.txt_prefijo,
-            fila,
-            3,
+        self.txt_prefijo.setPlaceholderText(
+            "Prefijo",
         )
 
-        fila += 1
-
-        grid.addWidget(
-            QLabel("Consecutivo"),
-            fila,
-            0,
-        )
-        grid.addWidget(
-            self.txt_consecutivo,
-            fila,
-            1,
-        )
-        grid.addWidget(
-            QLabel("CUFE"),
-            fila,
-            2,
-        )
-        grid.addWidget(
-            self.txt_cufe,
-            fila,
-            3,
+        self.txt_prefijo.setMaximumWidth(
+            110,
         )
 
-        fila += 1
+        self.txt_consecutivo = QLineEdit()
 
-        grid.addWidget(
-            QLabel("Observaciones"),
-            fila,
-            0,
-        )
-        grid.addWidget(
-            self.observaciones,
-            fila,
-            1,
-            1,
-            3,
+        self.txt_cufe = QLineEdit()
+
+        self.txt_cufe.setPlaceholderText(
+            "Se llena al importar el XML",
         )
 
-        fila += 1
+        self.observaciones = QTextEdit()
+
+        self.observaciones.setMinimumHeight(
+            90,
+        )
+
+        self.observaciones.setMaximumHeight(
+            120,
+        )
 
         self.formato = QComboBox()
 
@@ -304,61 +278,16 @@ class FormularioFacturaCompra(Page):
                 indice_formato,
             )
 
-        grid.addWidget(
-            QLabel("Formato de impresión"),
-            fila,
-            0,
-        )
-        grid.addWidget(
-            self.formato,
-            fila,
-            1,
-        )
-
-        fila += 1
-
         self.celda_retefuente = CeldaRetencionCombo(
             lookup=RetefuenteLookup(),
         )
+
         self.celda_reteica = CeldaRetencionCombo(
             lookup=ReteICALookup(),
         )
+
         self.celda_reteiva = CeldaRetencionCombo(
             lookup=ReteIVALookup(),
-        )
-
-        grid.addWidget(
-            QLabel("Retefuente"),
-            fila,
-            0,
-        )
-        grid.addWidget(
-            self.celda_retefuente,
-            fila,
-            1,
-        )
-        grid.addWidget(
-            QLabel("ReteICA"),
-            fila,
-            2,
-        )
-        grid.addWidget(
-            self.celda_reteica,
-            fila,
-            3,
-        )
-
-        fila += 1
-
-        grid.addWidget(
-            QLabel("ReteIVA"),
-            fila,
-            0,
-        )
-        grid.addWidget(
-            self.celda_reteiva,
-            fila,
-            1,
         )
 
         for celda in (
@@ -367,53 +296,266 @@ class FormularioFacturaCompra(Page):
             self.celda_reteiva,
         ):
 
+            celda.setMinimumWidth(
+                170,
+            )
+
             celda.cambiado.connect(
                 self._recalcular_totales,
             )
 
+        # ---------------- Cabecera en dos columnas ----------------
+        cabecera = QWidget()
+
+        grid = QGridLayout(
+            cabecera,
+        )
+
+        grid.setContentsMargins(
+            0,
+            0,
+            0,
+            0,
+        )
+
+        grid.setHorizontalSpacing(
+            14,
+        )
+
+        grid.setVerticalSpacing(
+            10,
+        )
+
+        factura_proveedor = QWidget()
+
+        layout_factura_proveedor = QHBoxLayout(
+            factura_proveedor,
+        )
+
+        layout_factura_proveedor.setContentsMargins(
+            0,
+            0,
+            0,
+            0,
+        )
+
+        layout_factura_proveedor.setSpacing(
+            8,
+        )
+
+        layout_factura_proveedor.addWidget(
+            self.txt_prefijo,
+        )
+
+        layout_factura_proveedor.addWidget(
+            self.txt_numero_proveedor,
+            1,
+        )
+
+        filas_izquierda = (
+            ("Proveedor", self.proveedor),
+            ("NIT", self.txt_nit),
+            ("Razón social", self.txt_razon),
+        )
+
+        filas_derecha = (
+            ("Número interno", self.txt_numero),
+            ("Fecha", self.fecha),
+            ("Factura del proveedor", factura_proveedor),
+        )
+
+        for fila, (texto, widget) in enumerate(
+            filas_izquierda,
+        ):
+
+            grid.addWidget(
+                QLabel(texto),
+                fila,
+                0,
+            )
+
+            grid.addWidget(
+                widget,
+                fila,
+                1,
+            )
+
+        for fila, (texto, widget) in enumerate(
+            filas_derecha,
+        ):
+
+            grid.addWidget(
+                QLabel(texto),
+                fila,
+                2,
+            )
+
+            grid.addWidget(
+                widget,
+                fila,
+                3,
+            )
+
         grid.setColumnStretch(
             1,
-            1,
+            3,
         )
 
         grid.setColumnStretch(
             3,
-            1,
+            2,
         )
 
         grid.setColumnMinimumWidth(
             0,
-            120,
+            110,
         )
 
         grid.setColumnMinimumWidth(
             2,
-            120,
+            150,
         )
 
-        cabecera.agregar_widget(
-            panel_cabecera,
-        )
-
-        cabecera.layout_principal.setContentsMargins(
-            16,
-            20,
-            16,
-            20,
-        )
-
-        self.setMinimumWidth(
-            self.ancho,
-        )
-
-        self.agregar_widget(
+        hoja.agregar_widget(
             cabecera,
         )
 
-        lineas_card = Card(
-            "Líneas",
+        # ---------------- Más datos (plegable) ----------------
+        self.btn_mas_datos = QPushButton(
+            "▸  Más datos (CUFE, consecutivo, formato de impresión)",
         )
 
+        self.btn_mas_datos.setObjectName(
+            "BotonEnlace",
+        )
+
+        self.btn_mas_datos.setCheckable(
+            True,
+        )
+
+        self.btn_mas_datos.setCursor(
+            Qt.CursorShape.PointingHandCursor,
+        )
+
+        self.panel_mas_datos = QWidget()
+
+        grid_mas = QGridLayout(
+            self.panel_mas_datos,
+        )
+
+        grid_mas.setContentsMargins(
+            0,
+            0,
+            0,
+            0,
+        )
+
+        grid_mas.setHorizontalSpacing(
+            14,
+        )
+
+        grid_mas.setVerticalSpacing(
+            10,
+        )
+
+        grid_mas.addWidget(
+            QLabel("CUFE"),
+            0,
+            0,
+        )
+
+        grid_mas.addWidget(
+            self.txt_cufe,
+            0,
+            1,
+            1,
+            3,
+        )
+
+        grid_mas.addWidget(
+            QLabel("Consecutivo"),
+            1,
+            0,
+        )
+
+        grid_mas.addWidget(
+            self.txt_consecutivo,
+            1,
+            1,
+        )
+
+        grid_mas.addWidget(
+            QLabel("Formato de impresión"),
+            1,
+            2,
+        )
+
+        grid_mas.addWidget(
+            self.formato,
+            1,
+            3,
+        )
+
+        grid_mas.setColumnMinimumWidth(
+            0,
+            110,
+        )
+
+        grid_mas.setColumnMinimumWidth(
+            2,
+            150,
+        )
+
+        grid_mas.setColumnStretch(
+            1,
+            3,
+        )
+
+        grid_mas.setColumnStretch(
+            3,
+            2,
+        )
+
+        self.panel_mas_datos.setVisible(
+            False,
+        )
+
+        def _alternar_mas_datos(
+            visible: bool,
+        ) -> None:
+
+            self.panel_mas_datos.setVisible(
+                visible,
+            )
+
+            self.btn_mas_datos.setText(
+                ("▾" if visible else "▸")
+                + "  Más datos (CUFE, consecutivo, formato de impresión)",
+            )
+
+        self.btn_mas_datos.toggled.connect(
+            _alternar_mas_datos,
+        )
+
+        # Si la factura ya trae CUFE (importada del XML o guardada),
+        # se muestran esos datos sin tener que desplegarlos.
+        self.txt_cufe.textChanged.connect(
+            lambda texto: self.btn_mas_datos.setChecked(
+                True,
+            )
+            if texto.strip()
+            else None,
+        )
+
+        hoja.agregar_widget(
+            self.btn_mas_datos,
+        )
+
+        hoja.agregar_widget(
+            self.panel_mas_datos,
+        )
+
+        # ---------------- Tabla de líneas ----------------
         self.tabla = QTableWidget(
             0,
             6,
@@ -435,67 +577,244 @@ class FormularioFacturaCompra(Page):
             QHeaderView.ResizeMode.Stretch,
         )
 
-        lineas_card.agregar_widget(
+        self.tabla.verticalHeader().setVisible(
+            False,
+        )
+
+        # Filas más altas: antes los campos de cantidad, precio e IVA
+        # quedaban recortados dentro de la celda.
+        self.tabla.verticalHeader().setDefaultSectionSize(
+            44,
+        )
+
+        self.tabla.setMinimumHeight(
+            200,
+        )
+
+        hoja.agregar_widget(
             self.tabla,
         )
 
-        self.agregar_widget(
-            lineas_card,
+        btn_agregar = QPushButton(
+            "+  Agregar línea",
         )
 
-        acciones_lineas = QHBoxLayout()
-
-        btn_agregar = QPushButton(
-            "Agregar línea",
+        btn_agregar.setObjectName(
+            "BotonAgregarLinea",
         )
 
         btn_agregar.clicked.connect(
             self._agregar_fila,
         )
 
-        btn_importar = QPushButton(
-            "Importar XML DIAN",
+        # ---------------- Observaciones + totales ----------------
+        pie = QHBoxLayout()
+
+        pie.setSpacing(
+            16,
         )
 
-        btn_importar.clicked.connect(
-            self._importar_xml,
+        columna_izquierda = QVBoxLayout()
+
+        columna_izquierda.setSpacing(
+            8,
         )
 
-        acciones_lineas.addWidget(
+        columna_izquierda.addWidget(
             btn_agregar,
+            0,
+            Qt.AlignmentFlag.AlignLeft,
         )
-        acciones_lineas.addWidget(
-            btn_importar,
+
+        lbl_observaciones = QLabel(
+            "Observaciones",
         )
-        acciones_lineas.addStretch()
+
+        lbl_observaciones.setObjectName(
+            "DocumentoEtiquetaSeccion",
+        )
+
+        columna_izquierda.addWidget(
+            lbl_observaciones,
+        )
+
+        columna_izquierda.addWidget(
+            self.observaciones,
+        )
+
+        columna_izquierda.addStretch()
+
+        pie.addLayout(
+            columna_izquierda,
+            1,
+        )
+
+        panel_totales = QWidget()
+
+        panel_totales.setObjectName(
+            "PanelTotalesDocumento",
+        )
+
+        panel_totales.setAttribute(
+            Qt.WidgetAttribute.WA_StyledBackground,
+            True,
+        )
+
+        panel_totales.setMinimumWidth(
+            330,
+        )
+
+        panel_totales.setMaximumWidth(
+            380,
+        )
+
+        grid_totales = QGridLayout(
+            panel_totales,
+        )
+
+        grid_totales.setContentsMargins(
+            14,
+            12,
+            14,
+            12,
+        )
+
+        grid_totales.setHorizontalSpacing(
+            10,
+        )
+
+        grid_totales.setVerticalSpacing(
+            8,
+        )
 
         self.lbl_subtotal = QLabel(
             "Subtotal: $ 0",
         )
+
         self.lbl_iva = QLabel(
             "IVA: $ 0",
         )
+
         self.lbl_total = QLabel(
             "Total: $ 0",
         )
 
-        acciones_lineas.addWidget(
-            self.lbl_subtotal,
-        )
-        acciones_lineas.addWidget(
-            self.lbl_iva,
-        )
-        acciones_lineas.addWidget(
-            self.lbl_total,
+        self.lbl_total.setObjectName(
+            "DocumentoTotal",
         )
 
-        self.agregar_layout(
-            acciones_lineas,
+        for lbl_valor in (
+            self.lbl_subtotal,
+            self.lbl_iva,
+            self.lbl_total,
+        ):
+
+            lbl_valor.setAlignment(
+                Qt.AlignmentFlag.AlignRight
+                | Qt.AlignmentFlag.AlignVCenter,
+            )
+
+        grid_totales.addWidget(
+            self.lbl_subtotal,
+            0,
+            0,
+            1,
+            2,
+        )
+
+        grid_totales.addWidget(
+            self.lbl_iva,
+            1,
+            0,
+            1,
+            2,
+        )
+
+        for fila, (texto, celda) in enumerate(
+            (
+                ("Retefuente", self.celda_retefuente),
+                ("ReteICA", self.celda_reteica),
+                ("ReteIVA", self.celda_reteiva),
+            ),
+            start=2,
+        ):
+
+            etiqueta_ret = QLabel(
+                texto,
+            )
+
+            etiqueta_ret.setAlignment(
+                Qt.AlignmentFlag.AlignRight
+                | Qt.AlignmentFlag.AlignVCenter,
+            )
+
+            grid_totales.addWidget(
+                etiqueta_ret,
+                fila,
+                0,
+            )
+
+            grid_totales.addWidget(
+                celda,
+                fila,
+                1,
+            )
+
+        grid_totales.addWidget(
+            self.lbl_total,
+            5,
+            0,
+            1,
+            2,
+        )
+
+        grid_totales.setColumnStretch(
+            1,
+            1,
+        )
+
+        pie.addWidget(
+            panel_totales,
+            0,
+            Qt.AlignmentFlag.AlignTop,
+        )
+
+        hoja.agregar_layout(
+            pie,
+        )
+
+        # ---------------- Botones ----------------
+        separador = QFrame()
+
+        separador.setObjectName(
+            "DocumentoSeparador",
+        )
+
+        separador.setFrameShape(
+            QFrame.Shape.HLine,
+        )
+
+        hoja.agregar_widget(
+            separador,
         )
 
         barra = QHBoxLayout()
 
+        barra.setSpacing(
+            8,
+        )
+
         barra.addStretch()
+
+        btn_cerrar = Botones.cerrar()
+
+        btn_cerrar.setText(
+            "Cancelar",
+        )
+
+        btn_cerrar.clicked.connect(
+            self.cerrar.emit,
+        )
 
         btn_guardar = Botones.guardar()
 
@@ -503,21 +822,27 @@ class FormularioFacturaCompra(Page):
             self.guardar,
         )
 
-        btn_cerrar = Botones.cerrar()
-
-        btn_cerrar.clicked.connect(
-            self.cerrar.emit,
+        barra.addWidget(
+            btn_cerrar,
         )
 
         barra.addWidget(
             btn_guardar,
         )
-        barra.addWidget(
-            btn_cerrar,
+
+        hoja.agregar_layout(
+            barra,
         )
 
-        self.agregar_layout(
-            barra,
+        self.setMinimumWidth(
+            min(
+                self.ancho,
+                980,
+            ),
+        )
+
+        self.agregar_widget(
+            hoja,
         )
 
         if not self.es_edicion:
