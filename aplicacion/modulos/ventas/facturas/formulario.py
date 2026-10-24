@@ -131,6 +131,8 @@ class FormularioFacturaVenta(
             1,
         )
 
+        self._aplicar_diseno_escritorio()
+
         self._recalcular_totales()
 
         QTimer.singleShot(

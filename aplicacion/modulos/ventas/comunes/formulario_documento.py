@@ -60,6 +60,8 @@ class FormularioDocumentoVenta(
 
         self._adaptar_interfaz_documento()
 
+        self._aplicar_diseno_escritorio()
+
     def _adaptar_interfaz_documento(
         self,
     ):
