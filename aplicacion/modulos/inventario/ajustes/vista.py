@@ -174,6 +174,24 @@ class AjustesInventarioPage(Page):
         layout.addLayout(botones)
         layout.addStretch()
 
+
+        from aplicacion.framework.ui.documento_escritorio import (
+
+            aplicar_diseno_documento,
+
+        )
+
+
+        aplicar_diseno_documento(
+
+            self,
+
+            "Ajuste de inventario",
+
+            area="inventarios",
+
+        )
+
     def _producto_seleccionado(
         self,
         _resultado,

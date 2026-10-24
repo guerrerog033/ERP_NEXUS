@@ -1822,6 +1822,15 @@ def _envolver_layout(
     return contenedor
 
 
+def _es_guardar(
+    boton,
+) -> bool:
+
+    texto = boton.text().lower()
+
+    return "guardar" in texto or "registrar" in texto
+
+
 def aplicar_diseno_documento(
     pagina,
     titulo: str,
@@ -1900,7 +1909,7 @@ def aplicar_diseno_documento(
             )
 
             if any(
-                "guardar" in boton.text().lower()
+                _es_guardar(boton)
                 for boton in encontrados
             ):
 
@@ -2000,7 +2009,7 @@ def aplicar_diseno_documento(
 
         texto = boton.text().lower()
 
-        if "guardar" in texto and boton_guardar is None:
+        if _es_guardar(boton) and boton_guardar is None:
 
             boton_guardar = boton
 
@@ -2324,9 +2333,18 @@ def aplicar_diseno_documento(
 
             pagina.cerrar.emit()
 
-    atajos = [
-        ("Escape", cerrar_con_escape),
-    ]
+    puede_cerrar = boton_cerrar is not None or hasattr(
+        pagina,
+        "cerrar",
+    )
+
+    atajos = (
+        [
+            ("Escape", cerrar_con_escape),
+        ]
+        if puede_cerrar
+        else []
+    )
 
     teclas = []
 
@@ -2380,9 +2398,11 @@ def aplicar_diseno_documento(
         ("Tab", "Siguiente campo", lambda: pagina.focusNextChild()),
     )
 
-    teclas.append(
-        ("Esc", "Cerrar", cerrar_con_escape),
-    )
+    if puede_cerrar:
+
+        teclas.append(
+            ("Esc", "Cerrar", cerrar_con_escape),
+        )
 
     registrar_atajos(
         pagina,

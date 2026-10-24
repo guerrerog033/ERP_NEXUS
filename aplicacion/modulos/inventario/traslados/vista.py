@@ -135,6 +135,24 @@ class TrasladosInventarioPage(Page):
         layout.addLayout(botones)
         layout.addStretch()
 
+
+        from aplicacion.framework.ui.documento_escritorio import (
+
+            aplicar_diseno_documento,
+
+        )
+
+
+        aplicar_diseno_documento(
+
+            self,
+
+            "Traslado entre bodegas",
+
+            area="inventarios",
+
+        )
+
     def _producto_seleccionado(
         self,
         _resultado,
