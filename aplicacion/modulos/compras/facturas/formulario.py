@@ -1079,8 +1079,17 @@ class FormularioFacturaCompra(Page):
         btn_borrar = QPushButton(
             "✕",
         )
-        btn_borrar.setFixedWidth(
-            28,
+        btn_borrar.setObjectName(
+            "BotonQuitarFila",
+        )
+
+        btn_borrar.setToolTip(
+            "Quitar esta línea",
+        )
+
+        btn_borrar.setFixedSize(
+            30,
+            30,
         )
         btn_borrar.clicked.connect(
             lambda _c=False, f=fila: self._borrar_fila(
