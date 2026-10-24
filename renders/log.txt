@@ -1,0 +1,42 @@
+usuario <aplicacion.autenticacion.modelos.Usuario object at 0x7fbb5b046fd0>
+captura renders/01_inicio.png
+captura renders/02_menu_ventas.png
+captura renders/03_lista_cotizaciones.png
+captura renders/04_nueva_cotizacion.png
+captura renders/05_nueva_factura.png
+captura renders/06_nuevo_cliente.png
+captura renders/07_nuevo_producto.png
+captura renders/08_lista_facturas.png
+captura renders/09_nuevo_pedido.png
+captura renders/10_compras.png
+captura renders/11_nueva_factura_compra.png
+captura renders/12_nuevo_documento_soporte.png
+captura renders/13_ordenes_compra.png
+captura renders/14_nuevo_recibo_caja.png
+captura renders/15_nuevo_egreso.png
+ERROR en 16_nuevo_comprobante
+Traceback (most recent call last):
+  File "/home/runner/work/ERP_NEXUS/ERP_NEXUS/scripts/dev/render_pantallas.py", line 83, in paso
+    funcion()
+    ~~~~~~~^^
+  File "/home/runner/work/ERP_NEXUS/ERP_NEXUS/scripts/dev/render_pantallas.py", line 133, in <lambda>
+    paso("16_nuevo_comprobante", lambda: abrir_nuevo("ComprobantesContables"))
+                                         ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/ERP_NEXUS/ERP_NEXUS/scripts/dev/render_pantallas.py", line 108, in abrir_nuevo
+    maestro.nuevo()
+    ~~~~~~~~~~~~~^^
+  File "/home/runner/work/ERP_NEXUS/ERP_NEXUS/aplicacion/framework/crud/crud_formulario_dialog.py", line 406, in nuevo
+    self._mostrar_dialogo_formulario()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/runner/work/ERP_NEXUS/ERP_NEXUS/aplicacion/framework/crud/crud_formulario_dialog.py", line 282, in _mostrar_dialogo_formulario
+    formulario_pestana = self._abrir_formulario_en_pestana(
+        id_registro,
+        modo=modo,
+    )
+  File "/home/runner/work/ERP_NEXUS/ERP_NEXUS/aplicacion/framework/crud/crud_formulario_dialog.py", line 243, in _abrir_formulario_en_pestana
+    formulario = self.crear_formulario(
+        id_registro=id_registro,
+        modo=modo,
+    )
+TypeError: MaestroComprobantes.crear_formulario() got an unexpected keyword argument 'modo'
+
