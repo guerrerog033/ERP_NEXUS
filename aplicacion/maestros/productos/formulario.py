@@ -245,10 +245,55 @@ class FormularioProducto(FormularioBase):
 
         if "Identificación" in grupos:
 
+            # Identificación en dos columnas (como World Office) para
+            # que la ficha quepa sin desplazarse.
+            from aplicacion.framework.ui.documento_escritorio import (
+                _caja_desde_formulario,
+            )
+
+            grupo_id = grupos["Identificación"]
+
+            caja_id = _caja_desde_formulario(
+                grupo_id.layout(),
+                set(),
+            )
+
+            caja_id.setTitle(
+                "Identificación",
+            )
+
+            caja_id.setObjectName(
+                "FormGroupBox",
+            )
+
+            grupo_id.hide()
+
+            grupos["Identificación"] = caja_id
+
             fila_superior.addWidget(
-                grupos["Identificación"],
+                caja_id,
                 1,
             )
+
+        for grupo in grupos.values():
+
+            interno = grupo.layout()
+
+            if isinstance(
+                interno,
+                QFormLayout,
+            ):
+
+                interno.setContentsMargins(
+                    12,
+                    10,
+                    12,
+                    10,
+                )
+
+                interno.setVerticalSpacing(
+                    6,
+                )
 
         self.imagen_widget = ImagenProductoWidget()
 
