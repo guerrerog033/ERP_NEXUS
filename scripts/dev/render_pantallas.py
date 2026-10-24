@@ -132,6 +132,18 @@ def main():
     paso("15_nuevo_egreso", lambda: abrir_nuevo("ComprobantesEgreso"))
     paso("16_nuevo_comprobante", lambda: abrir_nuevo("ComprobantesContables"))
 
+    def nueva_orden():
+        dashboard.modulo_seleccionado("OrdenesCompra")
+        esperar(600)
+        from aplicacion.modulos.compras.ordenes.vista import OrdenesCompraPage
+        for pagina in dashboard.area_trabajo.findChildren(OrdenesCompraPage):
+            pagina._nueva()
+            return
+        raise RuntimeError("sin pagina ordenes")
+
+    paso("17_nueva_orden_compra", nueva_orden)
+    paso("18_ajustes_inventario", lambda: dashboard.modulo_seleccionado("AjustesInventario"))
+
     LOG.close()
 
 
