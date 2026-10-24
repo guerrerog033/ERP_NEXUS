@@ -37,15 +37,21 @@ def main():
     from aplicacion.interfaz.dashboard import Dashboard
     d = Dashboard(usuario, embebido=True); d.resize(1440, 860); d.show(); esperar()
     espia = Espia(); app.installEventFilter(espia)
-    for modulo in ("Clientes", "Proveedores", "Productos", "Cotizaciones", "FacturasVenta", "FacturasCompra"):
-        log("=" * 20, "abrir", modulo)
+    from aplicacion.framework.menu_manifest import MODULOS
+    fallos = []
+    for modulo in MODULOS:
         t0 = time.perf_counter()
-        d.modulo_seleccionado(modulo)
-        t1 = time.perf_counter()
-        esperar(1500)
-        area = d.area_trabajo
-        log(f"tiempo modulo_seleccionado: {t1-t0:.2f}s")
-        log("pestañas:", [area.tabText(i) for i in range(area.count())])
+        try:
+            d.modulos.abrir(modulo)
+            esperar(300)
+            log(f"OK {modulo} {time.perf_counter()-t0:.2f}s")
+        except Exception as exc:
+            fallos.append(modulo)
+            log(f"FALLA {modulo}: {type(exc).__name__}: {exc}")
+            log(traceback.format_exc(limit=6))
+        while d.area_trabajo.count() > 1:
+            d.area_trabajo.cerrar_pestana(d.area_trabajo.count() - 1)
+    log("RESUMEN FALLOS:", fallos)
     LOG.close()
 
 if __name__ == "__main__":
